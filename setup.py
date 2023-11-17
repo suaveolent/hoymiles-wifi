@@ -6,4 +6,10 @@ setup(
     version='0.0.1',
     description='A python library for interfacing with Hoymiles HMS-XXXXW-T2 series of micro-inverters.',
     author='suaveolent',
+    include_package_data=True,
+    entry_points={
+    'console_scripts': [
+        'hoymiles-wifi = hoymiles_wifi.__main__:main',
+    ],
+}
 )

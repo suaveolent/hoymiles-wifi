@@ -1,6 +1,6 @@
 import socket
 import struct
-from protos.RealData_pb2 import RealDataResDTO, HMSStateResponse
+from hoymiles_wifi.protos.RealData_pb2 import RealDataResDTO, HMSStateResponse
 import crcmod
 import logging
 from datetime import datetime

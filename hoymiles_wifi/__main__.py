@@ -1,4 +1,4 @@
-from inverter import Inverter
+from hoymiles_wifi.inverter import Inverter
 import time
 
 def main():
