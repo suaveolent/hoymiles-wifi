@@ -1,9 +1,13 @@
+import argparse
 from hoymiles_wifi.inverter import Inverter
 import time
 
 def main():
-    # Replace 'your_inverter_ip' with the actual IP address or hostname of your inverter
-    inverter = Inverter('192.168.1.190')
+    parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
+    parser.add_argument("ip_address", type=str, help="IP address or hostname of the inverter")
+    args = parser.parse_args()
+
+    inverter = Inverter(args.ip_address)
 
     try:
         while True:

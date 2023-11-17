@@ -15,7 +15,7 @@ You can integrate the library into your own project, or simply use it in the com
 ### Command line:
 
 ```
-hoymiles-wifi
+hoymiles-wifi <ip_address>
 ```
 
 This will retrieve the current inverter state.
@@ -25,7 +25,7 @@ This will retrieve the current inverter state.
 ```
 from hoymiles_wifi.inverter import Inverter
 
-inverter = Inverter('192.168.1.190')
+inverter = Inverter(<ip_address>)
 response = inverter.update_state()
 
 if response:
