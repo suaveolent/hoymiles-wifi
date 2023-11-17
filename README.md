@@ -5,7 +5,7 @@ This Python library facilitates communication with Hoymiles HMS microinverters, 
 ## Installation
 
 ```
-$ pip install your-library-name
+$ pip install hoymiles-wifi
 ```
 
 ## Usage
