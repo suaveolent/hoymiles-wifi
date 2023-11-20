@@ -1,6 +1,10 @@
 # hoymiles-wifi
 
+
 This Python library facilitates communication with Hoymiles HMS microinverters, specifically targeting the HMS-XXXXW-T2 series. A special thank you to [DennisOSRM](https://github.com/DennisOSRM) for the inspiration and codebase from the [hms-mqtt-publisher](https://github.com/DennisOSRM/hms-mqtt-publisher) repository.
+
+**Disclaimer: This library is not affiliated with Hoymiles. It is an independent project developed to provide tools for interacting with Hoymiles HMS-XXXXW-T2 series micro-inverters featuring integrated WiFi DTU. Any trademarks or product names mentioned are the property of their respective owners.**
+
 
 ## Installation
 
