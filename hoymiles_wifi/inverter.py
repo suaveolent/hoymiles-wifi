@@ -1,12 +1,10 @@
 import socket
 import struct
+from hoymiles_wifi import logger
 from hoymiles_wifi.protos.RealData_pb2 import RealDataResDTO, HMSStateResponse
 import crcmod
-import logging
 from datetime import datetime
 import time
-
-logging.basicConfig(level=logging.INFO)
 
 INVERTER_PORT = 10081
 
@@ -24,7 +22,7 @@ class Inverter:
     def set_state(self, new_state):
         if self.state != new_state:
             self.state = new_state
-            logging.info(f"Inverter is {new_state}")
+            logger.info(f"Inverter is {new_state}")
 
     def update_state(self):
         self.sequence = (self.sequence + 1) & 0xFFFF
@@ -46,7 +44,7 @@ class Inverter:
 
         len_bytes = struct.pack('>H', len(request_as_bytes) + 10)
 
-        message = header + struct.pack('>HHH', self.sequence, crc16, len(request_as_bytes)) + request_as_bytes
+        message = header + struct.pack('>HHH', self.sequence, crc16, len_bytes) + request_as_bytes
 
         ip = socket.gethostbyname(self.host)
         address = (ip, INVERTER_PORT)
@@ -56,7 +54,7 @@ class Inverter:
                 stream.sendall(message)
                 buf = stream.recv(1024)
         except socket.error as e:
-            logging.debug(str(e))
+            logger.error(str(e))
             self.set_state(NetworkState.Offline)
             return None
 
@@ -64,7 +62,7 @@ class Inverter:
         parsed = HMSStateResponse.FromString(buf[10:10 + read_length])
 
         if parsed is None:
-            logging.debug("Error parsing response")
+            logger.error("Error parsing response")
             self.set_state(NetworkState.Offline)
             return None
 

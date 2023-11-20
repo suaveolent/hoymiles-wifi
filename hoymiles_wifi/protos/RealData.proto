@@ -34,13 +34,13 @@ message PortState {
 }
 
 message HMSStateResponse {
-  bytes dtu_sn = 1;             // serial
-  int32 time = 2;               // epoch
-  int32 device_nub = 3;
-  int32 pv_nub = 4;             // repeats cp field from request
-  int32 package_nub = 5;
+  string dtu_sn = 1;             // serial
+  int32  time = 2;               // epoch
+  int32  device_nub = 3;
+  int32  pv_nub = 4;             // repeats cp field from request
+  int32  package_nub = 5;
   repeated InverterState inverter_state = 9;
   repeated PortState port_state = 11;
-  int32 pv_current_power = 12;  // [W], factor 0.1
-  int32 pv_daily_yield = 13;    // [Wh]
+  int32  pv_current_power = 12;  // [W], factor 0.1
+  int32  pv_daily_yield = 13;    // [Wh]
 }
