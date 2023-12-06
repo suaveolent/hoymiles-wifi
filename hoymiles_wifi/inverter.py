@@ -2,9 +2,10 @@ import socket
 import struct
 from hoymiles_wifi import logger
 from hoymiles_wifi.protos.RealData_pb2 import RealDataResDTO, HMSStateResponse
-import crcmod
+from crcmod import mkCrcFun
 from datetime import datetime
 import time
+
 
 INVERTER_PORT = 10081
 
@@ -34,35 +35,30 @@ class Inverter:
         # request.cp = 23 + self.sequence
         # request.offset = 0
         # request.time = int(time.time())
-        
         header = b"\x48\x4d\xa3\x03"
-        
         request_as_bytes = request.SerializeToString()
-        crc16_func = crcmod.predefined.Crc('modbus')
-        crc16_func.update(request_as_bytes)
-        crc16 = crc16_func.crcValue & 0xFFFF
+        crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(request_as_bytes)
+        length = len(request_as_bytes) + 10
 
-        len_bytes = struct.pack('>H', len(request_as_bytes) + 10)
+        # compose request message
+        message = header + struct.pack('>HHHH', self.sequence, crc16, length, 0) + request_as_bytes
 
-        message = header + struct.pack('>HHH', self.sequence, crc16, len_bytes) + request_as_bytes
-
-        ip = socket.gethostbyname(self.host)
-        address = (ip, INVERTER_PORT)
-
+        address = (self.host, INVERTER_PORT)
         try:
             with socket.create_connection(address, timeout=0.5) as stream:
+                stream.settimeout(5)
                 stream.sendall(message)
                 buf = stream.recv(1024)
-        except socket.error as e:
-            logger.error(str(e))
+        except (socket.error, socket.timeout) as e:
+            logger.debug(f"{e}")
             self.set_state(NetworkState.Offline)
             return None
 
         read_length = struct.unpack('>H', buf[6:8])[0]
-        parsed = HMSStateResponse.FromString(buf[10:10 + read_length])
+        parsed = HMSStateResponse.FromString(buf[10:10+read_length])
 
-        if parsed is None:
-            logger.error("Error parsing response")
+        if not parsed:
+            logger.debug(f"Failed to parse response")
             self.set_state(NetworkState.Offline)
             return None
 
