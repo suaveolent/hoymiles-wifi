@@ -42,8 +42,8 @@ else:
 
 Please be aware of the following considerations:
 
- - No DTU Implementation: Unlike the original tool, this library
-   retrieves information directly from the internal DTU of Hoymiles
+ - No DTU Implementation: This library
+   retrieves information directly from the internal DTU of Hoymiles Wifi
    inverters.
 
 ## Caution
