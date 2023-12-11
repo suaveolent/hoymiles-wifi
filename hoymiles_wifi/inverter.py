@@ -55,10 +55,15 @@ class Inverter:
             return None
 
         read_length = struct.unpack('>H', buf[6:8])[0]
-        parsed = HMSStateResponse.FromString(buf[10:10+read_length])
 
-        if not parsed:
-            logger.debug(f"Failed to parse response")
+        try:
+            parsed = HMSStateResponse.FromString(buf[10:10+read_length])
+
+            if not parsed:
+                raise ValueError("Parsing resulted in an empty or falsy value")
+        
+        except Exception as e:
+            logger.debug(f"Failed to parse response: {e}")
             self.set_state(NetworkState.Offline)
             return None
 
