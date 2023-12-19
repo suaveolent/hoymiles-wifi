@@ -5,60 +5,21 @@ import time
 def main():
     parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
     parser.add_argument("ip_address", type=str, help="IP address or hostname of the inverter")
+    parser.add_argument("command", type=str, choices=['get-real-data-new', 'get-real-data-hms', 'get-real-data', 'get-config', 'network-info', 'app-information-data', 'app-get-hist-power'], help="Command to execute")
     args = parser.parse_args()
 
     inverter = Inverter(args.ip_address)
 
-    try:
-        while True:
+    # Execute the specified command
+    response = getattr(inverter, args.command.replace('-', '_'), lambda: None)()
+    
+    if response:
+        print(f"{args.command.capitalize()} Response: {response}")
+    else:
+        print(f"Unable to retrieve {args.command.replace('_', ' ')}")
 
-            response = inverter.get_real_data_new()
-            if response:
-                print(f"Get Real Data New Response: {response}")
-            else:
-                print("Unable to retrieve real data new")
-
-            response = inverter.get_real_data_hms()
-            if response:
-                print(f"Get Real Data HMS Response: {response}")
-            else:
-                print("Unable to retrieve real data hms")
-
-            response = inverter.get_real_data()
-            if response:
-                print(f"Get Real Data Response: {response}")
-            else:
-                print("Unable to retrieve real data")
-
-            response = inverter.get_config()
-            if response:
-                print(f"Get Config Response: {response}")
-            else:
-                print("Unable to retrieve config")
-
-            response = inverter.network_info()
-            if response:
-                print(f"Get Networking Info Response: {response}")
-            else:
-                print("Unable to retrieve network info")
-
-            response = inverter.app_information_data()
-            if response:
-                print(f"Get App Info Response: {response}")
-            else:
-                print("Unable to retrieve network info")
-
-            response = inverter.app_get_hist_power()
-            if response:
-                print(f"Get App Hist Power: {response}")
-            else:
-                print("Unable to retrieve app hist power")
-
-
-            # Sleep for a while before the next update
-            time.sleep(60)
-    except KeyboardInterrupt:
-        print("Exiting.")
+    # Sleep for a while before the next update
+    time.sleep(60)
 
 if __name__ == "__main__":
     main()
