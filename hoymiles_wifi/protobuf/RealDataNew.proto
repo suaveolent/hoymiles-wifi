@@ -84,7 +84,7 @@ message TGSMO {
     int32 warning_number = 17;             // Warning number
     int32 crc_checksum = 18;               // CRC checksum
     int32 link_status = 19;                // Link status indicator
-    int32 modulation_index_signal = 20;   // Modulation index signal
+    int32 modulation_index_signal = 20;    // Modulation index signal
 }
 
 message PvMO {
@@ -116,8 +116,8 @@ message RealDataNewReqDTO {
 
 message RealDataNewResDTO {
     string timestamp_ymd_hms = 1;          // Timestamp in the format YMD_HMS
-    int32 cumulative_power = 2;           // Cumulative power (Watt-hours)
+    int32 cumulative_power = 2;            // Cumulative power (Watt-hours)
     int32 error_code = 3;                  // Error code indicator
     int32 offset = 4;                      // Offset value
-    int32 timestamp = 5;                   // Timestamp value
+    int32 time = 5;                        // Timestamp value
 }
