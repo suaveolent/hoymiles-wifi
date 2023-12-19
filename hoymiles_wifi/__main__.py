@@ -12,7 +12,7 @@ def main():
     try:
         while True:
 
-            response = inverter.get_real_data()
+            response = inverter.get_real_data_hms()
             if response:
                 print(f"Get Real Data Response: {response}")
             else:
