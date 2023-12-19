@@ -8,6 +8,7 @@ import warnings
 
 from hoymiles_wifi.protobuf import (
     APPInfomationData_pb2,
+    AppGetHistPower_pb2,
     GetConfig_pb2,
     RealData_pb2,
     RealDataNew_pb2,
@@ -23,6 +24,7 @@ from hoymiles_wifi.const import (
     CMD_REAL_DATA_RES_DTO,
     CMD_NETWORK_INFO_RES,
     CMD_APP_INFO_DATA_RES_DTO,
+    CMD_APP_GET_HIST_POWER_RES,
 )
 
 class NetworkState:
@@ -84,6 +86,13 @@ class Inverter:
         request.time = int(time.time())
         command = CMD_APP_INFO_DATA_RES_DTO
         return self.send_request(command, request, APPInfomationData_pb2.APPInfoDataReqDTO)
+    
+    def app_get_hist_power(self):
+        request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
+        request.offset = 28800
+        request.requested_time = int(time.time())
+        command = CMD_APP_GET_HIST_POWER_RES
+        return self.send_request(command, request, AppGetHistPower_pb2.AppGetHistPowerReqDTO)
 
     def send_request(self, command, request, response_type):
         self.sequence = (self.sequence + 1) & 0xFFFF

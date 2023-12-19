@@ -17,8 +17,8 @@ message WInfoReqDTO {
 }
 
 message WInfoResDTO {
-  string ymd_hms = 1;     // Timestamp in the format YMD_HMS
-  int32 err_code = 2;     // Error code indicator
+  string time_ymd_hms = 1;     // Timestamp in the format YMD_HMS
+  int32 error_code = 2;     // Error code indicator
   int32 offset = 3;       // Offset value
   int32 time = 4;         // Timestamp value
 }
@@ -38,9 +38,9 @@ message WWVDataReqDTO {
 }
 
 message WWVDataResDTO {
-  string ymd_hms = 1;     // Timestamp in the format YMD_HMS
+  string time_ymd_hms = 1;     // Timestamp in the format YMD_HMS
   int32 package_now = 2;  // Current package number
-  int32 err_code = 3;     // Error code indicator
+  int32 error_code = 3;     // Error code indicator
   int32 offset = 4;       // Offset value
   int32 time = 5;         // Timestamp value
 }

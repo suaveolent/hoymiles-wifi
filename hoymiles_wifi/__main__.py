@@ -48,6 +48,13 @@ def main():
             else:
                 print("Unable to retrieve network info")
 
+            response = inverter.app_get_hist_power()
+            if response:
+                print(f"Get App Hist Power: {response}")
+            else:
+                print("Unable to retrieve app hist power")
+
+
             # Sleep for a while before the next update
             time.sleep(60)
     except KeyboardInterrupt:
