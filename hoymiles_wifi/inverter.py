@@ -7,6 +7,7 @@ import time
 import warnings
 
 from hoymiles_wifi.protobuf import (
+    APPInfomationData_pb2,
     GetConfig_pb2,
     RealData_pb2,
     RealDataNew_pb2,
@@ -21,6 +22,7 @@ from hoymiles_wifi.const import (
     CMD_REAL_RES_DTO,
     CMD_REAL_DATA_RES_DTO,
     CMD_NETWORK_INFO_RES,
+    CMD_APP_INFO_DATA_RES_DTO,
 )
 
 class NetworkState:
@@ -55,9 +57,9 @@ class Inverter:
 
     def get_real_data_new(self):
         request = RealDataNew_pb2.RealDataNewResDTO()
-        request.timestamp_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        request.time_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         request.offset = 28800
-        request.timestamp = int(time.time())
+        request.time = int(time.time())
         command = CMD_REAL_RES_DTO
         return self.send_request(command, request, RealDataNew_pb2.RealDataNewReqDTO)
     
@@ -73,7 +75,15 @@ class Inverter:
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_NETWORK_INFO_RES
-        return self.send_request(command, request, NetworkInfo_pb2.NetworkInfoReqDTO) 
+        return self.send_request(command, request, NetworkInfo_pb2.NetworkInfoReqDTO)
+    
+    def app_information_data(self):
+        request = APPInfomationData_pb2.APPInfoDataResDTO()
+        request.time_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        request.offset = 28800
+        request.time = int(time.time())
+        command = CMD_APP_INFO_DATA_RES_DTO
+        return self.send_request(command, request, APPInfomationData_pb2.APPInfoDataReqDTO)
 
     def send_request(self, command, request, response_type):
         self.sequence = (self.sequence + 1) & 0xFFFF

@@ -75,9 +75,9 @@ message InfoDataReqDTO {
 }
 
 message InfoDataResDTO {
-    string ymd_hms = 1;
+    string time_ymd_hms = 1;
     int32 offset = 2;
     int32 package_now = 3;
-    int32 err_code = 4;
+    int32 error_code = 4;
     int32 time = 5;
 }

@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 message EventDataResDTO {
-  int32 response_offset = 1;        // Offset in the response
-  int32 response_time = 2;          // Timestamp of the response
-  string start_timestamp = 3;       // Start timestamp in YYYY-MM-DD HH:MM:SS format
+  int32 offset = 1;              // Offset in the response
+  int32 time = 2;                // Timestamp of the response
+  string time_ymd_hms = 3;       // Start timestamp in YYYY-MM-DD HH:MM:SS format
 }
 
 message MIEvent {
@@ -20,7 +20,7 @@ message MIEvent {
 }
 
 message EventDataReqDTO {
-  int32 request_offset = 1;         // Offset in the request
-  int32 request_time = 2;           // Timestamp of the request
+  int32 offset = 1;         // Offset in the request
+  int32 time = 2;           // Timestamp of the request
   repeated MIEvent mi_events = 3;   // List of MI (Meter Interface) events
 }
