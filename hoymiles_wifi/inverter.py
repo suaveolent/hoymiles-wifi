@@ -11,6 +11,7 @@ from hoymiles_wifi.protobuf import (
     RealData_pb2,
     RealDataNew_pb2,
     RealDataHMS_pb2,
+    NetworkInfo_pb2,
  )
 
 from hoymiles_wifi.const import (
@@ -19,6 +20,7 @@ from hoymiles_wifi.const import (
     CMD_GET_CONFIG,
     CMD_REAL_RES_DTO,
     CMD_REAL_DATA_RES_DTO,
+    CMD_NETWORK_INFO_RES,
 )
 
 class NetworkState:
@@ -50,7 +52,6 @@ class Inverter:
         request = RealData_pb2.RealDataResDTO()
         command = CMD_REAL_DATA_RES_DTO
         return self.send_request(command, request, RealData_pb2.RealDataReqDTO)
-    
 
     def get_real_data_new(self):
         request = RealDataNew_pb2.RealDataNewResDTO()
@@ -66,6 +67,13 @@ class Inverter:
         request.time = int(time.time()) - 60
         command = CMD_GET_CONFIG
         return self.send_request(command, request, GetConfig_pb2.GetConfigReqDTO)    
+
+    def network_info(self):
+        request = NetworkInfo_pb2.NetworkInfoResDTO()
+        request.offset = 28800
+        request.time = int(time.time())
+        command = CMD_NETWORK_INFO_RES
+        return self.send_request(command, request, NetworkInfo_pb2.NetworkInfoReqDTO) 
 
     def send_request(self, command, request, response_type):
         self.sequence = (self.sequence + 1) & 0xFFFF

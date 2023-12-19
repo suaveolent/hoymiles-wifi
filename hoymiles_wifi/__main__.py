@@ -36,6 +36,12 @@ def main():
             else:
                 print("Unable to retrieve config")
 
+            response = inverter.network_info()
+            if response:
+                print(f"Get Networking Info Response: {response}")
+            else:
+                print("Unable to retrieve network info")
+
             # Sleep for a while before the next update
             time.sleep(60)
     except KeyboardInterrupt:
