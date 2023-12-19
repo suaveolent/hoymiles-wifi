@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-message RealDataResDTO {
-  string ymd_hms = 1;
-  int32 cp = 2;
-  int32 err_code = 3;
-  int32 offset = 4;
-  int32 time = 5;
+message HMSRealDataResDTO {
+  string ymd_hms = 1;         // YmdHms
+  int32 cp = 2;               // PackageNow
+  int32 err_code = 3;         // ErrCode
+  int32 offset = 4;           // Offset
+  int32 time = 5;             // Time
 }
 
 message InverterState {

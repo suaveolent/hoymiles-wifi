@@ -1,2 +1,1 @@
-recursive-include hoymiles_wifi/protos *.proto
-recursive-include hoymiles_wifi/protos *.py
+recursive-include hoymiles_wifi/protobuf *.py

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+message EventDataResDTO {
+  int32 response_offset = 1;        // Offset in the response
+  int32 response_time = 2;          // Timestamp of the response
+  string start_timestamp = 3;       // Start timestamp in YYYY-MM-DD HH:MM:SS format
+}
+
+message MIEvent {
+  int32 event_code = 1;             // Event code
+  int32 event_status = 2;           // Event status
+  int32 event_count = 3;            // Event count
+  int32 pv_voltage = 4;             // PV voltage
+  int32 grid_voltage = 5;           // Grid voltage
+  int32 grid_frequency = 6;         // Grid frequency
+  int32 grid_power = 7;             // Grid power
+  int32 temperature = 8;            // Temperature
+  int64 mi_id = 9;                  // Meter Interface (MI) ID
+  int32 start_timestamp = 10;       // Start timestamp
+}
+
+message EventDataReqDTO {
+  int32 request_offset = 1;         // Offset in the request
+  int32 request_time = 2;           // Timestamp of the request
+  repeated MIEvent mi_events = 3;   // List of MI (Meter Interface) events
+}

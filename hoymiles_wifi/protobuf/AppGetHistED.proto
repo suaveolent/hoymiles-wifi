@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message AppGetHistEDResDTO {
+  int32 cp = 1;           // Control point identifier
+  int32 oft = 2;          // Offset value
+  uint32 time = 3;        // Timestamp of the response
+}
+
+message APPEnergyInfoMO {
+  uint32 ed = 1;          // Energy data
+  uint32 r_time = 2;      // Relative timestamp
+}
+
+message AppGetHistEDReqDTO {
+  int64 sn = 1;           // Serial number
+  int32 oft = 2;          // Offset value
+  uint32 time = 3;        // Timestamp of the request
+  repeated APPEnergyInfoMO energ = 4;  // APPEnergyInfoMO data array
+}

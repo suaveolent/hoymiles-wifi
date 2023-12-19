@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+message SetConfigResDTO {
+  int32 offset = 1;
+  uint32 time = 2;
+  int32 lock_password = 3;
+  int32 lock_time = 4;
+  int32 limit_power_mypower = 5;
+  int32 zero_export_433_addr = 6;
+  int32 zero_export_enable = 7;
+  int32 netmode_select = 8;
+  int32 channel_select = 9;
+  int32 server_send_time = 10;
+  int32 serverport = 11;
+  string apn_set = 12;
+  string meter_kind = 13;
+  string meter_interface = 14;
+  string wifi_ssid = 15;
+  string wifi_passward = 16;
+  string server_domain_name = 17;
+  int32 inv_type = 18;
+  string dtu_sn = 19;
+  int32 access_model = 20;
+  int32 mac_0 = 21;
+  int32 mac_1 = 22;
+  int32 mac_2 = 23;
+  int32 mac_3 = 24;
+  int32 dhcp_switch = 25;
+  int32 ip_addr_0 = 26;
+  int32 ip_addr_1 = 27;
+  int32 ip_addr_2 = 28;
+  int32 ip_addr_3 = 29;
+  int32 subnet_mask_0 = 30;
+  int32 subnet_mask_1 = 31;
+  int32 subnet_mask_2 = 32;
+  int32 subnet_mask_3 = 33;
+  int32 default_gateway_0 = 34;
+  int32 default_gateway_1 = 35;
+  int32 default_gateway_2 = 36;
+  int32 default_gateway_3 = 37;
+  string apn_name = 38;
+  string apn_passward = 39;
+  int32 sub1g_sweep_switch = 40;
+  int32 sub1g_work_channel = 41;
+  int32 cable_dns_0 = 42;
+  int32 cable_dns_1 = 43;
+  int32 cable_dns_2 = 44;
+  int32 cable_dns_3 = 45;
+  int32 mac_4 = 46;
+  int32 mac_5 = 47;
+  string dtu_ap_ssid = 48;
+  string dtu_ap_pass = 49;
+  int32 app_page = 50;
+}
+
+message SetConfigReqDTO {
+  int32 offset = 1;
+  uint32 time = 2;
+  int32 err_code = 3;
+}

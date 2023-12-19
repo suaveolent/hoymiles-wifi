@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+message STValMO {
+  int32 code = 1;
+  int32 dflt_val = 2;
+  int32 dflt_tim = 3;
+  int32 rslt_val = 4;
+  int32 rslt_tim = 5;
+}
+
+message GPSTValMO {
+  int64 pv_sn = 1;
+  int32 ver = 2;
+  int32 st = 3;
+  int32 gpf = 4;
+  int32 gpf_ver = 5;
+  STValMO hv1_stval = 6;
+  STValMO lv1_stval = 7;
+  STValMO hv2_stval = 8;
+  STValMO lv2_stval = 9;
+  STValMO hf1_stval = 10;
+  STValMO lf1_stval = 11;
+  STValMO hf2_stval = 12;
+  STValMO lf2_stval = 13;
+}
+
+message GPSTReqDTO {
+  string dtu_sn = 1;
+  int32 time = 2;
+  int32 package_nub = 3;
+  int32 package_now = 4;
+  repeated GPSTValMO mGPSTInfo = 5;
+}
+
+message GPSTResDTO {
+  string ymd_hms = 1;
+  int32 offset = 2;
+  int32 package_now = 3;
+  int32 err_code = 4;
+  int32 time = 5;
+}

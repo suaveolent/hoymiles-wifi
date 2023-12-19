@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+message WarnReqDTO {
+  string dtu_sn = 1;
+  int32 time = 2;
+  int32 package_nub = 3;
+  int32 package_now = 4;
+  int32 warn_device = 5;
+  repeated WarnMO warns = 6;
+}
+
+message WarnMO {
+  int64 pv_sn = 1;
+  int32 code = 2;
+  int32 num = 3;
+  int32 s_time = 4;
+  int32 e_time = 5;
+  int32 w_data1 = 6;
+  int32 w_data2 = 7;
+}
+
+message WarnResDTO {
+  string ymd_hms = 1;
+  int32 package_now = 2;
+  int32 err_code = 3;
+  int32 offset = 4;
+  int32 time = 5;
+}
+
+message WaveReqDTO {
+  string dtu_sn = 1;
+  int32 time = 2;
+  int32 package_nub = 3;
+  int32 package_now = 4;
+  int64 pv_sn = 5;
+  int32 code = 6;
+  int32 num = 7;
+  int32 warn_time = 8;
+  int32 data_len = 9;
+  int32 pos = 10;
+  string warn_data = 11;
+}
+
+message WaveResDTO {
+  string ymd_hms = 1;
+  int32 package_now = 2;
+  int32 err_code = 3;
+  int32 offset = 4;
+  int32 time = 5;
+}

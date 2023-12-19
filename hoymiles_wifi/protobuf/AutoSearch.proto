@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+message AutoSearchReqDTO {
+  string dtu_serial_number = 1;    // DTU serial number
+  int32 time = 2;                  // Timestamp of the request
+  int32 package_number = 3;        // Total number of packages
+  int32 current_package = 4;       // Current package number
+  repeated int64 mi_serial_numbers = 5;  // Array of MI (Meter Interface) serial numbers
+}
+
+message AutoSearchResDTO {
+  string ymd_hms = 1;              // Timestamp in the format YMD_HMS
+  int32 offset = 2;                // Offset value
+  int32 current_package = 3;       // Current package number
+  int32 error_code = 4;            // Error code indicator
+  int32 time = 5;                   // Timestamp of the response
+}
