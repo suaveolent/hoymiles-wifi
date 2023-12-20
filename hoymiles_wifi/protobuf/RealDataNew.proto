@@ -89,7 +89,7 @@ message TGSMO {
 
 message PvMO {
     int64 serial_number = 1;               // Serial number of the device
-    int32 phase_index = 2;                 // Phase index
+    int32 port_number = 2;                  // Port number
     int32 voltage = 3;                     // Voltage (Volts)
     int32 current = 4;                     // Current (Amperes)
     int32 power = 5;                       // Power (Watts)
