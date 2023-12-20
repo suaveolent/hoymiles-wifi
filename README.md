@@ -19,7 +19,9 @@ You can integrate the library into your own project, or simply use it in the com
 ### Command line:
 
 ```
-hoymiles-wifi <ip_address>
+hoymiles-wifi [-h] --host HOST <command>
+
+commands: {get-real-data-new, get-real-data-hms, get-real-data, get-config, network-info, app-information-data,app-get-hist-power}
 ```
 
 This will retrieve the current inverter state.
@@ -30,13 +32,23 @@ This will retrieve the current inverter state.
 from hoymiles_wifi.inverter import Inverter
 
 inverter = Inverter(<ip_address>)
-response = inverter.update_state()
+response = inverter.<command>
 
 if response:
-    print(f"Inverter State: {response}")
+    print(f"Inverter Response: {response}")
 else:
-    print("Unable to retrieve inverter state")
+    print("Unable to get response!")
 ```
+
+#### Available functions
+- `get_real_data_new`: Retrieve real-time data
+- `get_real_data_hms`: Retrieve real-time data
+- `get_real_data`: Retrieve real-time data
+- `get_config`: Retrieve configuration information
+- `network_info`: Retrieve network information
+- `app_information_data`: Retrieve application information data
+- `app_get_hist_power`: Retrieve historical power data
+
 
 ## Note
 
