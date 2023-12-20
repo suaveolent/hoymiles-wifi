@@ -93,7 +93,7 @@ class Inverter:
         request.requested_time = int(time.time())
         command = CMD_APP_GET_HIST_POWER_RES
         return self.send_request(command, request, AppGetHistPower_pb2.AppGetHistPowerReqDTO)
-
+    
     def send_request(self, command, request, response_type):
         self.sequence = (self.sequence + 1) & 0xFFFF
 
