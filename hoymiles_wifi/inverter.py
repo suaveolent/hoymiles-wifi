@@ -112,7 +112,7 @@ class Inverter:
                 stream.sendall(message)
                 buf = stream.recv(1024)
         except (socket.error, socket.timeout) as e:
-            logger.error(f"{e}")
+            logger.debug(f"{e}")
             self.set_state(NetworkState.Offline)
             return None
 
@@ -125,7 +125,7 @@ class Inverter:
                 raise ValueError("Parsing resulted in an empty or falsy value")
 
         except Exception as e:
-            logger.debug(f"Failed to parse response: {e}")
+            logger.error(f"Failed to parse response: {e}")
             self.set_state(NetworkState.Offline)
             return None
 
