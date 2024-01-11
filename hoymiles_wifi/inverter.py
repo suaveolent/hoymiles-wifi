@@ -9,6 +9,7 @@ import warnings
 from hoymiles_wifi.protobuf import (
     APPInfomationData_pb2,
     AppGetHistPower_pb2,
+    CommandPB_pb2,
     GetConfig_pb2,
     RealData_pb2,
     RealDataNew_pb2,
@@ -25,6 +26,8 @@ from hoymiles_wifi.const import (
     CMD_NETWORK_INFO_RES,
     CMD_APP_INFO_DATA_RES_DTO,
     CMD_APP_GET_HIST_POWER_RES,
+    CMD_ACTION_POWER_LIMIT,
+    CMD_COMMAND_RES_DTO,
 )
 
 class NetworkState:
@@ -93,6 +96,26 @@ class Inverter:
         request.requested_time = int(time.time())
         command = CMD_APP_GET_HIST_POWER_RES
         return self.send_request(command, request, AppGetHistPower_pb2.AppGetHistPowerReqDTO)
+    
+    def set_power_limit(self, power_limit):
+
+        if(power_limit < 0 or power_limit > 100):
+            logger.error("Error. Invalid power limit!")
+            return
+
+        power_limit = power_limit * 10
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.time = int(time.time())
+        request.action = CMD_ACTION_POWER_LIMIT
+        request.package_nub = 1
+        request.tid = int(time.time())
+        request.data = f'A:{power_limit},B:0,C:0\r'.encode('utf-8')
+
+        command = CMD_COMMAND_RES_DTO
+
+        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+
     
     def send_request(self, command, request, response_type):
         self.sequence = (self.sequence + 1) & 0xFFFF

@@ -1,7 +1,7 @@
 INVERTER_PORT = 10081
 
 # App -> DTU start with 0xa3, responses start 0xa2
-CMD_HEADER = b'\x48\x4d'
+CMD_HEADER = b'HM'
 CMD_APP_INFO_DATA_RES_DTO = b'\xa3\x01'
 CMD_HB_RES_DTO = b'\xa3\x02'
 CMD_REAL_DATA_RES_DTO = b'\xa3\x03'
@@ -27,3 +27,6 @@ CMD_DEV_CONFIG_FETCH_RES_DTO_2 = b'\x83\x07'
 CMD_DEV_CONFIG_PUT_RES_DTO_2 = b'\x83\x08'
 CMD_GET_CONFIG_RES = b'\xdb\x08'
 CMD_SET_CONFIG_RES = b'\xdb\x07'
+
+
+CMD_ACTION_POWER_LIMIT = 8
