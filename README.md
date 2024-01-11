@@ -21,10 +21,8 @@ You can integrate the library into your own project, or simply use it in the com
 ```
 hoymiles-wifi [-h] --host HOST <command>
 
-commands: {get-real-data-new, get-real-data-hms, get-real-data, get-config, network-info, app-information-data,app-get-hist-power}
+commands: {get-real-data-new, get-real-data-hms, get-real-data, get-config, network-info, app-information-data,app-get-hist-power, set-power-limit}
 ```
-
-This will retrieve the current inverter state.
 
 ### Python code
 
@@ -41,13 +39,14 @@ else:
 ```
 
 #### Available functions
-- `get_real_data_new`: Retrieve real-time data
-- `get_real_data_hms`: Retrieve real-time data
-- `get_real_data`: Retrieve real-time data
-- `get_config`: Retrieve configuration information
-- `network_info`: Retrieve network information
-- `app_information_data`: Retrieve application information data
-- `app_get_hist_power`: Retrieve historical power data
+- `get_real_data_new()`: Retrieve real-time data
+- `get_real_data_hms()`: Retrieve real-time data
+- `get_real_data()`: Retrieve real-time data
+- `get_config()`: Retrieve configuration information
+- `network_info()`: Retrieve network information
+- `app_information_data()`: Retrieve application information data
+- `app_get_hist_power()`: Retrieve historical power data
+- `set_power_limit(power_limit)`: Set the power limit of the inverter (0-100%)
 
 
 ## Note
