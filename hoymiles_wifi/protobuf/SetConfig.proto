@@ -17,7 +17,7 @@ message SetConfigResDTO {
   string meter_kind = 13;               // Meter kind
   string meter_interface = 14;          // Meter interface
   string wifi_ssid = 15;                // Wi-Fi SSID
-  string wifi_passward = 16;            // Wi-Fi password
+  string wifi_password = 16;            // Wi-Fi password
   string server_domain_name = 17;       // Server domain name
   int32 inv_type = 18;                  // Inverter type
   string dtu_sn = 19;                   // Data Terminal Unit (DTU) serial number
@@ -40,7 +40,7 @@ message SetConfigResDTO {
   int32 default_gateway_2 = 36;         // Default gateway octet 2
   int32 default_gateway_3 = 37;         // Default gateway octet 3
   string apn_name = 38;                 // APN name
-  string apn_passward = 39;             // APN password
+  string apn_password = 39;             // APN password
   int32 sub1g_sweep_switch = 40;        // Sub-1GHz sweep switch
   int32 sub1g_work_channel = 41;        // Sub-1GHz work channel
   int32 cable_dns_0 = 42;               // Cable DNS octet 0

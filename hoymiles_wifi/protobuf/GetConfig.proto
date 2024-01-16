@@ -22,7 +22,7 @@ message GetConfigReqDTO {
   string meter_kind = 14;                // Meter kind
   string meter_interface = 15;           // Meter interface
   string wifi_ssid = 16;                 // Wifi SSID
-  string wifi_passward = 17;             // Wifi password
+  string wifi_password = 17;             // Wifi password
   string server_domain_name = 18;        // Server domain name
   int32 inv_type = 19;                   // Inverter type
   string dtu_sn = 20;                    // DTU serial number
@@ -46,7 +46,7 @@ message GetConfigReqDTO {
   int32 default_gateway_3 = 38;          // Default gateway byte 3
   string ka_nub = 39;                    // KA number
   string apn_name = 40;                  // APN name
-  string apn_passward = 41;              // APN password
+  string apn_password = 41;              // APN password
   int32 sub1g_sweep_switch = 42;        // Sub1G sweep switch
   int32 sub1g_work_channel = 43;        // Sub1G work channel
   int32 cable_dns_0 = 44;                // Cable DNS byte 0

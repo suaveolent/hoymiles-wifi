@@ -1,10 +1,13 @@
 import socket
 import struct
-from hoymiles_wifi import logger
 from crcmod import mkCrcFun
 from datetime import datetime
 import time
 import warnings
+
+from hoymiles_wifi import logger
+
+from hoymiles_wifi.utils import initialize_set_config
 
 from hoymiles_wifi.protobuf import (
     APPInfomationData_pb2,
@@ -15,7 +18,9 @@ from hoymiles_wifi.protobuf import (
     RealDataNew_pb2,
     RealDataHMS_pb2,
     NetworkInfo_pb2,
+    SetConfig_pb2,
  )
+
 
 from hoymiles_wifi.const import (
     INVERTER_PORT, 
@@ -28,7 +33,15 @@ from hoymiles_wifi.const import (
     CMD_APP_GET_HIST_POWER_RES,
     CMD_ACTION_POWER_LIMIT,
     CMD_COMMAND_RES_DTO,
+    CMD_SET_CONFIG,
+    CMD_SET_CONFIG_RES,
 )
+
+
+class NetmodeSelect:
+    WIFI = 1
+    SIM = 2
+    LAN = 3
 
 class NetworkState:
     Unknown = 0
@@ -41,10 +54,13 @@ class Inverter:
         self.state = NetworkState.Unknown
         self.sequence = 0
 
+    def get_state(self):
+        return self.state
+
     def set_state(self, new_state):
         if self.state != new_state:
             self.state = new_state
-            logger.info(f"Inverter is {new_state}")
+            logger.debug(f"Inverter is {new_state}")
 
     def update_state(self):
         warnings.warn("This function is deprecated and will be removed in the future.", FutureWarning)
@@ -115,6 +131,27 @@ class Inverter:
         command = CMD_COMMAND_RES_DTO
 
         return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+    
+    def set_wifi(self, ssid, password):
+
+        get_config_req = self.get_config()
+
+        if(get_config_req is None):
+            logger.error("Failed to get config")
+            return
+    
+        
+        request = initialize_set_config(get_config_req)
+    
+        request.time = int(time.time()) 
+        request.offset = 28800
+        request.app_page = 1
+        request.netmode_select = 1
+        request.wifi_ssid = ssid.encode('utf-8')
+        request.wifi_password = password.encode('utf-8')
+
+        command = CMD_SET_CONFIG
+        return self.send_request(command, request, SetConfig_pb2.SetConfigReqDTO)
 
     
     def send_request(self, command, request, response_type):
@@ -148,7 +185,7 @@ class Inverter:
                 raise ValueError("Parsing resulted in an empty or falsy value")
 
         except Exception as e:
-            logger.error(f"Failed to parse response: {e}")
+            logger.debug(f"Failed to parse response: {e}")
             self.set_state(NetworkState.Offline)
             return None
 

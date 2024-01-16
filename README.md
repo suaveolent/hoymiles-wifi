@@ -21,7 +21,7 @@ You can integrate the library into your own project, or simply use it in the com
 ```
 hoymiles-wifi [-h] --host HOST <command>
 
-commands: {get-real-data-new, get-real-data-hms, get-real-data, get-config, network-info, app-information-data,app-get-hist-power, set-power-limit}
+commands: {get-real-data-new, get-real-data-hms, get-real-data, get-config, network-info, app-information-data,app-get-hist-power, set-power-limit, set-wifi}
 ```
 
 ### Python code
@@ -47,6 +47,7 @@ else:
 - `app_information_data()`: Retrieve application information data
 - `app_get_hist_power()`: Retrieve historical power data
 - `set_power_limit(power_limit)`: Set the power limit of the inverter (0-100%)
+- `set_wifi(wifi_ssid, wifi_password)`: Configure the wifi network
 
 
 ## Note

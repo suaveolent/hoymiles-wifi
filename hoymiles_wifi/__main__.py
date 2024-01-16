@@ -54,13 +54,24 @@ def set_power_limit(inverter):
 
     return inverter.set_power_limit(power_limit)
 
+
+def set_wifi(inverter):
+    wifi_ssid = input("Enter the new wifi SSID: ").strip()
+    wifi_password = input("Enter the new wifi password: ").strip()
+    print(f'Setting wifi to "{wifi_ssid}"')
+    print(f'Setting wifi password to "{wifi_password}"')
+    cont = input("Are you sure? (y/n): ")
+    if(cont != 'y'):
+        return
+    return inverter.set_wifi(wifi_ssid, wifi_password)
+
 def print_invalid_command(command):
     print(f"Invalid command: {command}")
 
 def main():
     parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
     parser.add_argument("--host", type=str, required=True, help="IP address or hostname of the inverter")
-    parser.add_argument("command", type=str, choices=['get-real-data-new', 'get-real-data-hms', 'get-real-data', 'get-config', 'network-info', 'app-information-data', 'app-get-hist-power', 'set-power-limit'], help="Command to execute")
+    parser.add_argument("command", type=str, choices=['get-real-data-new', 'get-real-data-hms', 'get-real-data', 'get-config', 'network-info', 'app-information-data', 'app-get-hist-power', 'set-power-limit', 'set-wifi'], help="Command to execute")
     args = parser.parse_args()
 
     inverter = Inverter(args.host)
@@ -75,6 +86,7 @@ def main():
         'app-information-data': app_information_data,
         'app-get-hist-power': app_get_hist_power,
         'set-power-limit': set_power_limit,
+        'set-wifi': set_wifi,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
