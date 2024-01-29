@@ -1,5 +1,6 @@
 import socket
 import struct
+from typing import Any
 from crcmod import mkCrcFun
 from datetime import datetime
 import time
@@ -33,8 +34,9 @@ from hoymiles_wifi.const import (
     CMD_APP_GET_HIST_POWER_RES,
     CMD_ACTION_POWER_LIMIT,
     CMD_COMMAND_RES_DTO,
+    CMD_ACTION_FIRMWARE_UPGRADE,
     CMD_SET_CONFIG,
-    CMD_SET_CONFIG_RES,
+    CMD_CLOUD_COMMAND_RES_DTO,
 )
 
 
@@ -49,7 +51,7 @@ class NetworkState:
     Offline = 2
 
 class Inverter:
-    def __init__(self, host):
+    def __init__(self, host: str):
         self.host = host
         self.state = NetworkState.Unknown
         self.sequence = 0
@@ -57,7 +59,7 @@ class Inverter:
     def get_state(self):
         return self.state
 
-    def set_state(self, new_state):
+    def set_state(self, new_state: NetworkState):
         if self.state != new_state:
             self.state = new_state
             logger.debug(f"Inverter is {new_state}")
@@ -113,7 +115,7 @@ class Inverter:
         command = CMD_APP_GET_HIST_POWER_RES
         return self.send_request(command, request, AppGetHistPower_pb2.AppGetHistPowerReqDTO)
     
-    def set_power_limit(self, power_limit):
+    def set_power_limit(self, power_limit: int):
 
         if(power_limit < 0 or power_limit > 100):
             logger.error("Error. Invalid power limit!")
@@ -140,7 +142,6 @@ class Inverter:
             logger.error("Failed to get config")
             return
     
-        
         request = initialize_set_config(get_config_req)
     
         request.time = int(time.time()) 
@@ -153,8 +154,20 @@ class Inverter:
         command = CMD_SET_CONFIG
         return self.send_request(command, request, SetConfig_pb2.SetConfigReqDTO)
 
+
+    def firmware_update(self):
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.action = CMD_ACTION_FIRMWARE_UPGRADE
+        request.package_nub = 1
+        request.tid = 8806660
+        request.data = 'http://fwupdate.hoymiles.com/cfs/bin/2311/06/,1488725943932555264.bin\r'.encode('utf-8')
+
+        command = CMD_CLOUD_COMMAND_RES_DTO
+        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+
     
-    def send_request(self, command, request, response_type):
+    def send_request(self, command: bytes, request: Any, response_type: Any):
         self.sequence = (self.sequence + 1) & 0xFFFF
 
         request_as_bytes = request.SerializeToString()
@@ -186,7 +199,7 @@ class Inverter:
 
         except Exception as e:
             logger.debug(f"Failed to parse response: {e}")
-            self.set_state(NetworkState.Offline)
+            self.set_state(NetworkState.Unknown)
             return None
 
         self.set_state(NetworkState.Online)
