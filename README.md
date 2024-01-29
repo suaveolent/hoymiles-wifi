@@ -21,7 +21,17 @@ You can integrate the library into your own project, or simply use it in the com
 ```
 hoymiles-wifi [-h] --host HOST <command>
 
-commands: {get-real-data-new, get-real-data-hms, get-real-data, get-config, network-info, app-information-data,app-get-hist-power, set-power-limit, set-wifi, firmware-update}
+commands: {
+    get-real-data-new, 
+    get-real-data-hms,
+    get-real-data,
+    get-config,
+    network-info,
+    app-information-data,
+    app-get-hist-power,
+    set-power-limit,
+    set-wifi,
+    firmware-update}
 ```
 
 ### Python code
