@@ -160,7 +160,7 @@ class Inverter:
         request = CommandPB_pb2.CommandResDTO()
         request.action = CMD_ACTION_FIRMWARE_UPGRADE
         request.package_nub = 1
-        request.tid = 8806660
+        request.tid = int(time.time())
         request.data = 'http://fwupdate.hoymiles.com/cfs/bin/2311/06/,1488725943932555264.bin\r'.encode('utf-8')
 
         command = CMD_CLOUD_COMMAND_RES_DTO
