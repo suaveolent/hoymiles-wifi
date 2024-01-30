@@ -21,7 +21,7 @@ You can integrate the library into your own project, or simply use it in the com
 ```
 hoymiles-wifi [-h] --host HOST <command>
 
-commands: {
+commands:
     get-real-data-new, 
     get-real-data-hms,
     get-real-data,
@@ -31,7 +31,11 @@ commands: {
     app-get-hist-power,
     set-power-limit,
     set-wifi,
-    firmware-update}
+    firmware-update,
+    restart,
+    turn-on,
+    turn-off,
+    
 ```
 
 ### Python code
@@ -59,6 +63,9 @@ else:
 - `set_power_limit(power_limit)`: Set the power limit of the inverter (0-100%)
 - `set_wifi(wifi_ssid, wifi_password)`: Configure the wifi network
 - `firmware_update()`: Update to latest firmware
+- `restart`: Restart the inverter
+- `turn-on`: Turn the inverter on
+- `turn-off`: Turn the inverter off
 
 ## Note
 
