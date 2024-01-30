@@ -225,8 +225,6 @@ class Inverter:
             self.set_state(NetworkState.Offline)
             return None
         
-        print(f"Hexadecimal Content of buf: {buf.hex()}")
-
         read_length = struct.unpack('>H', buf[6:8])[0]
 
         try:
