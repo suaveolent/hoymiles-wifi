@@ -38,6 +38,8 @@ from hoymiles_wifi.const import (
     CMD_SET_CONFIG,
     CMD_CLOUD_COMMAND_RES_DTO,
     CMD_ACTION_RESTART,
+    CMD_ACTION_TURN_ON,
+    CMD_ACTION_TURN_OFF,
 )
 
 
@@ -178,6 +180,28 @@ class Inverter:
         command = CMD_CLOUD_COMMAND_RES_DTO
         return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
 
+
+    def turn_on(self):
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.action = CMD_ACTION_TURN_ON
+        request.package_nub = 1
+        request.dev_kind = 1
+        request.tid = int(time.time())
+
+        command = CMD_CLOUD_COMMAND_RES_DTO
+        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+    
+    def turn_off(self):
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.action = CMD_ACTION_TURN_OFF
+        request.package_nub = 1
+        request.dev_kind = 1
+        request.tid = int(time.time())
+
+        command = CMD_CLOUD_COMMAND_RES_DTO
+        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
     def send_request(self, command: bytes, request: Any, response_type: Any, inverter_port: int = INVERTER_PORT):
         self.sequence = (self.sequence + 1) & 0xFFFF

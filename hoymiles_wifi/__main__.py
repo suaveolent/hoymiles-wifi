@@ -96,6 +96,21 @@ def restart(inverter):
         return
     
     return inverter.restart()
+
+def turn_off(inverter):
+    cont = input("Do you want to turn *OFF* the device? (y/n): ")
+    if(cont != 'y'):
+        return
+    
+    return inverter.turn_off()
+
+def turn_on(inverter):
+    cont = input("Do you want to turn *ON* the device? (y/n): ")
+    if(cont != 'y'):
+        return
+    
+    return inverter.turn_on()
+
     
 
 def print_invalid_command(command):
@@ -120,7 +135,9 @@ def main():
             "set-power-limit",
             "set-wifi",
             "firmware-update",
-            "restart"
+            "restart",
+            "turn-on",
+            "turn-off"
         ],
         help="Command to execute",
     )
@@ -140,7 +157,9 @@ def main():
         'set-power-limit': set_power_limit,
         'set-wifi': set_wifi,
         'firmware-update': firmware_update,
-        'restart': restart
+        'restart': restart,
+        'turn-on': turn_on,
+        'turn-off': turn_off
     }
 
     command_func = switch.get(args.command, print_invalid_command)
