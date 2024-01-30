@@ -79,15 +79,15 @@ def firmware_update(inverter):
     if(cont != 'y'):
         return
     
-    print()
-    print("Updating firmware to version: V00.01.11...")
+    firmware_url = input("Enter the URL to the firmware update: ").strip()
+    print(f'Updating firmware with firmware from "{firmware_url}"')
     print()
 
     cont = input("Do you want to continue? (y/n): ")
     if(cont != 'y'):
         return
     
-    return inverter.firmware_update()
+    return inverter.firmware_update(firmware_url)
 
 def restart(inverter):
 
