@@ -37,6 +37,7 @@ from hoymiles_wifi.const import (
     CMD_ACTION_FIRMWARE_UPGRADE,
     CMD_SET_CONFIG,
     CMD_CLOUD_COMMAND_RES_DTO,
+    CMD_ACTION_RESTART,
 )
 
 
@@ -147,7 +148,7 @@ class Inverter:
         request.time = int(time.time()) 
         request.offset = 28800
         request.app_page = 1
-        request.netmode_select = 1
+        request.netmode_select = NetmodeSelect.WIFI
         request.wifi_ssid = ssid.encode('utf-8')
         request.wifi_password = password.encode('utf-8')
 
@@ -165,9 +166,20 @@ class Inverter:
 
         command = CMD_CLOUD_COMMAND_RES_DTO
         return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+    
+
+    def restart(self):
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.action = CMD_ACTION_RESTART
+        request.package_nub = 1
+        request.tid = int(time.time())
+
+        command = CMD_CLOUD_COMMAND_RES_DTO
+        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
 
     
-    def send_request(self, command: bytes, request: Any, response_type: Any):
+    def send_request(self, command: bytes, request: Any, response_type: Any, inverter_port: int = INVERTER_PORT):
         self.sequence = (self.sequence + 1) & 0xFFFF
 
         request_as_bytes = request.SerializeToString()
@@ -178,7 +190,7 @@ class Inverter:
         header = CMD_HEADER + command
         message = header + struct.pack('>HHH', self.sequence, crc16, length) + request_as_bytes
 
-        address = (self.host, INVERTER_PORT)
+        address = (self.host, inverter_port)
         try:
             with socket.create_connection(address, timeout=0.5) as stream:
                 stream.settimeout(5)
@@ -188,6 +200,8 @@ class Inverter:
             logger.debug(f"{e}")
             self.set_state(NetworkState.Offline)
             return None
+        
+        print(f"Hexadecimal Content of buf: {buf.hex()}")
 
         read_length = struct.unpack('>H', buf[6:8])[0]
 

@@ -89,6 +89,15 @@ def firmware_update(inverter):
     
     return inverter.firmware_update()
 
+def restart(inverter):
+
+    cont = input("Do you want to restart the device? (y/n): ")
+    if(cont != 'y'):
+        return
+    
+    return inverter.restart()
+    
+
 def print_invalid_command(command):
     print(f"Invalid command: {command}")
 
@@ -111,6 +120,7 @@ def main():
             "set-power-limit",
             "set-wifi",
             "firmware-update",
+            "restart"
         ],
         help="Command to execute",
     )
@@ -129,7 +139,8 @@ def main():
         'app-get-hist-power': app_get_hist_power,
         'set-power-limit': set_power_limit,
         'set-wifi': set_wifi,
-        'firmware-update': firmware_update
+        'firmware-update': firmware_update,
+        'restart': restart
     }
 
     command_func = switch.get(args.command, print_invalid_command)
@@ -138,7 +149,7 @@ def main():
     if response:
         print(f"{args.command.capitalize()} Response: {response}")
     else:
-        print(f"Unable to retrieve {args.command.replace('_', ' ')}")
+        print(f"No response or unable to retrieve response for {args.command.replace('_', ' ')}")
 
 
 if __name__ == "__main__":
