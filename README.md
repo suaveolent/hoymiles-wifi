@@ -64,8 +64,8 @@ else:
 - `set_wifi(wifi_ssid, wifi_password)`: Configure the wifi network
 - `firmware_update()`: Update to latest firmware
 - `restart`: Restart the inverter
-- `turn-on`: Turn the inverter on
-- `turn-off`: Turn the inverter off
+- `turn_on`: Turn the inverter on
+- `turn_off`: Turn the inverter off
 
 ## Note
 
