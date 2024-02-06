@@ -7,6 +7,7 @@ from hoymiles_wifi.utils import (
     generate_dtu_version_string
 )
 
+
 # Inverter commands
 def get_real_data_new(inverter):
     return inverter.get_real_data_new()
@@ -156,7 +157,6 @@ def main():
             "restart",
             "turn-on",
             "turn-off",
-            "get-dtu-serial-number",
             "get-information-data",
             "get-version-info"
         ],

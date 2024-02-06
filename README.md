@@ -35,7 +35,8 @@ commands:
     restart,
     turn-on,
     turn-off,
-    
+    get-information-data,
+    get-version-info
 ```
 
 ### Python code

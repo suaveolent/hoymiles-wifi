@@ -5,40 +5,37 @@ from hoymiles_wifi.protobuf import (
     SetConfig_pb2,
 )
 
-def format_number(num):
-    return "{:02d}".format(num)
+def format_number(number):
+    return "{:02d}".format(number)
 
-def generate_version_string(i):
-    value_of = i
-    version_string = format_number(value_of // 2048) + "." + format_number((value_of // 64) % 32) + "." + format_number(value_of % 64)
+def generate_version_string(version_number: int):
+    version_string = format_number(version_number // 2048) + "." + format_number((version_number // 64) % 32) + "." + format_number(version_number % 64)
     return version_string
 
-def generate_sw_version_string(i):
-    value_of = i
-    value_of2 = value_of // 10000
-    value_of3 = (value_of - (value_of2 * 10000)) // 100
-    value_of4 = (value_of - (value_of2 * 10000)) - (value_of3 * 100)
+def generate_sw_version_string(version_number: int):
 
-    version_string = format_number(value_of2) + "." + format_number(value_of3) + "." + format_number(value_of4)
+    version_number2 = version_number // 10000
+    version_number3 = (version_number - (version_number2 * 10000)) // 100
+    version_number4 = (version_number - (version_number2 * 10000)) - (version_number3 * 100)
+
+    version_string = format_number(version_number2) + "." + format_number(version_number3) + "." + format_number(version_number4)
     return version_string
 
 
-def generate_dtu_version_string(i):
-    def format_number(num):
-        return "{:02d}".format(num)
+def generate_dtu_version_string(version_number: int, type: str = None):
 
-    string_buffer = ""
-    i2 = i % 256
-    i3 = (i // 256) % 16
+    version_string = ""
+    version_number2 = version_number % 256
+    version_number3 = (version_number // 256) % 16
 
     if "SRF" == str:
-        string_buffer += f"{format_number(i // 1048576)}.{format_number((i % 65536) // 4096)}.{format_number(i3)}.{format_number(i2)}"
+        version_string += f"{format_number(version_number // 1048576)}.{format_number((version_number % 65536) // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
     elif "HRF" == str:
-        string_buffer += f"{format_number(i // 65536)}.{format_number((i % 65536) // 4096)}.{format_number(i3)}.{format_number(i2)}"
+        version_string += f"{format_number(version_number // 65536)}.{format_number((version_number % 65536) // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
     else:
-        string_buffer += f"{format_number(i // 4096)}.{format_number(i3)}.{format_number(i2)}"
+        version_string += f"{format_number(version_number // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
 
-    return string_buffer
+    return version_string
 
 def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res = SetConfig_pb2.SetConfigResDTO()
