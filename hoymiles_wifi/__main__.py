@@ -1,6 +1,13 @@
 import argparse
 from hoymiles_wifi.inverter import Inverter
 
+from hoymiles_wifi.utils import (
+    generate_version_string,
+    generate_sw_version_string, 
+    generate_dtu_version_string
+)
+
+# Inverter commands
 def get_real_data_new(inverter):
     return inverter.get_real_data_new()
 
@@ -111,6 +118,17 @@ def turn_on(inverter):
     
     return inverter.turn_on()
 
+def get_information_data(inverter):
+    return inverter.get_information_data()
+
+def get_version_info(inverter):
+    response = app_information_data(inverter)
+    return {
+        "dtu_hw_version": "H" + generate_dtu_version_string(response.dtu_info.dtu_hw_version),
+        "dtu_sw_version": "V" + generate_dtu_version_string(response.dtu_info.dtu_sw_version),
+        "inverter_hw_version" : "H" + generate_version_string(response.pv_info[0].pv_hw_version),
+        "inverter_sw_version": "V" + generate_sw_version_string(response.pv_info[0].pv_sw_version),
+    }
     
 
 def print_invalid_command(command):
@@ -137,7 +155,10 @@ def main():
             "firmware-update",
             "restart",
             "turn-on",
-            "turn-off"
+            "turn-off",
+            "get-dtu-serial-number",
+            "get-information-data",
+            "get-version-info"
         ],
         help="Command to execute",
     )
@@ -159,7 +180,9 @@ def main():
         'firmware-update': firmware_update,
         'restart': restart,
         'turn-on': turn_on,
-        'turn-off': turn_off
+        'turn-off': turn_off,
+        'get-information-data': get_information_data,
+        'get-version-info': get_version_info,
     }
 
     command_func = switch.get(args.command, print_invalid_command)

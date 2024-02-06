@@ -14,6 +14,7 @@ from hoymiles_wifi.protobuf import (
     APPInfomationData_pb2,
     AppGetHistPower_pb2,
     CommandPB_pb2,
+    InfomationData_pb2,
     GetConfig_pb2,
     RealData_pb2,
     RealDataNew_pb2,
@@ -202,6 +203,17 @@ class Inverter:
 
         command = CMD_CLOUD_COMMAND_RES_DTO
         return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+    
+    def get_information_data(self):
+
+        request = InfomationData_pb2.InfoDataResDTO()
+        request.time_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        request.offset = 28800
+        request.time = int(time.time())
+        command = CMD_APP_INFO_DATA_RES_DTO
+        return self.send_request(command, request, InfomationData_pb2.InfoDataReqDTO)
+    
+
     
     def send_request(self, command: bytes, request: Any, response_type: Any, inverter_port: int = INVERTER_PORT):
         self.sequence = (self.sequence + 1) & 0xFFFF

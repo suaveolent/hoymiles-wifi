@@ -1,7 +1,44 @@
+""""Utils for interacting with Hoymiles WiFi API."""
+
 from hoymiles_wifi.protobuf import (
     GetConfig_pb2,
     SetConfig_pb2,
 )
+
+def format_number(num):
+    return "{:02d}".format(num)
+
+def generate_version_string(i):
+    value_of = i
+    version_string = format_number(value_of // 2048) + "." + format_number((value_of // 64) % 32) + "." + format_number(value_of % 64)
+    return version_string
+
+def generate_sw_version_string(i):
+    value_of = i
+    value_of2 = value_of // 10000
+    value_of3 = (value_of - (value_of2 * 10000)) // 100
+    value_of4 = (value_of - (value_of2 * 10000)) - (value_of3 * 100)
+
+    version_string = format_number(value_of2) + "." + format_number(value_of3) + "." + format_number(value_of4)
+    return version_string
+
+
+def generate_dtu_version_string(i):
+    def format_number(num):
+        return "{:02d}".format(num)
+
+    string_buffer = ""
+    i2 = i % 256
+    i3 = (i // 256) % 16
+
+    if "SRF" == str:
+        string_buffer += f"{format_number(i // 1048576)}.{format_number((i % 65536) // 4096)}.{format_number(i3)}.{format_number(i2)}"
+    elif "HRF" == str:
+        string_buffer += f"{format_number(i // 65536)}.{format_number((i % 65536) // 4096)}.{format_number(i3)}.{format_number(i2)}"
+    else:
+        string_buffer += f"{format_number(i // 4096)}.{format_number(i3)}.{format_number(i2)}"
+
+    return string_buffer
 
 def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res = SetConfig_pb2.SetConfigResDTO()
@@ -54,3 +91,5 @@ def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res.dtu_ap_pass = get_config_req.dtu_ap_pass
 
     return set_config_res
+
+

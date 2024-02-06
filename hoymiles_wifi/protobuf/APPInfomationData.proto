@@ -51,8 +51,8 @@ message APPPvInfoMO {
   int32 pv_sw_version = 4;             // PV software version
   int32 pv_hw_part_number = 5;         // PV hardware part number
   int32 pv_hw_version = 6;             // PV hardware version
-  int32 pv_gpf_code = 7;               // PV GPF code
-  int32 pv_gpf = 8;                    // PV GPF
+  int32 pv_grid_profile_code = 7;      // PV grid profile code
+  int32 pv_grid_profile = 8;           // PV grid profile
   int32 pv_rf_hw_version = 9;          // PV RF hardware version
   int32 pv_rf_sw_version = 10;         // PV RF software version
   int32 mi_rule_id = 11;               // MI rule ID
