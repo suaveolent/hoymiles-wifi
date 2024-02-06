@@ -63,7 +63,7 @@ else:
 - `app_get_hist_power()`: Retrieve historical power data
 - `set_power_limit(power_limit)`: Set the power limit of the inverter (0-100%)
 - `set_wifi(wifi_ssid, wifi_password)`: Configure the wifi network
-- `firmware_update()`: Update to latest firmware
+- `firmware_update(firmware_url)`: Update to firmware at provided URL
 - `restart`: Restart the inverter
 - `turn_on`: Turn the inverter on
 - `turn_off`: Turn the inverter off
