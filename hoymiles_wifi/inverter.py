@@ -1,10 +1,10 @@
+import asyncio
 import socket
 import struct
 from typing import Any
 from crcmod import mkCrcFun
 from datetime import datetime
 import time
-import warnings
 
 from hoymiles_wifi import logger
 
@@ -60,66 +60,62 @@ class Inverter:
         self.state = NetworkState.Unknown
         self.sequence = 0
 
-    def get_state(self):
+    def get_state(self) -> NetworkState:
         return self.state
 
     def set_state(self, new_state: NetworkState):
         if self.state != new_state:
             self.state = new_state
             logger.debug(f"Inverter is {new_state}")
-
-    def update_state(self):
-        warnings.warn("This function is deprecated and will be removed in the future.", FutureWarning)
-        return self.get_real_data_hms()
         
-    def get_real_data_hms(self):
+    async def get_real_data_hms(self) -> RealDataHMS_pb2.HMSStateResponse | None:
         request = RealDataHMS_pb2.HMSRealDataResDTO()
         command = CMD_REAL_DATA_RES_DTO
-        return self.send_request(command, request, RealDataHMS_pb2.HMSStateResponse)
+        return await self.send_request(command, request, RealDataHMS_pb2.HMSStateResponse)
     
-    def get_real_data(self):
+    async def get_real_data(self) -> RealData_pb2.RealDataResDTO | None:
         request = RealData_pb2.RealDataResDTO()
         command = CMD_REAL_DATA_RES_DTO
-        return self.send_request(command, request, RealData_pb2.RealDataReqDTO)
+        return await self.send_request(command, request, RealData_pb2.RealDataReqDTO)
 
-    def get_real_data_new(self):
+    async def get_real_data_new(self) -> RealDataNew_pb2.RealDataNewResDTO | None:
         request = RealDataNew_pb2.RealDataNewResDTO()
         request.time_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_REAL_RES_DTO
-        return self.send_request(command, request, RealDataNew_pb2.RealDataNewReqDTO)
+        return await self.send_request(command, request, RealDataNew_pb2.RealDataNewReqDTO)
     
-    def get_config(self):
+    async def get_config(self) -> GetConfig_pb2.GetConfigResDTO | None:
         request = GetConfig_pb2.GetConfigResDTO()
         request.offset = 28800
         request.time = int(time.time()) - 60
         command = CMD_GET_CONFIG
-        return self.send_request(command, request, GetConfig_pb2.GetConfigReqDTO)    
+        return await self.send_request(command, request, GetConfig_pb2.GetConfigReqDTO)    
 
-    def network_info(self):
+    async def network_info(self) -> NetworkInfo_pb2.NetworkInfoResDTO | None:
         request = NetworkInfo_pb2.NetworkInfoResDTO()
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_NETWORK_INFO_RES
-        return self.send_request(command, request, NetworkInfo_pb2.NetworkInfoReqDTO)
+        return await self.send_request(command, request, NetworkInfo_pb2.NetworkInfoReqDTO)
     
-    def app_information_data(self):
+    async def app_information_data(self) -> APPInfomationData_pb2.APPInfoDataResDTO:
         request = APPInfomationData_pb2.APPInfoDataResDTO()
         request.time_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_APP_INFO_DATA_RES_DTO
-        return self.send_request(command, request, APPInfomationData_pb2.APPInfoDataReqDTO)
+        return await self.send_request(command, request, APPInfomationData_pb2.APPInfoDataReqDTO)
     
-    def app_get_hist_power(self):
+    async def app_get_hist_power(self) -> AppGetHistPower_pb2.AppGetHistPowerResDTO | None:
         request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
         request.offset = 28800
         request.requested_time = int(time.time())
         command = CMD_APP_GET_HIST_POWER_RES
-        return self.send_request(command, request, AppGetHistPower_pb2.AppGetHistPowerReqDTO)
+        return await self.send_request(command, request, AppGetHistPower_pb2.AppGetHistPowerReqDTO)
     
-    def set_power_limit(self, power_limit: int):
+    async def set_power_limit(self, power_limit: int) -> CommandPB_pb2.CommandResDTO | None:
 
         if(power_limit < 0 or power_limit > 100):
             logger.error("Error. Invalid power limit!")
@@ -136,11 +132,11 @@ class Inverter:
 
         command = CMD_COMMAND_RES_DTO
 
-        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
-    def set_wifi(self, ssid, password):
+    async def set_wifi(self, ssid: str, password: str) -> SetConfig_pb2.SetConfigResDTO | None:
 
-        get_config_req = self.get_config()
+        get_config_req = await self.get_config()
 
         if(get_config_req is None):
             logger.error("Failed to get config")
@@ -156,10 +152,10 @@ class Inverter:
         request.wifi_password = password.encode('utf-8')
 
         command = CMD_SET_CONFIG
-        return self.send_request(command, request, SetConfig_pb2.SetConfigReqDTO)
+        return await self.send_request(command, request, SetConfig_pb2.SetConfigReqDTO)
 
 
-    def firmware_update(self):
+    async def firmware_update(self) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
         request.action = CMD_ACTION_FIRMWARE_UPGRADE
@@ -168,10 +164,10 @@ class Inverter:
         request.data = 'http://fwupdate.hoymiles.com/cfs/bin/2311/06/,1488725943932555264.bin\r'.encode('utf-8')
 
         command = CMD_CLOUD_COMMAND_RES_DTO
-        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
 
-    def restart(self):
+    async def restart(self) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
         request.action = CMD_ACTION_RESTART
@@ -179,10 +175,10 @@ class Inverter:
         request.tid = int(time.time())
 
         command = CMD_CLOUD_COMMAND_RES_DTO
-        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
 
 
-    def turn_on(self):
+    async def turn_on(self) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
         request.action = CMD_ACTION_TURN_ON
@@ -191,9 +187,9 @@ class Inverter:
         request.tid = int(time.time())
 
         command = CMD_CLOUD_COMMAND_RES_DTO
-        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
-    def turn_off(self):
+    async def turn_off(self) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
         request.action = CMD_ACTION_TURN_OFF
@@ -202,20 +198,20 @@ class Inverter:
         request.tid = int(time.time())
 
         command = CMD_CLOUD_COMMAND_RES_DTO
-        return self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
-    def get_information_data(self):
+    async def get_information_data(self) -> InfomationData_pb2.InfoDataResDTO | None:
 
         request = InfomationData_pb2.InfoDataResDTO()
         request.time_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_APP_INFO_DATA_RES_DTO
-        return self.send_request(command, request, InfomationData_pb2.InfoDataReqDTO)
+        return await self.send_request(command, request, InfomationData_pb2.InfoDataReqDTO)
     
 
-    
-    def send_request(self, command: bytes, request: Any, response_type: Any, inverter_port: int = INVERTER_PORT):
+
+    async def send_request(self, command: bytes, request: Any, response_type: Any, inverter_port: int = INVERTER_PORT):
         self.sequence = (self.sequence + 1) & 0xFFFF
 
         request_as_bytes = request.SerializeToString()
@@ -227,16 +223,19 @@ class Inverter:
         message = header + struct.pack('>HHH', self.sequence, crc16, length) + request_as_bytes
 
         address = (self.host, inverter_port)
+
         try:
-            with socket.create_connection(address, timeout=0.5) as stream:
-                stream.settimeout(5)
-                stream.sendall(message)
-                buf = stream.recv(1024)
-        except (socket.error, socket.timeout) as e:
+            reader, writer = await asyncio.open_connection(*address)
+            
+            writer.write(message)
+            await writer.drain()
+            
+            buf = await asyncio.wait_for(reader.read(1024), timeout=5)
+        except (OSError, asyncio.TimeoutError) as e:
             logger.debug(f"{e}")
             self.set_state(NetworkState.Offline)
             return None
-        
+
         read_length = struct.unpack('>H', buf[6:8])[0]
 
         try:
@@ -244,12 +243,16 @@ class Inverter:
 
             if not parsed:
                 raise ValueError("Parsing resulted in an empty or falsy value")
-
         except Exception as e:
             logger.debug(f"Failed to parse response: {e}")
             self.set_state(NetworkState.Unknown)
             return None
+        finally:
+            writer.close()
+            await writer.wait_closed()
 
         self.set_state(NetworkState.Online)
         return parsed
+
+
 

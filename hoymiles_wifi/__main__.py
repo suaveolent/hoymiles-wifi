@@ -1,4 +1,6 @@
 import argparse
+import asyncio
+from dataclasses import dataclass
 from hoymiles_wifi.inverter import Inverter
 
 from hoymiles_wifi.utils import (
@@ -7,30 +9,44 @@ from hoymiles_wifi.utils import (
     generate_dtu_version_string
 )
 
+@dataclass
+class VersionInfo:
+    dtu_hw_version: str
+    dtu_sw_version: str
+    inverter_hw_version: str
+    inverter_sw_version: str
+
+    def __str__(self):
+        return (
+            f'dtu_hw_version: "{self.dtu_hw_version}"\n'
+            f'dtu_sw_version: "{self.dtu_sw_version}"\n'
+            f'inverter_hw_version: "{self.inverter_hw_version}"\n'
+            f'inverter_sw_version: "{self.inverter_sw_version}"\n'
+        )
 
 # Inverter commands
-def get_real_data_new(inverter):
-    return inverter.get_real_data_new()
+async def get_real_data_new(inverter):
+    return await inverter.get_real_data_new()
 
-def get_real_data_hms(inverter):
-    return inverter.get_real_data_hms()
+async def get_real_data_hms(inverter):
+    return await inverter.get_real_data_hms()
 
-def get_real_data(inverter):
-    return inverter.get_real_data()
+async def get_real_data(inverter):
+    return await inverter.get_real_data()
 
-def get_config(inverter):
-    return inverter.get_config()
+async def get_config(inverter):
+    return await inverter.get_config()
 
-def network_info(inverter):
-    return inverter.network_info()
+async def network_info(inverter):
+    return await inverter.network_info()
 
-def app_information_data(inverter):
-    return inverter.app_information_data()
+async def app_information_data(inverter):
+    return await inverter.app_information_data()
 
-def app_get_hist_power(inverter):
-    return inverter.app_get_hist_power()
+async def app_get_hist_power(inverter):
+    return await inverter.app_get_hist_power()
 
-def set_power_limit(inverter):
+async def set_power_limit(inverter):
 
     RED = '\033[91m'
     END = '\033[0m'
@@ -59,10 +75,10 @@ def set_power_limit(inverter):
     if(cont != 'y'):
         return
 
-    return inverter.set_power_limit(power_limit)
+    return await inverter.set_power_limit(power_limit)
 
 
-def set_wifi(inverter):
+async def set_wifi(inverter):
     wifi_ssid = input("Enter the new wifi SSID: ").strip()
     wifi_password = input("Enter the new wifi password: ").strip()
     print(f'Setting wifi to "{wifi_ssid}"')
@@ -70,9 +86,9 @@ def set_wifi(inverter):
     cont = input("Are you sure? (y/n): ")
     if(cont != 'y'):
         return
-    return inverter.set_wifi(wifi_ssid, wifi_password)
+    return await inverter.set_wifi(wifi_ssid, wifi_password)
 
-def firmware_update(inverter):
+async def firmware_update(inverter):
     RED = '\033[91m'
     END = '\033[0m'
 
@@ -95,47 +111,51 @@ def firmware_update(inverter):
     if(cont != 'y'):
         return
     
-    return inverter.firmware_update()
+    return await inverter.firmware_update()
 
-def restart(inverter):
+async def restart(inverter):
 
     cont = input("Do you want to restart the device? (y/n): ")
     if(cont != 'y'):
         return
     
-    return inverter.restart()
+    return await inverter.restart()
 
-def turn_off(inverter):
+async def turn_off(inverter):
     cont = input("Do you want to turn *OFF* the device? (y/n): ")
     if(cont != 'y'):
         return
     
-    return inverter.turn_off()
+    return await inverter.turn_off()
 
-def turn_on(inverter):
+async def turn_on(inverter):
     cont = input("Do you want to turn *ON* the device? (y/n): ")
     if(cont != 'y'):
         return
     
-    return inverter.turn_on()
+    return await inverter.turn_on()
 
-def get_information_data(inverter):
-    return inverter.get_information_data()
+async def get_information_data(inverter):
+    return await inverter.get_information_data()
 
-def get_version_info(inverter):
-    response = app_information_data(inverter)
-    return {
-        "dtu_hw_version": "H" + generate_dtu_version_string(response.dtu_info.dtu_hw_version),
-        "dtu_sw_version": "V" + generate_dtu_version_string(response.dtu_info.dtu_sw_version),
-        "inverter_hw_version" : "H" + generate_version_string(response.pv_info[0].pv_hw_version),
-        "inverter_sw_version": "V" + generate_sw_version_string(response.pv_info[0].pv_sw_version),
-    }
+async def get_version_info(inverter):
+    response = await app_information_data(inverter)
+
+    if not response:
+        return None
+
+    return VersionInfo(
+        dtu_hw_version="H" + generate_dtu_version_string(response.dtu_info.dtu_hw_version),
+        dtu_sw_version="V" + generate_dtu_version_string(response.dtu_info.dtu_sw_version),
+        inverter_hw_version="H" + generate_version_string(response.pv_info[0].pv_hw_version),
+        inverter_sw_version="V" + generate_sw_version_string(response.pv_info[0].pv_sw_version),
+    )
     
 
 def print_invalid_command(command):
     print(f"Invalid command: {command}")
 
-def main():
+async def main():
     parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
     parser.add_argument(
         "--host", type=str, required=True, help="IP address or hostname of the inverter"
@@ -186,13 +206,16 @@ def main():
     }
 
     command_func = switch.get(args.command, print_invalid_command)
-    response = command_func(inverter)
+    response = await command_func(inverter)
 
     if response:
-        print(f"{args.command.capitalize()} Response: {response}")
+        print(f"{args.command.capitalize()} Response: \n{response}")
     else:
         print(f"No response or unable to retrieve response for {args.command.replace('_', ' ')}")
 
 
+def run_main():
+    asyncio.run(main())
+
 if __name__ == "__main__":
-    main()
+    run_main()
