@@ -9,6 +9,10 @@ from hoymiles_wifi.utils import (
     generate_dtu_version_string
 )
 
+from hoymiles_wifi.const import (
+    DTU_FIRMWARE_URL_00_01_11
+)
+
 @dataclass
 class VersionInfo:
     dtu_hw_version: str
@@ -93,7 +97,7 @@ async def firmware_update(inverter):
     END = '\033[0m'
 
     print(RED + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + END)
-    print(RED + "!!!  Danger zone! This will update the firmeware of the inverter.  !!!" + END)
+    print(RED + "!!!    Danger zone! This will update the firmeware of the DTU.     !!!" + END)
     print(RED + "!!!  Please be careful and make sure you know what you are doing.  !!!" + END)
     print(RED + "!!!          Only proceed if you know what you are doing.          !!!" + END)
     print(RED + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + END)
@@ -103,15 +107,31 @@ async def firmware_update(inverter):
     if(cont != 'y'):
         return
     
+    print("Please select a firmware version:")
+    print("1.) V00.01.11")
+    print("2.) Custom URL")
+
+    while True:
+        selection = input("Enter your selection (1 or 2): ")
+
+        if selection == "1":
+            url = DTU_FIRMWARE_URL_00_01_11
+            break
+        elif selection == "2":
+            url = input("Enter the custom URL: ").strip()
+            break
+        else:
+            print("Invalid selection. Please enter 1 or 2.")
+    
     print()
-    print("Updating firmware to version: V00.01.11...")
+    print(f'Firmware update URL: "{url}"')
     print()
 
     cont = input("Do you want to continue? (y/n): ")
     if(cont != 'y'):
         return
     
-    return await inverter.firmware_update()
+    return await inverter.update_dtu_firmware()
 
 async def restart(inverter):
 

@@ -1,5 +1,4 @@
 import asyncio
-import socket
 import struct
 from typing import Any
 from crcmod import mkCrcFun
@@ -41,6 +40,7 @@ from hoymiles_wifi.const import (
     CMD_ACTION_RESTART,
     CMD_ACTION_TURN_ON,
     CMD_ACTION_TURN_OFF,
+    DTU_FIRMWARE_URL_00_01_11,
 )
 
 
@@ -155,13 +155,13 @@ class Inverter:
         return await self.send_request(command, request, SetConfig_pb2.SetConfigReqDTO)
 
 
-    async def firmware_update(self) -> CommandPB_pb2.CommandResDTO | None:
+    async def update_dtu_firmware(self, firmware_url: str = DTU_FIRMWARE_URL_00_01_11) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
         request.action = CMD_ACTION_FIRMWARE_UPGRADE
         request.package_nub = 1
         request.tid = int(time.time())
-        request.data = 'http://fwupdate.hoymiles.com/cfs/bin/2311/06/,1488725943932555264.bin\r'.encode('utf-8')
+        request.data = (firmware_url + '\r').encode('utf-8')
 
         command = CMD_CLOUD_COMMAND_RES_DTO
         return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
