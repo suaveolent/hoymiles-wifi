@@ -43,9 +43,9 @@ commands:
 
 ```
 from hoymiles_wifi.inverter import Inverter
-
+...
 inverter = Inverter(<ip_address>)
-response = inverter.<command>
+response = await inverter.<command>
 
 if response:
     print(f"Inverter Response: {response}")
