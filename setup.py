@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='hoymiles-wifi',
     packages=['hoymiles_wifi', 'hoymiles_wifi.protobuf'],
-    version='0.1.0',
+    version='0.1.1',
     description='A python library for interfacing with Hoymiles HMS-XXXXW-T2 series of micro-inverters.',
     author='suaveolent',
     include_package_data=True,
