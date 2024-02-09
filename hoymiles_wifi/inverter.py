@@ -236,9 +236,12 @@ class Inverter:
             self.set_state(NetworkState.Offline)
             return None
 
-        read_length = struct.unpack('>H', buf[6:8])[0]
-
         try:
+            if len(buf) < 8:
+                raise ValueError("Buffer is too short for unpacking")
+        
+            read_length = struct.unpack('>H', buf[6:8])[0]
+
             parsed = response_type.FromString(buf[10:10 + read_length])
 
             if not parsed:
