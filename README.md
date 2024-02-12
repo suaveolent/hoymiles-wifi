@@ -54,19 +54,19 @@ else:
 ```
 
 #### Available functions
-- `get_real_data_new()`: Retrieve real-time data
-- `get_real_data_hms()`: Retrieve real-time data
-- `get_real_data()`: Retrieve real-time data
-- `get_config()`: Retrieve configuration information
-- `network_info()`: Retrieve network information
-- `app_information_data()`: Retrieve application information data
-- `app_get_hist_power()`: Retrieve historical power data
-- `set_power_limit(power_limit)`: Set the power limit of the inverter (0-100%)
-- `set_wifi(wifi_ssid, wifi_password)`: Configure the wifi network
-- `firmware_update()`: Update to latest firmware
-- `restart`: Restart the inverter
-- `turn_on`: Turn the inverter on
-- `turn_off`: Turn the inverter off
+- `async_get_real_data_new()`: Retrieve real-time data
+- `async_get_real_data_hms()`: Retrieve real-time data
+- `async_get_real_data()`: Retrieve real-time data
+- `async_get_config()`: Retrieve configuration information
+- `async_network_info()`: Retrieve network information
+- `async_app_information_data()`: Retrieve application information data
+- `async_app_get_hist_power()`: Retrieve historical power data
+- `async_set_power_limit(power_limit)`: Set the power limit of the inverter (0-100%)
+- `async_set_wifi(wifi_ssid, wifi_password)`: Configure the wifi network
+- `async_firmware_update()`: Update to latest firmware
+- `async_restart`: Restart the inverter
+- `async_turn_on`: Turn the inverter on
+- `async_turn_off`: Turn the inverter off
 
 ## Note
 

@@ -29,28 +29,28 @@ class VersionInfo:
         )
 
 # Inverter commands
-async def get_real_data_new(inverter):
-    return await inverter.get_real_data_new()
+async def async_get_real_data_new(inverter):
+    return await inverter.async_get_real_data_new()
 
-async def get_real_data_hms(inverter):
-    return await inverter.get_real_data_hms()
+async def async_get_real_data_hms(inverter):
+    return await inverter.async_get_real_data_hms()
 
-async def get_real_data(inverter):
-    return await inverter.get_real_data()
+async def async_get_real_data(inverter):
+    return await inverter.async_get_real_data()
 
-async def get_config(inverter):
-    return await inverter.get_config()
+async def async_get_config(inverter):
+    return await inverter.async_get_config()
 
-async def network_info(inverter):
+async def async_network_info(inverter):
     return await inverter.network_info()
 
-async def app_information_data(inverter):
-    return await inverter.app_information_data()
+async def async_app_information_data(inverter):
+    return await inverter.async_app_information_data()
 
-async def app_get_hist_power(inverter):
-    return await inverter.app_get_hist_power()
+async def async_app_get_hist_power(inverter):
+    return await inverter.async_app_get_hist_power()
 
-async def set_power_limit(inverter):
+async def async_set_power_limit(inverter):
 
     RED = '\033[91m'
     END = '\033[0m'
@@ -79,10 +79,10 @@ async def set_power_limit(inverter):
     if(cont != 'y'):
         return
 
-    return await inverter.set_power_limit(power_limit)
+    return await inverter.async_set_power_limit(power_limit)
 
 
-async def set_wifi(inverter):
+async def async_set_wifi(inverter):
     wifi_ssid = input("Enter the new wifi SSID: ").strip()
     wifi_password = input("Enter the new wifi password: ").strip()
     print(f'Setting wifi to "{wifi_ssid}"')
@@ -90,9 +90,9 @@ async def set_wifi(inverter):
     cont = input("Are you sure? (y/n): ")
     if(cont != 'y'):
         return
-    return await inverter.set_wifi(wifi_ssid, wifi_password)
+    return await inverter.async_set_wifi(wifi_ssid, wifi_password)
 
-async def firmware_update(inverter):
+async def async_firmware_update(inverter):
     RED = '\033[91m'
     END = '\033[0m'
 
@@ -131,35 +131,35 @@ async def firmware_update(inverter):
     if(cont != 'y'):
         return
     
-    return await inverter.update_dtu_firmware()
+    return await inverter.async_update_dtu_firmware()
 
-async def restart(inverter):
+async def async_restart(inverter):
 
     cont = input("Do you want to restart the device? (y/n): ")
     if(cont != 'y'):
         return
     
-    return await inverter.restart()
+    return await inverter.async_restart()
 
-async def turn_off(inverter):
+async def async_turn_off(inverter):
     cont = input("Do you want to turn *OFF* the device? (y/n): ")
     if(cont != 'y'):
         return
     
-    return await inverter.turn_off()
+    return await inverter.async_turn_off()
 
-async def turn_on(inverter):
+async def async_turn_on(inverter):
     cont = input("Do you want to turn *ON* the device? (y/n): ")
     if(cont != 'y'):
         return
     
-    return await inverter.turn_on()
+    return await inverter.async_turn_on()
 
-async def get_information_data(inverter):
-    return await inverter.get_information_data()
+async def async_get_information_data(inverter):
+    return await inverter.async_get_information_data()
 
-async def get_version_info(inverter):
-    response = await app_information_data(inverter)
+async def async_get_version_info(inverter):
+    response = await async_app_information_data(inverter)
 
     if not response:
         return None
@@ -208,21 +208,21 @@ async def main():
 
     # Execute the specified command using a switch case
     switch = {
-        'get-real-data-new': get_real_data_new,
-        'get-real-data-hms': get_real_data_hms,
-        'get-real-data': get_real_data,
-        'get-config': get_config,
-        'network-info': network_info,
-        'app-information-data': app_information_data,
-        'app-get-hist-power': app_get_hist_power,
-        'set-power-limit': set_power_limit,
-        'set-wifi': set_wifi,
-        'firmware-update': firmware_update,
-        'restart': restart,
-        'turn-on': turn_on,
-        'turn-off': turn_off,
-        'get-information-data': get_information_data,
-        'get-version-info': get_version_info,
+        'get-real-data-new': async_get_real_data_new,
+        'get-real-data-hms': async_get_real_data_hms,
+        'get-real-data': async_get_real_data,
+        'get-config': async_get_config,
+        'network-info': async_network_info,
+        'app-information-data': async_app_information_data,
+        'app-get-hist-power': async_app_get_hist_power,
+        'set-power-limit': async_set_power_limit,
+        'set-wifi': async_set_wifi,
+        'firmware-update': async_firmware_update,
+        'restart': async_restart,
+        'turn-on': async_turn_on,
+        'turn-off': async_turn_off,
+        'get-information-data': async_get_information_data,
+        'get-version-info': async_get_version_info,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
