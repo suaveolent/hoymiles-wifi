@@ -19,7 +19,7 @@ You can integrate the library into your own project, or simply use it in the com
 ### Command line:
 
 ```
-hoymiles-wifi [-h] --host HOST <command>
+hoymiles-wifi [-h] --host HOST [--as-json] <command>
 
 commands:
     get-real-data-new, 
