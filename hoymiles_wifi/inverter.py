@@ -72,12 +72,12 @@ class Inverter:
     async def async_get_real_data_hms(self) -> RealDataHMS_pb2.HMSStateResponse | None:
         request = RealDataHMS_pb2.HMSRealDataResDTO()
         command = CMD_REAL_DATA_RES_DTO
-        return await self.send_request(command, request, RealDataHMS_pb2.HMSStateResponse)
+        return await self.async_send_request(command, request, RealDataHMS_pb2.HMSStateResponse)
     
     async def async_get_real_data(self) -> RealData_pb2.RealDataResDTO | None:
         request = RealData_pb2.RealDataResDTO()
         command = CMD_REAL_DATA_RES_DTO
-        return await self.send_request(command, request, RealData_pb2.RealDataReqDTO)
+        return await self.async_.send_request(command, request, RealData_pb2.RealDataReqDTO)
 
     async def async_get_real_data_new(self) -> RealDataNew_pb2.RealDataNewResDTO | None:
         request = RealDataNew_pb2.RealDataNewResDTO()
@@ -85,21 +85,21 @@ class Inverter:
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_REAL_RES_DTO
-        return await self.send_request(command, request, RealDataNew_pb2.RealDataNewReqDTO)
+        return await self.async_send_request(command, request, RealDataNew_pb2.RealDataNewReqDTO)
     
     async def aync_get_config(self) -> GetConfig_pb2.GetConfigResDTO | None:
         request = GetConfig_pb2.GetConfigResDTO()
         request.offset = 28800
         request.time = int(time.time()) - 60
         command = CMD_GET_CONFIG
-        return await self.send_request(command, request, GetConfig_pb2.GetConfigReqDTO)    
+        return await self.async_send_request(command, request, GetConfig_pb2.GetConfigReqDTO)    
 
     async def async_network_info(self) -> NetworkInfo_pb2.NetworkInfoResDTO | None:
         request = NetworkInfo_pb2.NetworkInfoResDTO()
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_NETWORK_INFO_RES
-        return await self.send_request(command, request, NetworkInfo_pb2.NetworkInfoReqDTO)
+        return await self.async_send_request(command, request, NetworkInfo_pb2.NetworkInfoReqDTO)
     
     async def async_app_information_data(self) -> APPInfomationData_pb2.APPInfoDataResDTO:
         request = APPInfomationData_pb2.APPInfoDataResDTO()
@@ -107,14 +107,14 @@ class Inverter:
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_APP_INFO_DATA_RES_DTO
-        return await self.send_request(command, request, APPInfomationData_pb2.APPInfoDataReqDTO)
+        return await self.async_send_request(command, request, APPInfomationData_pb2.APPInfoDataReqDTO)
     
     async def async_app_get_hist_power(self) -> AppGetHistPower_pb2.AppGetHistPowerResDTO | None:
         request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
         request.offset = 28800
         request.requested_time = int(time.time())
         command = CMD_APP_GET_HIST_POWER_RES
-        return await self.send_request(command, request, AppGetHistPower_pb2.AppGetHistPowerReqDTO)
+        return await self.async_send_request(command, request, AppGetHistPower_pb2.AppGetHistPowerReqDTO)
     
     async def async_set_power_limit(self, power_limit: int) -> CommandPB_pb2.CommandResDTO | None:
 
@@ -133,11 +133,11 @@ class Inverter:
 
         command = CMD_COMMAND_RES_DTO
 
-        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.async_send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
     async def async_set_wifi(self, ssid: str, password: str) -> SetConfig_pb2.SetConfigResDTO | None:
 
-        get_config_req = await self.get_config()
+        get_config_req = await self.async_get_config()
 
         if(get_config_req is None):
             logger.error("Failed to get config")
@@ -153,7 +153,7 @@ class Inverter:
         request.wifi_password = password.encode('utf-8')
 
         command = CMD_SET_CONFIG
-        return await self.send_request(command, request, SetConfig_pb2.SetConfigReqDTO)
+        return await self.async_send_request(command, request, SetConfig_pb2.SetConfigReqDTO)
 
 
     async def async_update_dtu_firmware(self, firmware_url: str = DTU_FIRMWARE_URL_00_01_11) -> CommandPB_pb2.CommandResDTO | None:
@@ -165,7 +165,7 @@ class Inverter:
         request.data = (firmware_url + '\r').encode('utf-8')
 
         command = CMD_CLOUD_COMMAND_RES_DTO
-        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.async_send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
 
     async def async_restart(self) -> CommandPB_pb2.CommandResDTO | None:
@@ -176,7 +176,7 @@ class Inverter:
         request.tid = int(time.time())
 
         command = CMD_CLOUD_COMMAND_RES_DTO
-        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.async_send_request(command, request, CommandPB_pb2.CommandReqDTO)
 
 
     async def async_turn_on(self) -> CommandPB_pb2.CommandResDTO | None:
@@ -188,7 +188,7 @@ class Inverter:
         request.tid = int(time.time())
 
         command = CMD_CLOUD_COMMAND_RES_DTO
-        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.async_send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
     async def async_turn_off(self) -> CommandPB_pb2.CommandResDTO | None:
 
@@ -199,7 +199,7 @@ class Inverter:
         request.tid = int(time.time())
 
         command = CMD_CLOUD_COMMAND_RES_DTO
-        return await self.send_request(command, request, CommandPB_pb2.CommandReqDTO)
+        return await self.async_send_request(command, request, CommandPB_pb2.CommandReqDTO)
     
     async def async_get_information_data(self) -> InfomationData_pb2.InfoDataResDTO | None:
 
@@ -208,9 +208,8 @@ class Inverter:
         request.offset = 28800
         request.time = int(time.time())
         command = CMD_APP_INFO_DATA_RES_DTO
-        return await self.send_request(command, request, InfomationData_pb2.InfoDataReqDTO)
+        return await self.async_send_request(command, request, InfomationData_pb2.InfoDataReqDTO)
     
-
 
     async def async_send_request(self, command: bytes, request: Any, response_type: Any, inverter_port: int = INVERTER_PORT):
         self.sequence = (self.sequence + 1) & 0xFFFF

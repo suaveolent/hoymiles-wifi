@@ -1,6 +1,9 @@
 import argparse
 import asyncio
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+import json
+from google.protobuf.message import Message
+from google.protobuf.json_format import MessageToJson
 from hoymiles_wifi.inverter import Inverter
 
 from hoymiles_wifi.utils import (
@@ -27,6 +30,9 @@ class VersionInfo:
             f'inverter_hw_version: "{self.inverter_hw_version}"\n'
             f'inverter_sw_version: "{self.inverter_sw_version}"\n'
         )
+
+    def to_dict(self):
+        return asdict(self)
 
 # Inverter commands
 async def async_get_real_data_new(inverter):
@@ -179,7 +185,9 @@ async def main():
     parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
     parser.add_argument(
         "--host", type=str, required=True, help="IP address or hostname of the inverter"
-    )    
+    ) 
+    parser.add_argument('--as-json', action='store_true', default=False,
+                    help='Format the output as JSON')   
     parser.add_argument(
         "command",
         type=str,
@@ -229,7 +237,13 @@ async def main():
     response = await command_func(inverter)
 
     if response:
-        print(f"{args.command.capitalize()} Response: \n{response}")
+        if args.as_json:
+            if isinstance(response, Message): 
+                print(MessageToJson(response))
+            else:
+                print(json.dumps(asdict(response), indent=4))
+        else:
+            print(f"{args.command.capitalize()} Response: \n{response}")
     else:
         print(f"No response or unable to retrieve response for {args.command.replace('_', ' ')}")
 
