@@ -37,6 +37,8 @@ commands:
     turn-off,
     get-information-data,
     get-version-info
+
+The `--as-json` option is optional and allows formatting the output as JSON.
 ```
 
 ### Python code
