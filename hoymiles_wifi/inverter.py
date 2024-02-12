@@ -87,7 +87,7 @@ class Inverter:
         command = CMD_REAL_RES_DTO
         return await self.async_send_request(command, request, RealDataNew_pb2.RealDataNewReqDTO)
     
-    async def aync_get_config(self) -> GetConfig_pb2.GetConfigResDTO | None:
+    async def async_get_config(self) -> GetConfig_pb2.GetConfigResDTO | None:
         request = GetConfig_pb2.GetConfigResDTO()
         request.offset = 28800
         request.time = int(time.time()) - 60
