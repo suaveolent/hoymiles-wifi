@@ -77,7 +77,7 @@ class Inverter:
     async def async_get_real_data(self) -> RealData_pb2.RealDataResDTO | None:
         request = RealData_pb2.RealDataResDTO()
         command = CMD_REAL_DATA_RES_DTO
-        return await self.async_.send_request(command, request, RealData_pb2.RealDataReqDTO)
+        return await self.async_send_request(command, request, RealData_pb2.RealDataReqDTO)
 
     async def async_get_real_data_new(self) -> RealDataNew_pb2.RealDataNewResDTO | None:
         request = RealDataNew_pb2.RealDataNewResDTO()

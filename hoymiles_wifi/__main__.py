@@ -176,7 +176,6 @@ async def async_get_version_info(inverter):
         inverter_hw_version="H" + generate_version_string(response.pv_info[0].pv_hw_version),
         inverter_sw_version="V" + generate_sw_version_string(response.pv_info[0].pv_sw_version),
     )
-    
 
 def print_invalid_command(command):
     print(f"Invalid command: {command}")
