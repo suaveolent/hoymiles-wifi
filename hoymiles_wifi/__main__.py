@@ -48,7 +48,7 @@ async def async_get_config(inverter):
     return await inverter.async_get_config()
 
 async def async_network_info(inverter):
-    return await inverter.network_info()
+    return await inverter.async_network_info()
 
 async def async_app_information_data(inverter):
     return await inverter.async_app_information_data()
