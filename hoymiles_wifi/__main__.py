@@ -177,6 +177,9 @@ async def async_get_version_info(inverter):
         inverter_sw_version="V" + generate_sw_version_string(response.pv_info[0].pv_sw_version),
     )
 
+async def async_heatbeat(inverter):
+    return await inverter.async_heartbeat()
+
 def print_invalid_command(command):
     print(f"Invalid command: {command}")
 
@@ -205,7 +208,8 @@ async def main():
             "turn-on",
             "turn-off",
             "get-information-data",
-            "get-version-info"
+            "get-version-info",
+            "heartbeat",
         ],
         help="Command to execute",
     )
@@ -230,6 +234,7 @@ async def main():
         'turn-off': async_turn_off,
         'get-information-data': async_get_information_data,
         'get-version-info': async_get_version_info,
+        'heartbeat': async_heatbeat,
     }
 
     command_func = switch.get(args.command, print_invalid_command)

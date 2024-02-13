@@ -11,6 +11,7 @@ from hoymiles_wifi import logger
 from hoymiles_wifi.utils import initialize_set_config
 
 from hoymiles_wifi.protobuf import (
+    APPHeartbeatPB_pb2,
     APPInfomationData_pb2,
     AppGetHistPower_pb2,
     CommandPB_pb2,
@@ -42,6 +43,7 @@ from hoymiles_wifi.const import (
     CMD_ACTION_TURN_ON,
     CMD_ACTION_TURN_OFF,
     DTU_FIRMWARE_URL_00_01_11,
+    CMD_HB_RES_DTO,
 )
 
 
@@ -209,6 +211,17 @@ class Inverter:
         request.time = int(time.time())
         command = CMD_APP_INFO_DATA_RES_DTO
         return await self.async_send_request(command, request, InfomationData_pb2.InfoDataReqDTO)
+    
+
+    async def async_heartbeat(self) -> APPHeartbeatPB_pb2.HBReqDTO | None:
+
+        request = APPHeartbeatPB_pb2.HBResDTO
+        request.time_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        request.offset = 28800
+        request.time = int(time.time())
+
+        command = CMD_HB_RES_DTO
+        return await self.async_send_request(command, request, APPHeartbeatPB_pb2.HBReqDTO)
     
 
     async def async_send_request(self, command: bytes, request: Any, response_type: Any, inverter_port: int = INVERTER_PORT):

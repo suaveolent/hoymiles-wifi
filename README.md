@@ -36,7 +36,8 @@ commands:
     turn-on,
     turn-off,
     get-information-data,
-    get-version-info
+    get-version-info,
+    heartbeat,
 
 The `--as-json` option is optional and allows formatting the output as JSON.
 ```
