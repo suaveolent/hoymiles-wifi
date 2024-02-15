@@ -5,14 +5,14 @@ from hoymiles_wifi.protobuf import (
     SetConfig_pb2,
 )
 
-def format_number(number):
+def format_number(number) -> str:
     return "{:02d}".format(number)
 
-def generate_version_string(version_number: int):
+def generate_version_string(version_number: int) -> str:
     version_string = format_number(version_number // 2048) + "." + format_number((version_number // 64) % 32) + "." + format_number(version_number % 64)
     return version_string
 
-def generate_sw_version_string(version_number: int):
+def generate_sw_version_string(version_number: int) -> str:
 
     version_number2 = version_number // 10000
     version_number3 = (version_number - (version_number2 * 10000)) // 100
@@ -22,7 +22,7 @@ def generate_sw_version_string(version_number: int):
     return version_string
 
 
-def generate_dtu_version_string(version_number: int, type: str = None):
+def generate_dtu_version_string(version_number: int, type: str = None) -> str:
 
     version_string = ""
     version_number2 = version_number % 256
@@ -36,6 +36,10 @@ def generate_dtu_version_string(version_number: int, type: str = None):
         version_string += f"{format_number(version_number // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
 
     return version_string
+
+def generate_inverter_serial_number(serial_number: int) -> str:
+    return hex(serial_number)[2:]
+
 
 def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res = SetConfig_pb2.SetConfigResDTO()

@@ -9,7 +9,8 @@ from hoymiles_wifi.inverter import Inverter
 from hoymiles_wifi.utils import (
     generate_version_string,
     generate_sw_version_string, 
-    generate_dtu_version_string
+    generate_dtu_version_string,
+    generate_inverter_serial_number,
 )
 
 from hoymiles_wifi.const import (
@@ -184,6 +185,7 @@ def print_invalid_command(command):
     print(f"Invalid command: {command}")
 
 async def main():
+
     parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
     parser.add_argument(
         "--host", type=str, required=True, help="IP address or hostname of the inverter"
