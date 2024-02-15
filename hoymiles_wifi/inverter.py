@@ -215,7 +215,7 @@ class Inverter:
 
     async def async_heartbeat(self) -> APPHeartbeatPB_pb2.HBReqDTO | None:
 
-        request = APPHeartbeatPB_pb2.HBResDTO
+        request = APPHeartbeatPB_pb2.HBResDTO()
         request.time_ymd_hms = datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         request.offset = 28800
         request.time = int(time.time())
