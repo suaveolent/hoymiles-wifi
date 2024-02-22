@@ -259,7 +259,7 @@ class Inverter:
             crc16_response = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(response_as_bytes)
 
             if crc16_response != crc16_target:
-                print(f"CRC16 mismatch: {crc16_response} != {crc16_target}")
+                logger.debug(f"CRC16 mismatch: {hex(crc16_response)} != {hex(crc16_target)}")
                 raise ValueError("CRC16 mismatch")
 
             parsed = response_type.FromString(response_as_bytes)
