@@ -7,7 +7,7 @@ setup(
         'protobuf',
         'crcmod',
     ],
-    version='0.1.5',
+    version='0.1.6',
     description='A python library for interfacing with Hoymiles HMS-XXXXW-T2 series of micro-inverters.',
     author='suaveolent',
     include_package_data=True,
