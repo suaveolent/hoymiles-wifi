@@ -252,16 +252,24 @@ class Inverter:
         try:
             if len(buf) < 8:
                 raise ValueError("Buffer is too short for unpacking")
-        
-            read_length = struct.unpack('>H', buf[6:8])[0]
+            
+            crc16_target, read_length = struct.unpack('>HH', buf[6:10])
+            response_as_bytes = buf[10:10 + read_length]
 
-            parsed = response_type.FromString(buf[10:10 + read_length])
+            crc16_response = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(response_as_bytes)
+
+            if crc16_response != crc16_target:
+                print(f"CRC16 mismatch: {crc16_response} != {crc16_target}")
+                raise ValueError("CRC16 mismatch")
+
+            parsed = response_type.FromString(response_as_bytes)
 
             if not parsed:
                 raise ValueError("Parsing resulted in an empty or falsy value")
         except Exception as e:
             logger.debug(f"Failed to parse response: {e}")
             self.set_state(NetworkState.Unknown)
+            print(e)
             return None
         finally:
             writer.close()
