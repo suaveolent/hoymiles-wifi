@@ -269,7 +269,6 @@ class Inverter:
         except Exception as e:
             logger.debug(f"Failed to parse response: {e}")
             self.set_state(NetworkState.Unknown)
-            print(e)
             return None
         finally:
             writer.close()
