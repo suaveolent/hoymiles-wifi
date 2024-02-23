@@ -62,6 +62,7 @@ class Inverter:
         self.host = host
         self.state = NetworkState.Unknown
         self.sequence = 0
+        self.mutex = asyncio.Lock()
 
     def get_state(self) -> NetworkState:
         return self.state
@@ -237,17 +238,21 @@ class Inverter:
 
         address = (self.host, inverter_port)
 
-        try:
-            reader, writer = await asyncio.open_connection(*address)
-            
-            writer.write(message)
-            await writer.drain()
-            
-            buf = await asyncio.wait_for(reader.read(1024), timeout=5)
-        except (OSError, asyncio.TimeoutError) as e:
-            logger.debug(f"{e}")
-            self.set_state(NetworkState.Offline)
-            return None
+        async with self.mutex:
+            try:
+                reader, writer = await asyncio.open_connection(*address)
+
+                writer.write(message)
+                await writer.drain()
+
+                buf = await asyncio.wait_for(reader.read(1024), timeout=5)
+            except (OSError, asyncio.TimeoutError) as e:
+                logger.debug(f"{e}")
+                self.set_state(NetworkState.Offline)
+                return None
+            finally:
+                writer.close()
+                await writer.wait_closed()
 
         try:
             if len(buf) < 8:
@@ -276,6 +281,3 @@ class Inverter:
 
         self.set_state(NetworkState.Online)
         return parsed
-
-
-
