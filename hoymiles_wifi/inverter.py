@@ -262,10 +262,11 @@ class Inverter:
                 raise ValueError("Buffer is too short for unpacking")
             
             crc16_target, read_length = struct.unpack('>HH', buf[6:10])
-            response_as_bytes = buf[10:10 + read_length]
 
-            if(len(buf) < 10 + read_length):
-                raise ValueError("Buffer is too short for unpacking")
+            if(len(buf) != read_length):
+                raise ValueError("Buffer is incomplete")
+
+            response_as_bytes = buf[10:read_length]
 
             crc16_response = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(response_as_bytes)
 
