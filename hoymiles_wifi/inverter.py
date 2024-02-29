@@ -34,16 +34,18 @@ from hoymiles_wifi.const import (
     CMD_NETWORK_INFO_RES,
     CMD_APP_INFO_DATA_RES_DTO,
     CMD_APP_GET_HIST_POWER_RES,
-    CMD_ACTION_POWER_LIMIT,
+    CMD_ACTION_LIMIT_POWER,
     CMD_COMMAND_RES_DTO,
-    CMD_ACTION_FIRMWARE_UPGRADE,
+    CMD_ACTION_DTU_UPGRADE,
     CMD_SET_CONFIG,
     CMD_CLOUD_COMMAND_RES_DTO,
-    CMD_ACTION_RESTART,
-    CMD_ACTION_TURN_ON,
-    CMD_ACTION_TURN_OFF,
+    CMD_ACTION_DTU_REBOOT,
+    CMD_ACTION_MI_START,
+    CMD_ACTION_MI_SHUTDOWN,
     DTU_FIRMWARE_URL_00_01_11,
     CMD_HB_RES_DTO,
+    CMD_CLOUD_INFO_DATA_RES_DTO,
+    DEV_DTU,
 )
 
 
@@ -129,7 +131,7 @@ class Inverter:
 
         request = CommandPB_pb2.CommandResDTO()
         request.time = int(time.time())
-        request.action = CMD_ACTION_POWER_LIMIT
+        request.action = CMD_ACTION_LIMIT_POWER
         request.package_nub = 1
         request.tid = int(time.time())
         request.data = f'A:{power_limit},B:0,C:0\r'.encode('utf-8')
@@ -162,7 +164,7 @@ class Inverter:
     async def async_update_dtu_firmware(self, firmware_url: str = DTU_FIRMWARE_URL_00_01_11) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
-        request.action = CMD_ACTION_FIRMWARE_UPGRADE
+        request.action = CMD_ACTION_DTU_UPGRADE
         request.package_nub = 1
         request.tid = int(time.time())
         request.data = (firmware_url + '\r').encode('utf-8')
@@ -174,7 +176,7 @@ class Inverter:
     async def async_restart(self) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
-        request.action = CMD_ACTION_RESTART
+        request.action = CMD_ACTION_DTU_REBOOT
         request.package_nub = 1
         request.tid = int(time.time())
 
@@ -185,9 +187,9 @@ class Inverter:
     async def async_turn_on(self) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
-        request.action = CMD_ACTION_TURN_ON
+        request.action = CMD_ACTION_MI_START
         request.package_nub = 1
-        request.dev_kind = 1
+        request.dev_kind = DEV_DTU
         request.tid = int(time.time())
 
         command = CMD_CLOUD_COMMAND_RES_DTO
@@ -196,9 +198,9 @@ class Inverter:
     async def async_turn_off(self) -> CommandPB_pb2.CommandResDTO | None:
 
         request = CommandPB_pb2.CommandResDTO()
-        request.action = CMD_ACTION_TURN_OFF
+        request.action = CMD_ACTION_MI_SHUTDOWN
         request.package_nub = 1
-        request.dev_kind = 1
+        request.dev_kind = DEV_DTU
         request.tid = int(time.time())
 
         command = CMD_CLOUD_COMMAND_RES_DTO
