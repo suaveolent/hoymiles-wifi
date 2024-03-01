@@ -5,6 +5,13 @@ This Python library facilitates communication with Hoymiles HMS microinverters, 
 
 **Disclaimer: This library is not affiliated with Hoymiles. It is an independent project developed to provide tools for interacting with Hoymiles HMS-XXXXW-2T series micro-inverters featuring integrated WiFi DTU. Any trademarks or product names mentioned are the property of their respective owners.**
 
+## Supported Devices
+
+The library was successfully tested with:
+
+ - Hoymiles HMS-800W-2T
+ - Hoymiles DTU WLite
+
 
 ## Installation
 
