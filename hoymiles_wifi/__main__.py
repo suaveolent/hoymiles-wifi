@@ -10,7 +10,7 @@ from hoymiles_wifi.utils import (
     generate_version_string,
     generate_sw_version_string, 
     generate_dtu_version_string,
-    generate_inverter_serial_number,
+    get_hw_model_name,
 )
 
 from hoymiles_wifi.const import (
@@ -185,6 +185,8 @@ def print_invalid_command(command):
     print(f"Invalid command: {command}")
 
 async def main():
+
+    get_hw_model_name("116473511341")
 
     parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
     parser.add_argument(

@@ -5,6 +5,47 @@ from hoymiles_wifi.protobuf import (
     SetConfig_pb2,
 )
 
+devInfo = [
+    ([0x10, 0x10, 0x10, "ALL"], 300, "HM-300-1T"),
+    ([0x10, 0x10, 0x20, "ALL"], 350, "HM-350-1T"),
+    ([0x10, 0x10, 0x30, "ALL"], 400, "HM-400-1T"),
+    ([0x10, 0x10, 0x40, "ALL"], 400, "HM-400-1T"),
+    ([0x10, 0x11, 0x10, "ALL"], 600, "HM-600-2T"),
+    ([0x10, 0x11, 0x20, "ALL"], 700, "HM-700-2T"),
+    ([0x10, 0x11, 0x30, "ALL"], 800, "HM-800-2T"),
+    ([0x10, 0x11, 0x40, "ALL"], 800, "HM-800-2T"),
+    ([0x10, 0x12, 0x10, "ALL"], 1200, "HM-1200-4T"),
+    ([0x10, 0x02, 0x30, "ALL"], 1500, "MI-1500-4T Gen3"),
+    ([0x10, 0x12, 0x30, "ALL"], 1500, "HM-1500-4T"),
+    ([0x10, 0x10, 0x10, 0x15], int(300 * 0.7), "HM-300-1T"),  # HM-300 factory limited to 70%
+
+    ([0x10, 0x20, 0x11, "ALL"], 300, "HMS-300-1T"),  # 00
+    ([0x10, 0x20, 0x21, "ALL"], 350, "HMS-350-1T"),  # 00
+    ([0x10, 0x20, 0x41, "ALL"], 400, "HMS-400-1T"),  # 00
+    ([0x10, 0x10, 0x51, "ALL"], 450, "HMS-450-1T"),  # 01
+    ([0x10, 0x20, 0x51, "ALL"], 450, "HMS-450-1T"),  # 03
+    ([0x10, 0x10, 0x71, "ALL"], 500, "HMS-500-1T"),  # 02
+    ([0x10, 0x20, 0x71, "ALL"], 500, "HMS-500-1T v2"),  # 02
+    ([0x10, 0x21, 0x11, "ALL"], 600, "HMS-600-2T"),  # 01
+    ([0x10, 0x21, 0x41, "ALL"], 800, "HMS-800-2T"),  # 00
+    ([0x10, 0x11, 0x51, "ALL"], 900, "HMS-900-2T"),  # 01
+    ([0x10, 0x21, 0x51, "ALL"], 900, "HMS-900-2T"),  # 03
+    ([0x10, 0x21, 0x71, "ALL"], 1000, "HMS-1000-2T"),  # 05
+    ([0x10, 0x11, 0x71, "ALL"], 1000, "HMS-1000-2T"),  # 01
+    ([0x10, 0x22, 0x41, "ALL"], 1600, "HMS-1600-4T"),  # 4
+    ([0x10, 0x12, 0x51, "ALL"], 1800, "HMS-1800-4T"),  # 01
+    ([0x10, 0x22, 0x51, "ALL"], 1800, "HMS-1800-4T"),  # 16
+    ([0x10, 0x12, 0x71, "ALL"], 2000, "HMS-2000-4T"),  # 01
+    ([0x10, 0x22, 0x71, "ALL"], 2000, "HMS-2000-4T"),  # 10
+
+    ([0x10, 0x32, 0x41, "ALL"], 1600, "HMT-1600-4T"),  # 00
+    ([0x10, 0x32, 0x51, "ALL"], 1800, "HMT-1800-4T"),  # 00
+    ([0x10, 0x32, 0x71, "ALL"], 2000, "HMT-2000-4T"),  # 0
+
+    ([0x10, 0x33, 0x11, "ALL"], 1800, "HMT-1800-6T"),  # 01
+    ([0x10, 0x33, 0x31, "ALL"], 2250, "HMT-2250-6T")  # 01
+]
+
 def format_number(number) -> str:
     return "{:02d}".format(number)
 
@@ -93,4 +134,83 @@ def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
 
     return set_config_res
 
+
+ALL = 0xff
+
+dev_info = [
+    ([0x10, 0x10, 0x10, ALL], 300, "HM-300-1T"),
+    ([0x10, 0x10, 0x20, ALL], 350, "HM-350-1T"),
+    ([0x10, 0x10, 0x30, ALL], 400, "HM-400-1T"),
+    ([0x10, 0x10, 0x40, ALL], 400, "HM-400-1T"),
+    ([0x10, 0x11, 0x10, ALL], 600, "HM-600-2T"),
+    ([0x10, 0x11, 0x20, ALL], 700, "HM-700-2T"),
+    ([0x10, 0x11, 0x30, ALL], 800, "HM-800-2T"),
+    ([0x10, 0x11, 0x40, ALL], 800, "HM-800-2T"),
+    ([0x10, 0x12, 0x10, ALL], 1200, "HM-1200-4T"),
+    ([0x10, 0x02, 0x30, ALL], 1500, "MI-1500-4T Gen3"),
+    ([0x10, 0x12, 0x30, ALL], 1500, "HM-1500-4T"),
+    ([0x10, 0x10, 0x10, 0x15], int(300 * 0.7), "HM-300-1T"),  # HM-300 factory limited to 70%
+
+    ([0x10, 0x20, 0x11, ALL], 300, "HMS-300-1T"),  # 00
+    ([0x10, 0x20, 0x21, ALL], 350, "HMS-350-1T"),  # 00
+    ([0x10, 0x20, 0x41, ALL], 400, "HMS-400-1T"),  # 00
+    ([0x10, 0x10, 0x51, ALL], 450, "HMS-450-1T"),  # 01
+    ([0x10, 0x20, 0x51, ALL], 450, "HMS-450-1T"),  # 03
+    ([0x10, 0x10, 0x71, ALL], 500, "HMS-500-1T"),  # 02
+    ([0x10, 0x20, 0x71, ALL], 500, "HMS-500-1T v2"),  # 02
+    ([0x10, 0x21, 0x11, ALL], 600, "HMS-600-2T"),  # 01
+    ([0x10, 0x21, 0x41, ALL], 800, "HMS-800-2T"),  # 00
+    ([0x10, 0x11, 0x51, ALL], 900, "HMS-900-2T"),  # 01
+    ([0x10, 0x21, 0x51, ALL], 900, "HMS-900-2T"),  # 03
+    ([0x10, 0x21, 0x71, ALL], 1000, "HMS-1000-2T"),  # 05
+    ([0x10, 0x11, 0x71, ALL], 1000, "HMS-1000-2T"),  # 01
+    ([0x10, 0x22, 0x41, ALL], 1600, "HMS-1600-4T"),  # 4
+    ([0x10, 0x12, 0x51, ALL], 1800, "HMS-1800-4T"),  # 01
+    ([0x10, 0x22, 0x51, ALL], 1800, "HMS-1800-4T"),  # 16
+    ([0x10, 0x12, 0x71, ALL], 2000, "HMS-2000-4T"),  # 01
+    ([0x10, 0x22, 0x71, ALL], 2000, "HMS-2000-4T"),  # 10
+
+    ([0x10, 0x32, 0x41, ALL], 1600, "HMT-1600-4T"),  # 00
+    ([0x10, 0x32, 0x51, ALL], 1800, "HMT-1800-4T"),  # 00
+    ([0x10, 0x32, 0x71, ALL], 2000, "HMT-2000-4T"),  # 0
+
+    ([0x10, 0x33, 0x11, ALL], 1800, "HMT-1800-6T"),  # 01
+    ([0x10, 0x33, 0x31, ALL], 2250, "HMT-2250-6T")  # 01
+]
+
+
+def convert_serial_to_hex(serial_number: str):
+    # Convert the serial number from string to int and then to hex
+    return [int(serial_number[i:i + 2], 16) for i in range(0, len(serial_number), 2)]
+
+def get_dev_idx(serial_number: str):
+    ret = 0xff
+    pos = 0
+
+    # Convert serial number to hex
+    serial_hex = convert_serial_to_hex(serial_number)
+
+    print(serial_hex)
+
+    # Check for all 4 bytes first
+    for pos in range(len(dev_info)):
+        if dev_info[pos][0] == serial_hex:
+            ret = pos
+            break
+
+    # Then only for 3 bytes but only if not already found
+    if ret == 0xff:
+        for pos in range(len(dev_info)):
+            if dev_info[pos][0][:3] == serial_hex[:3]:
+                ret = pos
+                break
+
+    return ret
+
+def get_hw_model_name(serial_number: str):
+    # Convert serial number to hex
+    idx = get_dev_idx(serial_number)
+    if idx == 0xff:
+        return ""
+    return dev_info[idx][2]
 
