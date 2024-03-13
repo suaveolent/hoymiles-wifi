@@ -6,11 +6,12 @@ from google.protobuf.message import Message
 from google.protobuf.json_format import MessageToJson
 from hoymiles_wifi.inverter import Inverter
 
-from hoymiles_wifi.utils import (
+from hoymiles_wifi.hoymiles import (
     generate_version_string,
     generate_sw_version_string, 
     generate_dtu_version_string,
     get_hw_model_name,
+    get_dtu_model_name,
 )
 
 from hoymiles_wifi.const import (
@@ -185,8 +186,6 @@ def print_invalid_command(command):
     print(f"Invalid command: {command}")
 
 async def main():
-
-    get_hw_model_name("116473511341")
 
     parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
     parser.add_argument(

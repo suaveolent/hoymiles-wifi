@@ -44,7 +44,6 @@ from hoymiles_wifi.const import (
     CMD_ACTION_MI_SHUTDOWN,
     DTU_FIRMWARE_URL_00_01_11,
     CMD_HB_RES_DTO,
-    CMD_CLOUD_INFO_DATA_RES_DTO,
     DEV_DTU,
 )
 

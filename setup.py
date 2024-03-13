@@ -5,10 +5,10 @@ setup(
     packages=['hoymiles_wifi', 'hoymiles_wifi.protobuf'],
     install_requires=[
         'protobuf',
-        'crcmod',
+        'crcmod'
     ],
     version='0.1.7',
-    description='A python library for interfacing with Hoymiles HMS-XXXXW-T2 series of micro-inverters.',
+    description='A python library for interfacing with Hoymiles HMS-XXXXW-2T series of micro-inverters.',
     author='suaveolent',
     include_package_data=True,
     entry_points={
