@@ -1,47 +1,14 @@
-""""Utils for interacting with Hoymiles WiFi API."""
+"""Utils for interacting with Hoymiles WiFi API."""
 
 from hoymiles_wifi.protobuf import (
     GetConfig_pb2,
     SetConfig_pb2,
 )
 
-def format_number(number) -> str:
-    return "{:02d}".format(number)
-
-def generate_version_string(version_number: int) -> str:
-    version_string = format_number(version_number // 2048) + "." + format_number((version_number // 64) % 32) + "." + format_number(version_number % 64)
-    return version_string
-
-def generate_sw_version_string(version_number: int) -> str:
-
-    version_number2 = version_number // 10000
-    version_number3 = (version_number - (version_number2 * 10000)) // 100
-    version_number4 = (version_number - (version_number2 * 10000)) - (version_number3 * 100)
-
-    version_string = format_number(version_number2) + "." + format_number(version_number3) + "." + format_number(version_number4)
-    return version_string
-
-
-def generate_dtu_version_string(version_number: int, type: str = None) -> str:
-
-    version_string = ""
-    version_number2 = version_number % 256
-    version_number3 = (version_number // 256) % 16
-
-    if "SRF" == str:
-        version_string += f"{format_number(version_number // 1048576)}.{format_number((version_number % 65536) // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
-    elif "HRF" == str:
-        version_string += f"{format_number(version_number // 65536)}.{format_number((version_number % 65536) // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
-    else:
-        version_string += f"{format_number(version_number // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
-
-    return version_string
-
-def generate_inverter_serial_number(serial_number: int) -> str:
-    return hex(serial_number)[2:]
-
 
 def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
+    """Initialize set config response with get config request."""
+
     set_config_res = SetConfig_pb2.SetConfigResDTO()
     set_config_res.lock_password = get_config_req.lock_password
     set_config_res.lock_time = get_config_req.lock_time
@@ -63,8 +30,8 @@ def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res.access_model = get_config_req.access_model
     set_config_res.mac_0 = get_config_req.mac_0
     set_config_res.mac_1 = get_config_req.mac_1
-    set_config_res.mac_2 = get_config_req.mac_2 
-    set_config_res.mac_3 = get_config_req.mac_3 
+    set_config_res.mac_2 = get_config_req.mac_2
+    set_config_res.mac_3 = get_config_req.mac_3
     set_config_res.mac_4 = get_config_req.mac_4
     set_config_res.mac_5 = get_config_req.mac_5
     set_config_res.dhcp_switch = get_config_req.dhcp_switch
@@ -92,5 +59,3 @@ def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res.dtu_ap_pass = get_config_req.dtu_ap_pass
 
     return set_config_res
-
-
