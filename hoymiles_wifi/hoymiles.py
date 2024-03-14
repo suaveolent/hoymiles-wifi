@@ -245,7 +245,7 @@ def get_inverter_power(serial_bytes: bytes) -> InverterPower:
     return power
 
 
-def get_hw_model_name(serial_number: str) -> str:
+def get_inverter_model_name(serial_number: str) -> str:
     """Get hardware model name."""
 
     if serial_number == "22069994886948":

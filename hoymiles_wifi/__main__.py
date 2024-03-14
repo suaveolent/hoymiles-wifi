@@ -14,8 +14,11 @@ from hoymiles_wifi.const import DTU_FIRMWARE_URL_00_01_11, MAX_POWER_LIMIT
 from hoymiles_wifi.dtu import DTU
 from hoymiles_wifi.hoymiles import (
     generate_dtu_version_string,
+    generate_inverter_serial_number,
     generate_sw_version_string,
     generate_version_string,
+    get_dtu_model_name,
+    get_inverter_model_name,
 )
 from hoymiles_wifi.protobuf import (
     AppGetHistPower_pb2,
@@ -267,6 +270,27 @@ async def async_heatbeat(dtu: DTU) -> APPHeartbeatPB_pb2.APPHeartbeatResDTO | No
     return await dtu.async_heartbeat()
 
 
+async def async_identify_dtu(dtu: DTU) -> str:
+    """Identify the DTU asynchronously."""
+
+    real_data = await async_get_real_data_new(dtu)
+    return get_dtu_model_name(real_data.device_serial_number)
+
+
+async def async_identify_inverters(dtu: DTU) -> list[str]:
+    """Identify the DTU asynchronously."""
+
+    inverter_models = []
+    real_data = await async_get_real_data_new(dtu)
+    if real_data:
+        for sgs_data in real_data.sgs_data:
+            serial_number = generate_inverter_serial_number(sgs_data.serial_number)
+            inverter_model = get_inverter_model_name(serial_number)
+            inverter_models.append(inverter_model)
+
+    return inverter_models
+
+
 def print_invalid_command(command: str) -> None:
     """Print an invalid command message."""
 
@@ -306,6 +330,8 @@ async def main() -> None:
             "get-information-data",
             "get-version-info",
             "heartbeat",
+            "identify-dtu",
+            "identify-inverters",
         ],
         help="Command to execute",
     )
@@ -331,6 +357,8 @@ async def main() -> None:
         "get-information-data": async_get_information_data,
         "get-version-info": async_get_version_info,
         "heartbeat": async_heatbeat,
+        "identify-dtu": async_identify_dtu,
+        "identify-inverters": async_identify_inverters,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
