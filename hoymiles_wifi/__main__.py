@@ -204,7 +204,7 @@ async def async_firmware_update(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
 
 
 async def async_restart_dtu(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
-    """Restart the device asynchronously."""
+    """Restart the DTU asynchronously."""
 
     cont = input("Do you want to restart the DTU? (y/n): ")
     if cont != "y":
@@ -213,8 +213,8 @@ async def async_restart_dtu(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
     return await dtu.async_restart_dtu()
 
 
-async def async_turn_on_dtu(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
-    """Turn on the dtu asynchronously."""
+async def async_turn_on_inverter(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
+    """Turn on the irnverte asynchronously."""
 
     cont = input("Do you want to turn *ON* the DTU? (y/n): ")
     if cont != "y":
@@ -223,8 +223,8 @@ async def async_turn_on_dtu(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
     return await dtu.async_turn_on_dtu()
 
 
-async def async_turn_off_dtu(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
-    """Turn off the dtu asynchronously."""
+async def async_turn_off_inverter(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
+    """Turn off the inverter asynchronously."""
 
     cont = input("Do you want to turn *OFF* the DTU? (y/n): ")
     if cont != "y":
@@ -300,9 +300,9 @@ async def main() -> None:
             "set-power-limit",
             "set-wifi",
             "firmware-update",
-            "restart",
-            "turn-on",
-            "turn-off",
+            "restart-dtu",
+            "turn-on-inverter",
+            "turn-off-inverter",
             "get-information-data",
             "get-version-info",
             "heartbeat",
@@ -325,9 +325,9 @@ async def main() -> None:
         "set-power-limit": async_set_power_limit,
         "set-wifi": async_set_wifi,
         "firmware-update": async_firmware_update,
-        "restart": async_restart_dtu,
-        "turn-on": async_turn_on_dtu,
-        "turn-off": async_turn_off_dtu,
+        "restart-dtu": async_restart_dtu,
+        "turn-on": async_turn_on_inverter,
+        "turn-off": async_turn_off_inverter,
         "get-information-data": async_get_information_data,
         "get-version-info": async_get_version_info,
         "heartbeat": async_heatbeat,

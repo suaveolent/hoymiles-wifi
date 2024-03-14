@@ -253,7 +253,7 @@ class DTU:
             command, request, CommandPB_pb2.CommandReqDTO
         )
 
-    async def async_turn_on_dtu(self) -> CommandPB_pb2.CommandResDTO | None:
+    async def async_turn_on_inverter(self) -> CommandPB_pb2.CommandResDTO | None:
         """Turn on DTU."""
 
         request = CommandPB_pb2.CommandResDTO()
@@ -267,7 +267,7 @@ class DTU:
             command, request, CommandPB_pb2.CommandReqDTO
         )
 
-    async def async_turn_off_dtu(self) -> CommandPB_pb2.CommandResDTO | None:
+    async def async_turn_off_inverter(self) -> CommandPB_pb2.CommandResDTO | None:
         """Turn off DTU."""
 
         request = CommandPB_pb2.CommandResDTO()
