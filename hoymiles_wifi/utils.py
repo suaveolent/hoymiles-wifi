@@ -1,11 +1,14 @@
-""""Utils for interacting with Hoymiles WiFi API."""
+"""Utils for interacting with Hoymiles WiFi API."""
 
 from hoymiles_wifi.protobuf import (
     GetConfig_pb2,
     SetConfig_pb2,
 )
 
+
 def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
+    """Initialize set config response with get config request."""
+
     set_config_res = SetConfig_pb2.SetConfigResDTO()
     set_config_res.lock_password = get_config_req.lock_password
     set_config_res.lock_time = get_config_req.lock_time
@@ -27,8 +30,8 @@ def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res.access_model = get_config_req.access_model
     set_config_res.mac_0 = get_config_req.mac_0
     set_config_res.mac_1 = get_config_req.mac_1
-    set_config_res.mac_2 = get_config_req.mac_2 
-    set_config_res.mac_3 = get_config_req.mac_3 
+    set_config_res.mac_2 = get_config_req.mac_2
+    set_config_res.mac_3 = get_config_req.mac_3
     set_config_res.mac_4 = get_config_req.mac_4
     set_config_res.mac_5 = get_config_req.mac_5
     set_config_res.dhcp_switch = get_config_req.dhcp_switch
@@ -56,7 +59,3 @@ def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res.dtu_ap_pass = get_config_req.dtu_ap_pass
 
     return set_config_res
-
-
-
-

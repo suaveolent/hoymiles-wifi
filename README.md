@@ -1,7 +1,6 @@
 # hoymiles-wifi
 
-
-This Python library facilitates communication with Hoymiles HMS microinverters, specifically targeting the HMS-XXXXW-2T series.
+This Python library facilitates communication with Hoymiles DTUs and the HMS-XXXXW-2T HMS microinverters, utilizing protobuf messages.
 
 **Disclaimer: This library is not affiliated with Hoymiles. It is an independent project developed to provide tools for interacting with Hoymiles HMS-XXXXW-2T series micro-inverters featuring integrated WiFi DTU. Any trademarks or product names mentioned are the property of their respective owners.**
 
@@ -9,9 +8,8 @@ This Python library facilitates communication with Hoymiles HMS microinverters, 
 
 The library was successfully tested with:
 
- - Hoymiles HMS-800W-2T
- - Hoymiles DTU WLite
-
+- Hoymiles HMS-800W-2T
+- Hoymiles DTU WLite
 
 ## Installation
 
@@ -29,7 +27,7 @@ You can integrate the library into your own project, or simply use it in the com
 hoymiles-wifi [-h] --host HOST [--as-json] <command>
 
 commands:
-    get-real-data-new, 
+    get-real-data-new,
     get-real-data-hms,
     get-real-data,
     get-config,
@@ -52,18 +50,19 @@ The `--as-json` option is optional and allows formatting the output as JSON.
 ### Python code
 
 ```
-from hoymiles_wifi.inverter import Inverter
+from hoymiles_wifi.dtu import DTU
 ...
-inverter = Inverter(<ip_address>)
-response = await inverter.<command>
+dtu = DTU(<ip_address>)
+response = await dtu.<command>
 
 if response:
-    print(f"Inverter Response: {response}")
+    print(f"DTU Response: {response}")
 else:
     print("Unable to get response!")
 ```
 
 #### Available functions
+
 - `async_get_real_data_new()`: Retrieve real-time data
 - `async_get_real_data_hms()`: Retrieve real-time data
 - `async_get_real_data()`: Retrieve real-time data
@@ -82,15 +81,12 @@ else:
 
 Please be aware of the following considerations:
 
- - No DTU Implementation: This library
-   retrieves information directly from the internal DTU of Hoymiles Wifi
-   inverters.
+- No DTU Implementation: This library retrieves information directly from the (internal) DTU of Hoymiles Wifi inverters.
 
 ## Caution
 
 Use this library responsibly and be aware of potential risks. There are no guarantees provided, and any misuse or incorrect implementation may result in undesirable outcomes. Ensure that your inverter is not compromised during communication.
 
-  
 ## Known Limitations
 
 **Update Frequency:** The library may experience limitations in fetching updates, potentially around twice per minute. The inverter firmware may enforce a mandatory wait period of approximately 30 seconds between requests.
@@ -100,5 +96,6 @@ Use this library responsibly and be aware of potential risks. There are no guara
 ## Attribution
 
 A special thank you for the inspiration and codebase to:
- - [DennisOSRM](https://github.com/DennisOSRM): [hms-mqtt-publisher](https://github.com/DennisOSRM/hms-mqtt-publisher)
- - [henkwiedig](https://github.com/henkwiedig): [Hoymiles-DTU-Proto](https://github.com/henkwiedig/Hoymiles-DTU-Proto)
+
+- [DennisOSRM](https://github.com/DennisOSRM): [hms-mqtt-publisher](https://github.com/DennisOSRM/hms-mqtt-publisher)
+- [henkwiedig](https://github.com/henkwiedig): [Hoymiles-DTU-Proto](https://github.com/henkwiedig/Hoymiles-DTU-Proto)

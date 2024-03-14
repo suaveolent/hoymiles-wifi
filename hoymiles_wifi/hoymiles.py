@@ -1,22 +1,31 @@
-""""Hoymiles quirks for inverters and DTU"""
+"""Hoymiles quirks for inverters and DTU."""
 
-from enum import Enum
 import struct
+from enum import Enum
 
 from hoymiles_wifi import logger
 
+
 class InverterType(Enum):
+    """Inverter type."""
+
     ONE = "1T"
     TWO = "2T"
     FOUR = "4T"
     SIX = "6T"
 
+
 class InverterSeries(Enum):
+    """Inverter series."""
+
     HM = "HM"
     HMS = "HMS"
     HMT = "HMT"
 
+
 class InverterPower(Enum):
+    """Inverter power."""
+
     P_100 = "100"
     P_250 = "250"
     P_300_350_400 = "300/350/400"
@@ -31,7 +40,27 @@ class InverterPower(Enum):
     P_2000 = "2000"
 
 
+power_mapping = {
+    0x1011: InverterPower.P_100,
+    0x1020: InverterPower.P_250,
+    0x1021: InverterPower.P_300_350_400,
+    0x1121: InverterPower.P_300_350_400,
+    0x1125: InverterPower.P_400,
+    0x1040: InverterPower.P_500,
+    0x1041: InverterPower.P_600_700_800,
+    0x1042: InverterPower.P_600_700_800,
+    0x1141: InverterPower.P_600_700_800,
+    0x1060: InverterPower.P_1000,
+    0x1061: InverterPower.P_1200_1500,
+    0x1161: InverterPower.P_1000_1200_1500,
+    0x1164: InverterPower.P_1600,
+    0x1412: InverterPower.P_800W,
+}
+
+
 class DTUType(Enum):
+    """DTU type."""
+
     DTU_G100 = "DTU-G100"
     DTU_W100 = "DTU-W100"
     DTU_LITE_S = "DTU-Lite-S"
@@ -43,43 +72,114 @@ class DTUType(Enum):
     DTU_W_LITE = "DTU-WLite"
 
 
-def format_number(number) -> str:
-    return "{:02d}".format(number)
+type_mapping = {
+    0x10F7: DTUType.DTU_PRO,
+    0x10FB: DTUType.DTU_PRO,
+    0x4101: DTUType.DTU_PRO,
+    0x10FC: DTUType.DTU_PRO,
+    0x4120: DTUType.DTU_PRO,
+    0x10F8: DTUType.DTU_PRO,
+    0x4100: DTUType.DTU_PRO,
+    0x10FD: DTUType.DTU_PRO,
+    0x4121: DTUType.DTU_PRO,
+    0x10D3: DTUType.DTU_W100_LITE_S,
+    0x4110: DTUType.DTU_W100_LITE_S,
+    0x10D8: DTUType.DTU_W100_LITE_S,
+    0x4130: DTUType.DTU_W100_LITE_S,
+    0x4132: DTUType.DTU_W100_LITE_S,
+    0x4133: DTUType.DTU_W100_LITE_S,
+    0x10D9: DTUType.DTU_W100_LITE_S,
+    0x4111: DTUType.DTU_W100_LITE_S,
+    0x10D2: DTUType.DTU_G100,
+    0x10D6: DTUType.DTU_LITE,
+    0x10D7: DTUType.DTU_LITE,
+    0x4131: DTUType.DTU_LITE,
+    0x1124: DTUType.DTU_HMS_W,
+    0x1125: DTUType.DTU_HMS_W,
+    0x1403: DTUType.DTU_HMS_W,
+    0x1144: DTUType.DTU_HMS_W,
+    0x1143: DTUType.DTU_HMS_W,
+    0x1145: DTUType.DTU_HMS_W,
+    0x1412: DTUType.DTU_HMS_W,
+    0x1164: DTUType.DTU_HMS_W,
+    0x1165: DTUType.DTU_HMS_W,
+    0x1166: DTUType.DTU_HMS_W,
+    0x1167: DTUType.DTU_HMS_W,
+    0x1222: DTUType.DTU_HMS_W,
+    0x1422: DTUType.DTU_HMS_W,
+    0x1423: DTUType.DTU_HMS_W,
+    0x1361: DTUType.DTU_HMS_W,
+    0x1362: DTUType.DTU_HMS_W,
+    0x1381: DTUType.DTU_HMS_W,
+    0x1382: DTUType.DTU_HMS_W,
+    0x4143: DTUType.DTU_HMS_W,
+}
+
+
+def format_number(number: int) -> str:
+    """Format number to two digits."""
+
+    return f"{number:02d}"
+
 
 def generate_version_string(version_number: int) -> str:
-    version_string = format_number(version_number // 2048) + "." + format_number((version_number // 64) % 32) + "." + format_number(version_number % 64)
+    """Generate version string."""
+
+    version_string = (
+        format_number(version_number // 2048)
+        + "."
+        + format_number((version_number // 64) % 32)
+        + "."
+        + format_number(version_number % 64)
+    )
     return version_string
 
+
 def generate_sw_version_string(version_number: int) -> str:
+    """Generate software version string."""
 
     version_number2 = version_number // 10000
     version_number3 = (version_number - (version_number2 * 10000)) // 100
-    version_number4 = (version_number - (version_number2 * 10000)) - (version_number3 * 100)
+    version_number4 = (version_number - (version_number2 * 10000)) - (
+        version_number3 * 100
+    )
 
-    version_string = format_number(version_number2) + "." + format_number(version_number3) + "." + format_number(version_number4)
+    version_string = (
+        format_number(version_number2)
+        + "."
+        + format_number(version_number3)
+        + "."
+        + format_number(version_number4)
+    )
     return version_string
 
 
-def generate_dtu_version_string(version_number: int, type: str = None) -> str:
+def generate_dtu_version_string(version_number: int, type: str = "") -> str:
+    """Generate DTU version string."""
 
     version_string = ""
     version_number2 = version_number % 256
     version_number3 = (version_number // 256) % 16
 
-    if "SRF" == str:
+    if type == "SRF":
         version_string += f"{format_number(version_number // 1048576)}.{format_number((version_number % 65536) // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
-    elif "HRF" == str:
+    elif type == "HRF":
         version_string += f"{format_number(version_number // 65536)}.{format_number((version_number % 65536) // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
     else:
         version_string += f"{format_number(version_number // 4096)}.{format_number(version_number3)}.{format_number(version_number2)}"
 
     return version_string
 
+
 def generate_inverter_serial_number(serial_number: int) -> str:
+    """Generate inverter serial number."""
+
     return hex(serial_number)[2:]
 
+
 def get_inverter_type(serial_bytes: bytes) -> InverterType:
-    
+    """Get inverter type."""
+
     inverter_type = None
     # Access individual bytes
     if serial_bytes[0] == 0x11:
@@ -95,17 +195,20 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
         if serial_bytes[1] in [0x12]:
             inverter_type = InverterType.TWO
 
-    if inverter_type == None:
-        raise ValueError(f"Unknown inverter type: {hex(serial_bytes[0])} {hex(serial_bytes[1])}")
+    if inverter_type is None:
+        raise ValueError(
+            f"Unknown inverter type: {hex(serial_bytes[0])} {hex(serial_bytes[1])}"
+        )
 
     return inverter_type
 
 
 def get_inverter_series(serial_bytes: bytes) -> InverterSeries:
+    """Get inverter series."""
 
     series = None
     if serial_bytes[0] == 0x11:
-        if (serial_bytes[1] & 0x0f) == 0x04:
+        if (serial_bytes[1] & 0x0F) == 0x04:
             series = InverterSeries.HMS
         else:
             series = InverterSeries.HM
@@ -118,52 +221,34 @@ def get_inverter_series(serial_bytes: bytes) -> InverterSeries:
         series = InverterSeries.HMT
     elif serial_bytes[0] == 0x14:
         series = InverterSeries.HMS
-    
+
     if series is None:
-        raise ValueError(f"Unknown series: {hex(serial_bytes[0])} {hex(serial_bytes[1])}!")
-    
+        raise ValueError(
+            f"Unknown series: {hex(serial_bytes[0])} {hex(serial_bytes[1])}!"
+        )
+
     return series
 
+
 def get_inverter_power(serial_bytes: bytes) -> InverterPower:
-    
-    inverter_type_bytes = struct.unpack('>H', serial_bytes[:2])[0]
+    """Get inverter power."""
 
-    power = None
+    inverter_type_bytes = struct.unpack(">H", serial_bytes[:2])[0]
 
-    if inverter_type_bytes in [0x1011]:
-        power = InverterPower.P_100
-    elif inverter_type_bytes in [0x1020]:
-        power = InverterPower.P_250
-    elif inverter_type_bytes in [0x1021, 0x1121]:
-        power = InverterPower.P_300_350_400
-    elif inverter_type_bytes in [0x1125]:
-        power = InverterPower.P_400
-    elif inverter_type_bytes in [0x1040]:
-        power = InverterPower.P_500
-    elif inverter_type_bytes in [0x1041, 0x1042, 0x1141]:
-        power = InverterPower.P_600_700_800
-    elif inverter_type_bytes in [0x1060]:
-        power = InverterPower.P_1000
-    elif inverter_type_bytes in [0x1061]:
-        power = InverterPower.P_1200_1500
-    elif inverter_type_bytes in [0x1161]:
-        power = InverterPower.P_1000_1200_1500
-    elif inverter_type_bytes in [0x1164]:
-        power = InverterPower.P_1600
-    elif inverter_type_bytes in [0x1412]:
-        power = InverterPower.P_800W
+    power = power_mapping.get(inverter_type_bytes)
 
     if power is None:
-        raise ValueError(f"Unknown power: {hex(serial_bytes[0])} {hex(serial_bytes[1])}!")
-    
+        raise ValueError(
+            f"Unknown power: {hex(serial_bytes[0])} {hex(serial_bytes[1])}!"
+        )
+
     return power
 
 
-
-
 def get_hw_model_name(serial_number: str) -> str:
+    """Get hardware model name."""
 
-    if(serial_number == "22069994886948"):
+    if serial_number == "22069994886948":
         serial_number = generate_inverter_serial_number(int(serial_number))
 
     serial_bytes = bytes.fromhex(serial_number)
@@ -176,40 +261,32 @@ def get_hw_model_name(serial_number: str) -> str:
         logger.error(e)
         return "Unknown"
     else:
-        inverter_model_name = inverter_series.value + "-" + inverter_power.value + "-" + inverter_type.value
+        inverter_model_name = (
+            inverter_series.value
+            + "-"
+            + inverter_power.value
+            + "-"
+            + inverter_type.value
+        )
         return inverter_model_name
 
+
 def get_dtu_model_type(serial_bytes: bytes) -> DTUType:
+    """Get DTU model type."""
 
-    dtu_type = None
+    dtu_type_bytes = struct.unpack(">H", serial_bytes[:2])[0]
 
-    dtu_type_bytes = struct.unpack('>H', serial_bytes[:2])[0]
-
-    if (dtu_type_bytes in [0x10F7] or
-        dtu_type_bytes in [0x10FB, 0x4101, 0x10FC, 0x4120] or
-        dtu_type_bytes in [0x10F8, 0x4100, 0x10FD, 0x4121]):
-        dtu_type = DTUType.DTU_PRO
-    elif dtu_type_bytes in [0x10D3, 0x4110, 0x10D8, 0x4130, 0x4132, 0x4133, 0x10D9, 0x4111]:
-        dtu_type = DTUType.DTU_W100_LITE_S
-    elif dtu_type_bytes in [0x10D2]:
-        dtu_type = DTUType.DTU_G100
-    elif dtu_type_bytes in [0x10D6, 0x10D7, 0x4131]:
-        dtu_type = DTUType.DTU_LITE
-    elif (dtu_type_bytes in [0x1124, 0x1125, 0x1403] or
-          dtu_type_bytes in [0x1144, 0x1143, 0x1145, 0x1412] or
-          dtu_type_bytes in [0x1164, 0x1165, 0x1166, 0x1167, 0x1222, 0x1422, 0x1423] or
-          dtu_type_bytes in [0x1361, 0x1362] or
-          dtu_type_bytes in [0x1381, 0x1382] or
-          dtu_type_bytes in [0x4143]):
-        dtu_type = DTUType.DTU_HMS_W
+    dtu_type = type_mapping.get(dtu_type_bytes)
 
     if dtu_type is None:
         raise ValueError(f"Unknown DTU: {serial_bytes[:2]}!")
 
     return dtu_type
 
+
 def get_dtu_model_name(serial_number: str) -> str:
-        
+    """Get DTU model name."""
+
     serial_bytes = bytes.fromhex(serial_number)
 
     try:
@@ -219,4 +296,3 @@ def get_dtu_model_name(serial_number: str) -> str:
         return "Unknown"
     else:
         return dtu_type.value
-
