@@ -67,7 +67,7 @@ class DTUType(Enum):
     DTU_LITE = "DTU-Lite"
     DTU_PRO = "DTU-PRO"
     DTU_PRO_S = "DTU-PRO-S"
-    DTU_HMS_W = "DTU-HMS-W"
+    DTUBI = "DTUBI"
     DTU_W100_LITE_S = "DTU-W100/DTU-Lite-S"
     DTU_W_LITE = "DTU-WLite"
 
@@ -94,25 +94,25 @@ type_mapping = {
     0x10D6: DTUType.DTU_LITE,
     0x10D7: DTUType.DTU_LITE,
     0x4131: DTUType.DTU_LITE,
-    0x1124: DTUType.DTU_HMS_W,
-    0x1125: DTUType.DTU_HMS_W,
-    0x1403: DTUType.DTU_HMS_W,
-    0x1144: DTUType.DTU_HMS_W,
-    0x1143: DTUType.DTU_HMS_W,
-    0x1145: DTUType.DTU_HMS_W,
-    0x1412: DTUType.DTU_HMS_W,
-    0x1164: DTUType.DTU_HMS_W,
-    0x1165: DTUType.DTU_HMS_W,
-    0x1166: DTUType.DTU_HMS_W,
-    0x1167: DTUType.DTU_HMS_W,
-    0x1222: DTUType.DTU_HMS_W,
-    0x1422: DTUType.DTU_HMS_W,
-    0x1423: DTUType.DTU_HMS_W,
-    0x1361: DTUType.DTU_HMS_W,
-    0x1362: DTUType.DTU_HMS_W,
-    0x1381: DTUType.DTU_HMS_W,
-    0x1382: DTUType.DTU_HMS_W,
-    0x4143: DTUType.DTU_HMS_W,
+    0x1124: DTUType.DTUBI,
+    0x1125: DTUType.DTUBI,
+    0x1403: DTUType.DTUBI,
+    0x1144: DTUType.DTUBI,
+    0x1143: DTUType.DTUBI,
+    0x1145: DTUType.DTUBI,
+    0x1412: DTUType.DTUBI,
+    0x1164: DTUType.DTUBI,
+    0x1165: DTUType.DTUBI,
+    0x1166: DTUType.DTUBI,
+    0x1167: DTUType.DTUBI,
+    0x1222: DTUType.DTUBI,
+    0x1422: DTUType.DTUBI,
+    0x1423: DTUType.DTUBI,
+    0x1361: DTUType.DTUBI,
+    0x1362: DTUType.DTUBI,
+    0x1381: DTUType.DTUBI,
+    0x1382: DTUType.DTUBI,
+    0x4143: DTUType.DTUBI,
 }
 
 

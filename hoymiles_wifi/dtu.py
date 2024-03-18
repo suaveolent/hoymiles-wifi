@@ -32,6 +32,7 @@ from hoymiles_wifi.const import (
     DEV_DTU,
     DTU_FIRMWARE_URL_00_01_11,
     DTU_PORT,
+    OFFSET,
 )
 from hoymiles_wifi.protobuf import (
     AppGetHistPower_pb2,
@@ -88,15 +89,6 @@ class DTU:
             self.state = new_state
             logger.debug(f"DTU is {new_state}")
 
-    async def async_get_real_data_hms(self) -> RealDataHMS_pb2.HMSStateResponse | None:
-        """Get real data HMS."""
-
-        request = RealDataHMS_pb2.HMSRealDataResDTO()
-        command = CMD_REAL_DATA_RES_DTO
-        return await self.async_send_request(
-            command, request, RealDataHMS_pb2.HMSStateResponse
-        )
-
     async def async_get_real_data(self) -> RealData_pb2.RealDataResDTO | None:
         """Get real data."""
 
@@ -113,7 +105,7 @@ class DTU:
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
-        request.offset = 28800
+        request.offset = OFFSET
         request.time = int(time.time())
         command = CMD_REAL_RES_DTO
         return await self.async_send_request(
@@ -124,7 +116,7 @@ class DTU:
         """Get config."""
 
         request = GetConfig_pb2.GetConfigResDTO()
-        request.offset = 28800
+        request.offset = OFFSET
         request.time = int(time.time()) - 60
         command = CMD_GET_CONFIG
         return await self.async_send_request(
@@ -137,7 +129,7 @@ class DTU:
         """Get network info."""
 
         request = NetworkInfo_pb2.NetworkInfoResDTO()
-        request.offset = 28800
+        request.offset = OFFSET
         request.time = int(time.time())
         command = CMD_NETWORK_INFO_RES
         return await self.async_send_request(
@@ -152,7 +144,7 @@ class DTU:
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
-        request.offset = 28800
+        request.offset = OFFSET
         request.time = int(time.time())
         command = CMD_APP_INFO_DATA_RES_DTO
         return await self.async_send_request(
@@ -165,7 +157,7 @@ class DTU:
         """Get historical power."""
 
         request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
-        request.offset = 28800
+        request.offset = OFFSET
         request.requested_time = int(time.time())
         command = CMD_APP_GET_HIST_POWER_RES
         return await self.async_send_request(
@@ -212,7 +204,7 @@ class DTU:
         request = initialize_set_config(get_config_req)
 
         request.time = int(time.time())
-        request.offset = 28800
+        request.offset = OFFSET
         request.app_page = 1
         request.netmode_select = NetmodeSelect.WIFI
         request.wifi_ssid = ssid.encode("utf-8")
@@ -290,7 +282,7 @@ class DTU:
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
-        request.offset = 28800
+        request.offset = OFFSET
         request.time = int(time.time())
         command = CMD_APP_INFO_DATA_RES_DTO
         return await self.async_send_request(
@@ -304,7 +296,7 @@ class DTU:
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
-        request.offset = 28800
+        request.offset = OFFSET
         request.time = int(time.time())
 
         command = CMD_HB_RES_DTO
@@ -363,6 +355,8 @@ class DTU:
                 raise ValueError("Buffer is too short for unpacking")
 
             crc16_target, read_length = struct.unpack(">HH", buf[6:10])
+
+            logger.debug(f"Read length: {read_length}")
 
             if len(buf) != read_length:
                 raise ValueError("Buffer is incomplete")

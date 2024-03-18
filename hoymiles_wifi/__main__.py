@@ -29,7 +29,6 @@ from hoymiles_wifi.protobuf import (
     InfomationData_pb2,
     NetworkInfo_pb2,
     RealData_pb2,
-    RealDataHMS_pb2,
     RealDataNew_pb2,
 )
 
@@ -69,14 +68,6 @@ async def async_get_real_data_new(
     """Get real data from the inverter asynchronously."""
 
     return await dtu.async_get_real_data_new()
-
-
-async def async_get_real_data_hms(
-    dtu: DTU,
-) -> RealDataHMS_pb2.RealDataHMSResDTO | None:
-    """Get real data from the inverter asynchronously."""
-
-    return await dtu.async_get_real_data_hms()
 
 
 async def async_get_real_data(dtu: DTU) -> RealData_pb2.RealDataResDTO | None:
@@ -300,7 +291,7 @@ def print_invalid_command(command: str) -> None:
 async def main() -> None:
     """Execute the main function for the hoymiles_wifi package."""
 
-    parser = argparse.ArgumentParser(description="Hoymiles HMS Monitoring")
+    parser = argparse.ArgumentParser(description="Hoymiles DTU Monitoring")
     parser.add_argument(
         "--host", type=str, required=True, help="IP address or hostname of the DTU"
     )
@@ -315,7 +306,6 @@ async def main() -> None:
         type=str,
         choices=[
             "get-real-data-new",
-            "get-real-data-hms",
             "get-real-data",
             "get-config",
             "network-info",
@@ -342,7 +332,6 @@ async def main() -> None:
     # Execute the specified command using a switch case
     switch = {
         "get-real-data-new": async_get_real_data_new,
-        "get-real-data-hms": async_get_real_data_hms,
         "get-real-data": async_get_real_data,
         "get-config": async_get_config,
         "network-info": async_network_info,
