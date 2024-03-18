@@ -43,7 +43,6 @@ from hoymiles_wifi.protobuf import (
     InfomationData_pb2,
     NetworkInfo_pb2,
     RealData_pb2,
-    RealDataHMS_pb2,
     RealDataNew_pb2,
     SetConfig_pb2,
 )
@@ -93,6 +92,13 @@ class DTU:
         """Get real data."""
 
         request = RealData_pb2.RealDataResDTO()
+        request.time_ymd_hms = (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        )
+        request.time = int(time.time())
+        request.offset = OFFSET
+        request.error_code = 0
+
         command = CMD_REAL_DATA_RES_DTO
         return await self.async_send_request(
             command, request, RealData_pb2.RealDataReqDTO
