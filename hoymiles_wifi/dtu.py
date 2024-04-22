@@ -56,6 +56,10 @@ class NetmodeSelect(Enum):
     SIM = 2
     LAN = 3
 
+    def __int__(self):
+        """Return the integer value of the network mode selection."""
+        return self.value
+
 
 class NetworkState(Enum):
     """Network state."""
