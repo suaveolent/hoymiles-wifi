@@ -15,6 +15,7 @@ from hoymiles_wifi import logger
 from hoymiles_wifi.const import (
     CMD_ACTION_DTU_REBOOT,
     CMD_ACTION_DTU_UPGRADE,
+    CMD_ACTION_GRID_FILE_READ,
     CMD_ACTION_LIMIT_POWER,
     CMD_ACTION_MI_SHUTDOWN,
     CMD_ACTION_MI_START,
@@ -22,6 +23,7 @@ from hoymiles_wifi.const import (
     CMD_APP_INFO_DATA_RES_DTO,
     CMD_CLOUD_COMMAND_RES_DTO,
     CMD_COMMAND_RES_DTO,
+    CMD_COMMAND_STATUS_RES_DTO,
     CMD_GET_CONFIG,
     CMD_HB_RES_DTO,
     CMD_HEADER,
@@ -113,6 +115,8 @@ class DTU:
         )
         request.offset = OFFSET
         request.time = int(time.time())
+        request.error_code = 0
+        request.cp = 0
         command = CMD_REAL_RES_DTO
         return await self.async_send_request(
             command, request, RealDataNew_pb2.RealDataNewReqDTO
@@ -309,6 +313,55 @@ class DTU:
         return await self.async_send_request(
             command, request, APPHeartbeatPB_pb2.HBReqDTO
         )
+
+    async def async_read_grid_profile(self) -> CommandPB_pb2.CommandStatusReqDTO | None:
+        """Read grid file."""
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.time = int(time.time())
+        request.action = CMD_ACTION_GRID_FILE_READ
+        request.package_nub = 1
+        request.tid = int(time.time())
+        request.data = "0"
+        request.mi_to_sn.append(22069994886948)
+
+        command = CMD_COMMAND_RES_DTO
+        response = await self.async_send_request(
+            command, request, CommandPB_pb2.CommandReqDTO
+        )
+
+        print(response)
+
+        status_request = CommandPB_pb2.CommandStatusResDTO()
+        status_request.time = int(time.time())
+        status_request.action = CMD_ACTION_GRID_FILE_READ
+        request.package_now = 1
+        status_request.tid = int(time.time())
+        command = CMD_COMMAND_STATUS_RES_DTO
+
+        status_response = await self.async_send_request(
+            command, request, CommandPB_pb2.CommandStatusReqDTO
+        )
+
+        print(status_response)
+
+        info_data_response = await self.async_app_information_data()
+        print(info_data_response)
+
+        # info_data_request = InfomationData_pb2.InfoDataResDTO()
+        # info_data_request.time_ymd_hms = (
+        #     datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        # )
+        # info_data_request.offset = OFFSET
+        # info_data_request.time = int(time.time())
+        # command = CMD_APP_INFO_DATA_RES_DTO
+        # info_data_response = await self.async_send_request(
+        #     command, request, APPInfomationData_pb2.APPInfoDataReqDTO
+        # )
+
+        # print(info_data_response)
+
+        return status_response
 
     async def async_send_request(
         self,

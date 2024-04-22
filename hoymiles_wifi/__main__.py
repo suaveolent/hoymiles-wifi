@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import json
 from dataclasses import asdict, dataclass
+import sys
 
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.message import Message
@@ -282,6 +283,12 @@ async def async_identify_inverters(dtu: DTU) -> list[str]:
     return inverter_models
 
 
+async def async_read_grid_profile(dtu: DTU) -> str:
+    """Read the grid profile asynchronously."""
+
+    return await dtu.async_read_grid_profile()
+
+
 def print_invalid_command(command: str) -> None:
     """Print an invalid command message."""
 
@@ -322,6 +329,7 @@ async def main() -> None:
             "heartbeat",
             "identify-dtu",
             "identify-inverters",
+            "read-grid-profile",
         ],
         help="Command to execute",
     )
@@ -348,6 +356,7 @@ async def main() -> None:
         "heartbeat": async_heatbeat,
         "identify-dtu": async_identify_dtu,
         "identify-inverters": async_identify_inverters,
+        "read-grid-profile": async_read_grid_profile,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
