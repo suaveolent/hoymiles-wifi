@@ -6,7 +6,7 @@ import asyncio
 import struct
 import time
 from datetime import datetime
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Any
 
 from crcmod import mkCrcFun
@@ -49,16 +49,12 @@ from hoymiles_wifi.protobuf import (
 from hoymiles_wifi.utils import initialize_set_config
 
 
-class NetmodeSelect(Enum):
+class NetmodeSelect(IntEnum):
     """Network mode selection."""
 
     WIFI = 1
     SIM = 2
     LAN = 3
-
-    def __int__(self):
-        """Return the integer value of the network mode selection."""
-        return self.value
 
 
 class NetworkState(Enum):
