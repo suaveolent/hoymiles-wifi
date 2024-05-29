@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import sys
 from dataclasses import asdict, dataclass
 
 from google.protobuf.json_format import MessageToJson
@@ -286,6 +287,8 @@ def print_invalid_command(command: str) -> None:
     """Print an invalid command message."""
 
     print(f"Invalid command: {command}")  # noqa: T201
+    sys.exit(1)
+    
 
 
 async def main() -> None:
@@ -366,6 +369,7 @@ async def main() -> None:
             f"No response or unable to retrieve response for "
             f"{args.command.replace('_', ' ')}",
         )
+        sys.exit(2)
 
 
 def run_main() -> None:
