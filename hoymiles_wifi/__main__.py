@@ -283,6 +283,12 @@ async def async_identify_inverters(dtu: DTU) -> list[str]:
     return inverter_models
 
 
+async def async_get_alarm_list(dtu: DTU) -> None:
+    """Get alarm list from the dtu asynchronously."""
+
+    return await dtu.async_get_alarm_list()
+
+
 def print_invalid_command(command: str) -> None:
     """Print an invalid command message."""
 
@@ -325,6 +331,7 @@ async def main() -> None:
             "heartbeat",
             "identify-dtu",
             "identify-inverters",
+            "get-alarm-list",
         ],
         help="Command to execute",
     )
@@ -351,6 +358,7 @@ async def main() -> None:
         "heartbeat": async_heatbeat,
         "identify-dtu": async_identify_dtu,
         "identify-inverters": async_identify_inverters,
+        "get-alarm-list": async_get_alarm_list,
     }
 
     command_func = switch.get(args.command, print_invalid_command)

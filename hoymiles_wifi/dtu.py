@@ -13,6 +13,7 @@ from crcmod import mkCrcFun
 
 from hoymiles_wifi import logger
 from hoymiles_wifi.const import (
+    CMD_ACTION_ALARM_LIST,
     CMD_ACTION_DTU_REBOOT,
     CMD_ACTION_DTU_UPGRADE,
     CMD_ACTION_LIMIT_POWER,
@@ -308,6 +309,20 @@ class DTU:
         command = CMD_HB_RES_DTO
         return await self.async_send_request(
             command, request, APPHeartbeatPB_pb2.HBReqDTO
+        )
+
+    async def async_get_alarm_list(self) -> CommandPB_pb2.CommandResDTO | None:
+        """Turn off DTU."""
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.action = CMD_ACTION_ALARM_LIST
+        request.package_nub = 1
+        request.dev_kind = 0
+        request.tid = int(time.time())
+
+        command = CMD_COMMAND_RES_DTO
+        return await self.async_send_request(
+            command, request, CommandPB_pb2.CommandReqDTO
         )
 
     async def async_send_request(
