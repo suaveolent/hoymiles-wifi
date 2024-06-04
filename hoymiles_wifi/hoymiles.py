@@ -34,6 +34,7 @@ class InverterPower(Enum):
     P_600_700_800 = "600/700/800"
     P_800W = "800W"
     P_1000 = "1000"
+    P_10000W = "10000W"
     P_1000_1200_1500 = "1000/1200/1500"
     P_1200_1500 = "1200/1500"
     P_1600 = "1600"
@@ -54,7 +55,8 @@ power_mapping = {
     0x1061: InverterPower.P_1200_1500,
     0x1161: InverterPower.P_1000_1200_1500,
     0x1164: InverterPower.P_1600,
-    0x1412: InverterPower.P_800W,
+    0x141292: InverterPower.P_800W,
+    0x141293: InverterPower.P_10000W,
 }
 
 
@@ -114,6 +116,8 @@ type_mapping = {
     0x1382: DTUType.DTUBI,
     0x4143: DTUType.DTUBI,
 }
+
+HMS_W_SERIES = 0x1412
 
 
 def format_number(number: int) -> str:
@@ -235,6 +239,9 @@ def get_inverter_power(serial_bytes: bytes) -> InverterPower:
 
     inverter_type_bytes = struct.unpack(">H", serial_bytes[:2])[0]
 
+    if inverter_type_bytes == HMS_W_SERIES:
+        inverter_type_bytes = struct.unpack(">I", b"\x00" + serial_bytes[:3])[0]
+
     power = power_mapping.get(inverter_type_bytes)
 
     if power is None:
@@ -247,9 +254,6 @@ def get_inverter_power(serial_bytes: bytes) -> InverterPower:
 
 def get_inverter_model_name(serial_number: str) -> str:
     """Get hardware model name."""
-
-    if serial_number == "22069994886948":
-        serial_number = generate_inverter_serial_number(int(serial_number))
 
     serial_bytes = bytes.fromhex(serial_number)
 
