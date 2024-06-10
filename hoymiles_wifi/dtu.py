@@ -164,8 +164,10 @@ class DTU:
         """Get historical power."""
 
         request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
+        request.control_point = 0
         request.offset = OFFSET
         request.requested_time = int(time.time())
+        request.requested_day = 0
         command = CMD_APP_GET_HIST_POWER_RES
         return await self.async_send_request(
             command,

@@ -34,7 +34,7 @@ class InverterPower(Enum):
     P_600_700_800 = "600/700/800"
     P_800W = "800W"
     P_1000 = "1000"
-    P_10000W = "10000W"
+    P_1000W = "1000W"
     P_1000_1200_1500 = "1000/1200/1500"
     P_1200_1500 = "1200/1500"
     P_1600 = "1600"
@@ -56,7 +56,7 @@ power_mapping = {
     0x1161: InverterPower.P_1000_1200_1500,
     0x1164: InverterPower.P_1600,
     0x141292: InverterPower.P_800W,
-    0x141293: InverterPower.P_10000W,
+    0x141293: InverterPower.P_1000W,
 }
 
 
