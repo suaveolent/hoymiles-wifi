@@ -280,6 +280,11 @@ async def async_identify_inverters(dtu: DTU) -> list[str]:
             inverter_model = get_inverter_model_name(serial_number)
             inverter_models.append(inverter_model)
 
+        for tgs_data in real_data.tgs_data:
+            serial_number = generate_inverter_serial_number(tgs_data.serial_number)
+            inverter_model = get_inverter_model_name(serial_number)
+            inverter_models.append(inverter_model)
+
     return inverter_models
 
 
@@ -294,7 +299,6 @@ def print_invalid_command(command: str) -> None:
 
     print(f"Invalid command: {command}")  # noqa: T201
     sys.exit(1)
-    
 
 
 async def main() -> None:
