@@ -183,6 +183,12 @@ def generate_inverter_serial_number(serial_number: int) -> str:
     return hex(serial_number)[2:]
 
 
+def convert_inverter_serial_number(serial_number_str: str) -> int:
+    """Get inverter serial number from string."""
+
+    return int(serial_number_str, 16)
+
+
 def get_inverter_type(serial_bytes: bytes) -> InverterType:
     """Get inverter type."""
 

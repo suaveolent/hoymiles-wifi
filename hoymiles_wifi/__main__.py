@@ -209,23 +209,27 @@ async def async_restart_dtu(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
 
 
 async def async_turn_on_inverter(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
-    """Turn on the irnverte asynchronously."""
+    """Turn on the inverter asynchronously."""
 
-    cont = input("Do you want to turn *ON* the DTU? (y/n): ")
+    inverter_serial = input("Enter the inverter serial number to turn *ON*: ")
+
+    cont = input(f"Do you want to turn *ON* the Inverter {inverter_serial}? (y/n): ")
     if cont != "y":
         return None
 
-    return await dtu.async_turn_on_dtu()
+    return await dtu.async_turn_on_inverter(inverter_serial)
 
 
 async def async_turn_off_inverter(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
     """Turn off the inverter asynchronously."""
 
-    cont = input("Do you want to turn *OFF* the DTU? (y/n): ")
+    inverter_serial = input("Enter the inverter serial number to turn *OFF*: ")
+
+    cont = input(f"Do you want to turn *OFF* the Inverter {inverter_serial}? (y/n): ")
     if cont != "y":
         return None
 
-    return await dtu.async_turn_off_dtu()
+    return await dtu.async_turn_off_inverter(inverter_serial)
 
 
 async def async_get_information_data(
@@ -355,8 +359,8 @@ async def main() -> None:
         "set-wifi": async_set_wifi,
         "firmware-update": async_firmware_update,
         "restart-dtu": async_restart_dtu,
-        "turn-on": async_turn_on_inverter,
-        "turn-off": async_turn_off_inverter,
+        "turn-on-inverter": async_turn_on_inverter,
+        "turn-off-inverter": async_turn_off_inverter,
         "get-information-data": async_get_information_data,
         "get-version-info": async_get_version_info,
         "heartbeat": async_heatbeat,
