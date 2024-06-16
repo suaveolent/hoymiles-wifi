@@ -35,6 +35,7 @@ class InverterPower(Enum):
     P_800W = "800W"
     P_1000 = "1000"
     P_1000W = "1000W"
+    P_800W_1000W = "800W/1000W"
     P_1000_1200_1500 = "1000/1200/1500"
     P_1200_1500 = "1200/1500"
     P_1600 = "1600"
@@ -56,8 +57,7 @@ power_mapping = {
     0x1061: InverterPower.P_1200_1500,
     0x1161: InverterPower.P_1000_1200_1500,
     0x1164: InverterPower.P_1600,
-    0x141292: InverterPower.P_800W,
-    0x141293: InverterPower.P_1000W,
+    0x1412: InverterPower.P_800W_1000W,
     0x1382: InverterPower.P_2250,
 }
 
@@ -118,8 +118,6 @@ type_mapping = {
     0x1382: DTUType.DTUBI,
     0x4143: DTUType.DTUBI,
 }
-
-HMS_W_SERIES = 0x1412
 
 
 def format_number(number: int) -> str:
@@ -246,10 +244,6 @@ def get_inverter_power(serial_bytes: bytes) -> InverterPower:
     """Get inverter power."""
 
     inverter_type_bytes = struct.unpack(">H", serial_bytes[:2])[0]
-
-    if inverter_type_bytes == HMS_W_SERIES:
-        inverter_type_bytes = struct.unpack(">I", b"\x00" + serial_bytes[:3])[0]
-
     power = power_mapping.get(inverter_type_bytes)
 
     if power is None:
