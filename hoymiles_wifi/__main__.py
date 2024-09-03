@@ -270,24 +270,26 @@ async def async_identify_dtu(dtu: DTU) -> str:
     """Identify the DTU asynchronously."""
 
     real_data = await async_get_real_data_new(dtu)
-    return get_dtu_model_name(real_data.device_serial_number)
+    dtu_model_name = get_dtu_model_name(real_data.device_serial_number)
+
+    return {real_data.device_serial_number: dtu_model_name}
 
 
 async def async_identify_inverters(dtu: DTU) -> list[str]:
     """Identify the DTU asynchronously."""
 
-    inverter_models = []
+    inverter_models = {}
     real_data = await async_get_real_data_new(dtu)
     if real_data:
         for sgs_data in real_data.sgs_data:
             serial_number = generate_inverter_serial_number(sgs_data.serial_number)
             inverter_model = get_inverter_model_name(serial_number)
-            inverter_models.append(inverter_model)
+            inverter_models[serial_number] = inverter_model
 
         for tgs_data in real_data.tgs_data:
             serial_number = generate_inverter_serial_number(tgs_data.serial_number)
             inverter_model = get_inverter_model_name(serial_number)
-            inverter_models.append(inverter_model)
+            inverter_models[serial_number] = inverter_model
 
     return inverter_models
 
@@ -376,6 +378,8 @@ async def main() -> None:
         if args.as_json:
             if isinstance(response, Message):
                 print(MessageToJson(response))  # noqa: T201
+            elif isinstance(response, dict):
+                print(json.dumps(response, indent=4))  # noqa: T201
             else:
                 print(json.dumps(asdict(response), indent=4))  # noqa: T201
         else:
