@@ -120,6 +120,16 @@ type_mapping = {
 }
 
 
+class MeterType(Enum):
+    """Meter type."""
+
+    DDSU666 = "DDSU666"
+    DTSU666 = "DTSU666"
+
+
+meter_mapping = {0x1123: MeterType.DDSU666}
+
+
 def format_number(number: int) -> str:
     """Format number to two digits."""
 
@@ -302,3 +312,30 @@ def get_dtu_model_name(serial_number: str) -> str:
         return "Unknown"
     else:
         return dtu_type.value
+
+
+def get_meter_model_type(serial_bytes: bytes) -> MeterType:
+    """Get Meter model type."""
+
+    dtu_type_bytes = struct.unpack(">H", serial_bytes[:2])[0]
+
+    meter_type = meter_mapping.get(dtu_type_bytes)
+
+    if meter_type is None:
+        raise ValueError(f"Unknown Meter: {serial_bytes[:2]}!")
+
+    return meter_type
+
+
+def get_meter_model_name(serial_number: str) -> str:
+    """Get Meter model name."""
+
+    serial_bytes = bytes.fromhex(serial_number)
+
+    try:
+        meter_type = get_meter_model_type(serial_bytes)
+    except Exception as e:
+        logger.error(e)
+        return "Unknown"
+    else:
+        return meter_type.value
