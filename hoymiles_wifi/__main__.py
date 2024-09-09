@@ -315,6 +315,12 @@ async def main() -> None:
         "--host", type=str, required=True, help="IP address or hostname of the DTU"
     )
     parser.add_argument(
+        "--local_addr",
+        type=str,
+        required=False,
+        help="IP address of the interface to bind to",
+    )
+    parser.add_argument(
         "--as-json",
         action="store_true",
         default=False,
@@ -347,7 +353,7 @@ async def main() -> None:
     )
     args = parser.parse_args()
 
-    dtu = DTU(args.host)
+    dtu = DTU(args.host, args.local_addr)
 
     # Execute the specified command using a switch case
     switch = {

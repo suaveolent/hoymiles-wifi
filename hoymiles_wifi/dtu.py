@@ -70,10 +70,11 @@ class NetworkState(Enum):
 class DTU:
     """DTU class."""
 
-    def __init__(self, host: str):
+    def __init__(self, host: str, local_addr: str = None):
         """Initialize DTU class."""
 
         self.host = host
+        self.local_addr = local_addr
         self.state = NetworkState.Unknown
         self.sequence = 0
         self.mutex = asyncio.Lock()
@@ -365,11 +366,13 @@ class DTU:
             + request_as_bytes
         )
 
-        address = (self.host, dtu_port)
+        ip_to_bind = (self.local_addr, 0) if self.local_addr is not None else None
 
         async with self.mutex:
             try:
-                reader, writer = await asyncio.open_connection(*address)
+                reader, writer = await asyncio.open_connection(
+                    host=self.host, port=dtu_port, local_addr=ip_to_bind
+                )
 
                 writer.write(message)
                 await writer.drain()
