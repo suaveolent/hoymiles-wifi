@@ -47,7 +47,8 @@ commands:
     get-version-info,
     heartbeat,
     identify-dtu,
-    identify-inverters
+    identify-inverters,
+    identify-meters,
 
 The `--as-json` option is optional and allows formatting the output as JSON.
 ```
