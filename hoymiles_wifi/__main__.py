@@ -20,6 +20,7 @@ from hoymiles_wifi.hoymiles import (
     generate_version_string,
     get_dtu_model_name,
     get_inverter_model_name,
+    get_meter_model_name,
 )
 from hoymiles_wifi.protobuf import (
     AppGetHistPower_pb2,
@@ -294,6 +295,20 @@ async def async_identify_inverters(dtu: DTU) -> list[str]:
     return inverter_models
 
 
+async def async_identify_meters(dtu: DTU) -> list[str]:
+    """Identify the meters asynchronously."""
+
+    meter_models = {}
+    real_data = await async_get_real_data_new(dtu)
+    if real_data:
+        for meter_model in real_data.meter_data:
+            serial_number = generate_inverter_serial_number(meter_model.serial_number)
+            meter_model = get_meter_model_name(serial_number)
+            meter_models[serial_number] = meter_model
+
+    return meter_models
+
+
 async def async_get_alarm_list(dtu: DTU) -> None:
     """Get alarm list from the dtu asynchronously."""
 
@@ -347,6 +362,7 @@ async def main() -> None:
             "heartbeat",
             "identify-dtu",
             "identify-inverters",
+            "identify-meters",
             "get-alarm-list",
         ],
         help="Command to execute",
@@ -374,6 +390,7 @@ async def main() -> None:
         "heartbeat": async_heatbeat,
         "identify-dtu": async_identify_dtu,
         "identify-inverters": async_identify_inverters,
+        "identify-meters": async_identify_meters,
         "get-alarm-list": async_get_alarm_list,
     }
 
@@ -391,10 +408,18 @@ async def main() -> None:
         else:
             print(f"{args.command.capitalize()} Response: \n{response}")  # noqa: T201
     else:
-        print(  # noqa: T201
-            f"No response or unable to retrieve response for "
-            f"{args.command.replace('_', ' ')}",
-        )
+        if args.as_json:
+            print(  # noqa: T201
+                json.dumps(
+                    {"error": f"No response for {args.command.replace('_', ' ')}"},
+                    indent=4,
+                )
+            )
+        else:
+            print(  # noqa: T201
+                f"No response or unable to retrieve response for "
+                f"{args.command.replace('_', ' ')}",
+            )
         sys.exit(2)
 
 
