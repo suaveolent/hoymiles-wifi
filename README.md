@@ -78,11 +78,11 @@ else:
 - `async_set_power_limit(power_limit)`: Set the power limit of the inverter (0-100%)
 - `async_set_wifi(wifi_ssid, wifi_password)`: Configure the wifi network
 - `async_firmware_update()`: Update to latest firmware
-- `async_restart_dtu`: Restart the DTU
-- `async_turn_on_inverter`: Turn the inverter on
-- `async_turn_off_inverter`: Turn the inverter off
-- `async_get_information_data`: Retrieve information data
-- `async_heartbeat`: Request a heartbeat message from the DTU
+- `async_restart_dtu()`: Restart the DTU
+- `async_turn_on_inverter()`: Turn the inverter on
+- `async_turn_off_inverter()`: Turn the inverter off
+- `async_get_information_data()`: Retrieve information data
+- `async_heartbeat()`: Request a heartbeat message from the DTU
 
 ## Note
 
