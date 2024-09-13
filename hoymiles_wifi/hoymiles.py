@@ -124,7 +124,7 @@ class MeterType(Enum):
     DTSU666 = "DTSU666"
 
 
-meter_mapping = {0x1123: MeterType.DDSU666}
+meter_mapping = {0x10C0: MeterType.DDSU666}
 
 
 def format_number(number: int) -> str:
