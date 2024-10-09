@@ -370,8 +370,13 @@ class DTU:
 
         async with self.mutex:
             try:
-                reader, writer = await asyncio.open_connection(
-                    host=self.host, port=dtu_port, local_addr=ip_to_bind
+                reader, writer = await asyncio.wait_for(
+                    asyncio.open_connection(
+                        host=self.host,
+                        port=dtu_port,
+                        local_addr=ip_to_bind,
+                    ),
+                    timeout=5,
                 )
 
                 writer.write(message)
