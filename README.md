@@ -12,7 +12,8 @@ https://github.com/suaveolent/ha-hoymiles-wifi
 The library was successfully tested with:
 
 - Hoymiles HMS-800W-2T
-- Hoymiles DTU WLite
+- Hoymiles DTU-WLite
+- Hoymiles DTU-Pro
 
 ## Installation
 
