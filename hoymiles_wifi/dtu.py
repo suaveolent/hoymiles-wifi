@@ -389,8 +389,9 @@ class DTU:
                 return None
             finally:
                 try:
-                    writer.close()
-                    await writer.wait_closed()
+                    if writer:
+                        writer.close()
+                        await writer.wait_closed()
                 except Exception as e:
                     logger.debug(f"Error closing writer: {e}")
 
