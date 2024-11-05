@@ -124,7 +124,9 @@ class MeterType(Enum):
     DTSU666 = "DTSU666"
 
 
-meter_mapping = {0x10C0: MeterType.DDSU666}
+meter_mapping = {
+    0x10C0: MeterType.DDSU666,
+}
 
 
 def format_number(number: int) -> str:
@@ -198,8 +200,10 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
     """Get inverter type."""
 
     inverter_type = None
-    # Access individual bytes
-    if serial_bytes[0] == 0x11:
+    if serial_bytes[0] == 0x10:
+        if (serial_bytes[1]) == 0x14:
+            inverter_type = InverterType.TWO
+    elif serial_bytes[0] == 0x11:
         if serial_bytes[1] in [0x25, 0x24, 0x22, 0x21]:
             inverter_type = InverterType.ONE
         elif serial_bytes[1] in [0x44, 0x42, 0x41]:
