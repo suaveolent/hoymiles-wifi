@@ -118,7 +118,7 @@ class DTU:
         )
         request.offset = OFFSET
         request.time = int(time.time())
-        request.cp = 1
+        request.cp = 0
         command = CMD_REAL_RES_DTO
 
         # Await the initial response
@@ -131,7 +131,7 @@ class DTU:
             combined_response.MergeFrom(response)
 
             # Fetch additional data based on the value of response.ap
-            for cp in range(2, response.ap + 1):
+            for cp in range(1, response.ap):
                 request.cp = cp
                 additional_response = await self.async_send_request(
                     command, request, RealDataNew_pb2.RealDataNewReqDTO
