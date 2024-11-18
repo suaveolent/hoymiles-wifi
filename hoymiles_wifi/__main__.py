@@ -68,7 +68,6 @@ async def async_get_real_data_new(
     dtu: DTU,
 ) -> RealDataNew_pb2.RealDataNewResDTO | None:
     """Get real data from the inverter asynchronously."""
-
     return await dtu.async_get_real_data_new()
 
 

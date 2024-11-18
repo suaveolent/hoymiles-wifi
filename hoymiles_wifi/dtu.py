@@ -107,32 +107,37 @@ class DTU:
             command, request, RealData_pb2.RealDataReqDTO
         )
 
-    async def async_get_real_data_new(
-        self, num_packages: int = 1
-    ) -> RealDataNew_pb2.RealDataNewResDTO | None:
+    async def async_get_real_data_new(self) -> RealDataNew_pb2.RealDataNewResDTO | None:
         """Get real data new."""
 
         combined_response = RealDataNew_pb2.RealDataNewReqDTO()
 
-        for cp in range(num_packages):
-            request = RealDataNew_pb2.RealDataNewResDTO()
-            request.time_ymd_hms = (
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
-            )
+        request = RealDataNew_pb2.RealDataNewResDTO()
+        request.time_ymd_hms = (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        )
+        request.offset = OFFSET
+        request.time = int(time.time())
+        request.cp = 1
+        command = CMD_REAL_RES_DTO
 
-            request.offset = OFFSET
-            request.time = int(time.time())
-            request.cp = cp
-            command = CMD_REAL_RES_DTO
+        # Await the initial response
+        response = await self.async_send_request(
+            command, request, RealDataNew_pb2.RealDataNewReqDTO
+        )
 
-            # Await the response
-            response = await self.async_send_request(
-                command, request, RealDataNew_pb2.RealDataNewReqDTO
-            )
+        # Combine the initial response into the combined_response
+        if response is not None:
+            combined_response.MergeFrom(response)
 
-            # Combine the response into the combined_response
-            if response is not None:
-                combined_response.MergeFrom(response)
+            # Fetch additional data based on the value of response.ap
+            for cp in range(2, response.ap + 1):
+                request.cp = cp
+                additional_response = await self.async_send_request(
+                    command, request, RealDataNew_pb2.RealDataNewReqDTO
+                )
+                if additional_response is not None:
+                    combined_response.MergeFrom(additional_response)
 
         return combined_response if combined_response.ByteSize() > 0 else None
 
