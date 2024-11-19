@@ -213,7 +213,7 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
     elif serial_bytes[0] == 0x13:
         inverter_type = InverterType.SIX
     elif serial_bytes[0] == 0x14:
-        if serial_bytes[1] in [0x12]:
+        if serial_bytes[1] in [0x10, 0x12]:
             inverter_type = InverterType.TWO
 
     if inverter_type is None:
