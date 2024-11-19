@@ -110,16 +110,36 @@ class DTU:
     async def async_get_real_data_new(self) -> RealDataNew_pb2.RealDataNewResDTO | None:
         """Get real data new."""
 
+        combined_response = RealDataNew_pb2.RealDataNewReqDTO()
+
         request = RealDataNew_pb2.RealDataNewResDTO()
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
         request.offset = OFFSET
         request.time = int(time.time())
+        request.cp = 0
         command = CMD_REAL_RES_DTO
-        return await self.async_send_request(
+
+        # Await the initial response
+        response = await self.async_send_request(
             command, request, RealDataNew_pb2.RealDataNewReqDTO
         )
+
+        # Combine the initial response into the combined_response
+        if response is not None:
+            combined_response.MergeFrom(response)
+
+            # Fetch additional data based on the value of response.ap
+            for cp in range(1, response.ap):
+                request.cp = cp
+                additional_response = await self.async_send_request(
+                    command, request, RealDataNew_pb2.RealDataNewReqDTO
+                )
+                if additional_response is not None:
+                    combined_response.MergeFrom(additional_response)
+
+        return combined_response if combined_response.ByteSize() > 0 else None
 
     async def async_get_config(self) -> GetConfig_pb2.GetConfigResDTO | None:
         """Get config."""

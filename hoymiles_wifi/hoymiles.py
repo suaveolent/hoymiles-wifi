@@ -30,6 +30,7 @@ class InverterPower(Enum):
     P_250 = "250"
     P_300_350_400 = "300/350/400"
     P_400 = "400"
+    P_400W = "400W"
     P_500 = "500"
     P_600_700_800 = "600/700/800"
     P_1000 = "1000"
@@ -46,6 +47,7 @@ power_mapping = {
     0x1021: InverterPower.P_300_350_400,
     0x1121: InverterPower.P_300_350_400,
     0x1125: InverterPower.P_400,
+    0x1403: InverterPower.P_400W,
     0x1040: InverterPower.P_500,
     0x1041: InverterPower.P_600_700_800,
     0x1042: InverterPower.P_600_700_800,
@@ -114,6 +116,7 @@ type_mapping = {
     0x1381: DTUType.DTUBI,
     0x1382: DTUType.DTUBI,
     0x4143: DTUType.DTUBI,
+    0x4144: DTUType.DTUBI,
 }
 
 
@@ -124,7 +127,9 @@ class MeterType(Enum):
     DTSU666 = "DTSU666"
 
 
-meter_mapping = {0x10C0: MeterType.DDSU666}
+meter_mapping = {
+    0x10C0: MeterType.DDSU666,
+}
 
 
 def format_number(number: int) -> str:
@@ -198,8 +203,10 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
     """Get inverter type."""
 
     inverter_type = None
-    # Access individual bytes
-    if serial_bytes[0] == 0x11:
+    if serial_bytes[0] == 0x10:
+        if (serial_bytes[1]) == 0x14:
+            inverter_type = InverterType.TWO
+    elif serial_bytes[0] == 0x11:
         if serial_bytes[1] in [0x25, 0x24, 0x22, 0x21]:
             inverter_type = InverterType.ONE
         elif serial_bytes[1] in [0x44, 0x42, 0x41]:
@@ -209,7 +216,9 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
     elif serial_bytes[0] == 0x13:
         inverter_type = InverterType.SIX
     elif serial_bytes[0] == 0x14:
-        if serial_bytes[1] in [0x12]:
+        if serial_bytes[1] in [0x03]:
+            inverter_type = InverterType.ONE
+        if serial_bytes[1] in [0x10, 0x12]:
             inverter_type = InverterType.TWO
 
     if inverter_type is None:

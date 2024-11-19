@@ -101,8 +101,8 @@ message PvMO {
 message RealDataNewReqDTO {
   string device_serial_number = 1; // Serial number of the device
   int32 timestamp = 2;             // Timestamp of the data
-  int32 active_power = 3;          // Active power (Watts)
-  int32 cp = 4;                    // Control parameter?
+  int32 ap = 3;                    // Number of packages
+  int32 cp = 4;                    // Current pacakge
   int32 firmware_version = 5;      // Firmware version
   repeated MeterMO meter_data = 6; // Meter data array
   repeated RpMO rp_data = 7;       // RpMO data array
@@ -116,7 +116,7 @@ message RealDataNewReqDTO {
 
 message RealDataNewResDTO {
   string time_ymd_hms = 1; // Timestamp in the format YMD_HMS
-  int32 cp = 2;            // Control parameter?
+  int32 cp = 2;            // Current Package
   int32 error_code = 3;    // Error code indicator
   int32 offset = 4;        // Offset value
   int32 time = 5;          // Timestamp value
