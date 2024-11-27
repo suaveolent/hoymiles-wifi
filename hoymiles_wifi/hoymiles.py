@@ -129,6 +129,7 @@ class MeterType(Enum):
 
 meter_mapping = {
     0x10C0: MeterType.DDSU666,
+    0x37ff: MeterType.DTSU666,
 }
 
 
