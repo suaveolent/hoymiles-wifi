@@ -19,6 +19,7 @@ from hoymiles_wifi.const import (
     CMD_ACTION_LIMIT_POWER,
     CMD_ACTION_MI_SHUTDOWN,
     CMD_ACTION_MI_START,
+    CMD_ACTION_PERFORMANCE_DATA_MODE,
     CMD_APP_GET_HIST_POWER_RES,
     CMD_APP_INFO_DATA_RES_DTO,
     CMD_CLOUD_COMMAND_RES_DTO,
@@ -356,6 +357,18 @@ class DTU:
         request.dev_kind = 0
         request.tid = int(time.time())
 
+        command = CMD_COMMAND_RES_DTO
+        return await self.async_send_request(
+            command, request, CommandPB_pb2.CommandReqDTO
+        )
+
+    async def async_enable_performance_data_mode(self) -> CommandPB_pb2.CommandReqDTO | None:
+        """Enable performance mode to be able to receive new Data with a 30s or lower update interval."""
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.time = int(time.time())
+        request.action = CMD_ACTION_PERFORMANCE_DATA_MODE
+        request.package_nub = 1
         command = CMD_COMMAND_RES_DTO
         return await self.async_send_request(
             command, request, CommandPB_pb2.CommandReqDTO

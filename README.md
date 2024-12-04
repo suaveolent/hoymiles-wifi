@@ -33,7 +33,6 @@ hoymiles-wifi [-h] --host HOST [--local_addr IP_OF_INTERFACE_TO_USE] [--as-json]
 
 commands:
     get-real-data-new,
-    get-real-data-hms,
     get-real-data,
     get-config,
     network-info,
@@ -51,6 +50,8 @@ commands:
     identify-dtu,
     identify-inverters,
     identify-meters,
+    get-alarm-list,
+    enable-performance-data-mode,
 
 The `--as-json` option is optional and allows formatting the output as JSON.
 ```
@@ -72,7 +73,6 @@ else:
 #### Available functions
 
 - `async_get_real_data_new()`: Retrieve real-time data
-- `async_get_real_data_hms()`: Retrieve real-time data
 - `async_get_real_data()`: Retrieve real-time data
 - `async_get_config()`: Retrieve configuration information
 - `async_network_info()`: Retrieve network information
@@ -86,6 +86,8 @@ else:
 - `async_turn_off_inverter()`: Turn the inverter off
 - `async_get_information_data()`: Retrieve information data
 - `async_heartbeat()`: Request a heartbeat message from the DTU
+- `async_get_alarm_list()`: Get alarm list from the DTU
+- `async_enable_performance_data_mode()`: Enabel a higher update interval (every ~30s or less)
 
 ## Note
 
@@ -99,9 +101,18 @@ Use this library responsibly and be aware of potential risks. There are no guara
 
 ## Known Limitations
 
-**Update Frequency:** The library may experience limitations in fetching updates, potentially around twice per minute. The inverter firmware may enforce a mandatory wait period of approximately 30 seconds between requests.
+> [!NOTE]
+> **Update Frequency:**
+>  The library may experience limitations in fetching updates, around twice per minute. This shows as the Data you recive back shows every time the same as the previos request. If this happens to you than you have 3 options:
+> 1. lower your update interval to ~35s between requestss.
+> 2. use `async_enable_performance_data_mode()`
+> 3. open the S-Miles Installer App, conect to DTU and open the Toolkit (sends the same Data as 2.)
+>
+>This behavior apers to reset after each (re-)start!
 
-**Compatibility:** While developed for the HMS-800W-2T inverter, compatibility with other inverters from the series is untested at the time of writing. Exercise caution and conduct thorough testing if using with different inverter models.
+> [!IMPORTANT]
+> **Compatibility:**
+> While developed for the HMS-800W-2T inverter, compatibility with other inverters from the series is untested at the time of writing. Exercise caution and conduct thorough testing if using with different inverter models.
 
 ## Attribution
 
