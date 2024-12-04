@@ -101,8 +101,8 @@ Use this library responsibly and be aware of potential risks. There are no guara
 
 ## Known Limitations
 
+### Update Frequency:
 > [!NOTE]
-> **Update Frequency:**
 >  The library may experience limitations in fetching updates, around twice per minute. This shows as the Data you recive back shows every time the same as the previos request. If this happens to you than you have 3 options:
 > 1. lower your update interval to ~35s between requestss.
 > 2. use `async_enable_performance_data_mode()`
@@ -111,7 +111,13 @@ Use this library responsibly and be aware of potential risks. There are no guara
 >This behavior apers to reset after each (re-)start!
 
 > [!IMPORTANT]
-> **Compatibility:**
+>Setting the update interval below approximately 32 seconds may disable Hoymiles cloud functionality. To ensure proper communication with Hoymiles servers, keep the update interval at or above this threshold.
+
+> [!CAUTION]
+> With a even higher update interval (1~2s) you can also also lose connectivity with the App.
+
+### Compatibility:
+> [!IMPORTANT]
 > While developed for the HMS-800W-2T inverter, compatibility with other inverters from the series is untested at the time of writing. Exercise caution and conduct thorough testing if using with different inverter models.
 
 ## Attribution
