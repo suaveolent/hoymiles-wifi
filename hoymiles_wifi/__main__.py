@@ -109,34 +109,39 @@ async def async_app_get_hist_power(
 
 async def async_set_power_limit(
     dtu: DTU,
+    power_limit: int = -1,
+    interactive_mode: bool = True,
 ) -> CommandPB_pb2.CommandResDTO | None:
     """Set the power limit of the inverter asynchronously."""
 
-    print(  # noqa: T201
-        RED
-        + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
-        + "!!! Danger zone! This will change the power limit of the dtu. !!!\n"
-        + "!!!   Please be careful and make sure you know what you are doing. !!!\n"
-        + "!!!          Only proceed if you know what you are doing.          !!!\n"
-        + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
-        + END,
-    )
+    if interactive_mode:
+        print(  # noqa: T201
+            RED
+            + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+            + "!!! Danger zone! This will change the power limit of the dtu. !!!\n"
+            + "!!!   Please be careful and make sure you know what you are doing. !!!\n"
+            + "!!!          Only proceed if you know what you are doing.          !!!\n"
+            + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+            + END,
+        )
 
-    cont = input("Do you want to continue? (y/n): ")
-    if cont != "y":
-        return None
+        cont = input("Do you want to continue? (y/n): ")
+        if cont != "y":
+            return None
 
-    power_limit = int(input("Enter the new power limit (0-100): "))
+        power_limit = int(input("Enter the new power limit (0-100): "))
 
     if power_limit < 0 or power_limit > MAX_POWER_LIMIT:
         print("Error. Invalid power limit!")  # noqa: T201
         return None
 
     print(f"Setting power limit to {power_limit}%")  # noqa: T201
-    cont = input("Are you sure? (y/n): ")
 
-    if cont != "y":
-        return None
+    if interactive_mode:
+        cont = input("Are you sure? (y/n): ")
+
+        if cont != "y":
+            return None
 
     return await dtu.async_set_power_limit(power_limit)
 
@@ -347,6 +352,19 @@ async def main() -> None:
         help="Format the output as JSON",
     )
     parser.add_argument(
+        "--disable-interactive",
+        action="store_true",
+        default=False,
+        help="Disables interactive mode, forcing non-interactive operations.",
+    )
+    parser.add_argument(
+        "--power-limit",
+        type=int,
+        default=-1,
+        help="Power limit to set (0...100).",
+    )
+
+    parser.add_argument(
         "command",
         type=str,
         choices=[
@@ -402,7 +420,13 @@ async def main() -> None:
     }
 
     command_func = switch.get(args.command, print_invalid_command)
-    response = await command_func(dtu)
+    if args.command == "set-power-limit":
+        kwargs = {}
+        kwargs["power_limit"] = args.power_limit
+        kwargs["interactive_mode"] = not args.disable_interactive
+        response = await command_func(dtu, **kwargs)
+    else:
+        response = await command_func(dtu)
 
     if response:
         if args.as_json:
