@@ -314,6 +314,12 @@ async def async_get_alarm_list(dtu: DTU) -> None:
     return await dtu.async_get_alarm_list()
 
 
+async def async_enable_performance_data_mode(dtu: DTU) -> None:
+    """Enable performance mode to be able to receive new Data with a 30s or lower update interval asynchronously."""
+
+    return await dtu.async_enable_performance_data_mode()
+
+
 def print_invalid_command(command: str) -> None:
     """Print an invalid command message."""
 
@@ -363,6 +369,7 @@ async def main() -> None:
             "identify-inverters",
             "identify-meters",
             "get-alarm-list",
+            "enable-performance-data-mode",
         ],
         help="Command to execute",
     )
@@ -391,6 +398,7 @@ async def main() -> None:
         "identify-inverters": async_identify_inverters,
         "identify-meters": async_identify_meters,
         "get-alarm-list": async_get_alarm_list,
+        "enable-performance-data-mode": async_enable_performance_data_mode,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
