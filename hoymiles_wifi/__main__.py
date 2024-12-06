@@ -315,7 +315,7 @@ async def async_get_alarm_list(dtu: DTU) -> None:
 
 
 async def async_enable_performance_data_mode(dtu: DTU) -> None:
-    """Enable performance mode to be able to receive new Data with a 30s or lower update interval asynchronously."""
+    """Enable performance data mode asynchronously."""
 
     return await dtu.async_enable_performance_data_mode()
 

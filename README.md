@@ -5,7 +5,8 @@ This Python library facilitates communication with Hoymiles DTUs and the HMS-XXX
 For the Home Assistant integration have a look here:
 https://github.com/suaveolent/ha-hoymiles-wifi
 
-**Disclaimer: This library is not affiliated with Hoymiles. It is an independent project developed to provide tools for interacting with Hoymiles HMS-XXXXW series micro-inverters featuring integrated WiFi DTU. Any trademarks or product names mentioned are the property of their respective owners.**
+> [!NOTE]
+> Disclaimer: This library is not affiliated with Hoymiles. It is an independent project developed to provide tools for interacting with Hoymiles DTUs and Hoymiles HMS-XXXXW series micro-inverters featuring integrated WiFi DTU. Any trademarks or product names mentioned are the property of their respective owners.
 
 ## Supported Devices
 
@@ -14,7 +15,7 @@ The library was successfully tested with:
 - Hoymiles HMS-400W-1T
 - Hoymiles HMS-800W-2T
 - Hoymiles DTU-WLite
-- Hoymiles DTU-Pro
+- Hoymiles DTU-Pro (S)
 
 ## Installation
 
@@ -58,7 +59,7 @@ The `--as-json` option is optional and allows formatting the output as JSON.
 
 ### Python code
 
-```
+```python
 from hoymiles_wifi.dtu import DTU
 ...
 dtu = DTU(<ip_address>)
@@ -87,13 +88,14 @@ else:
 - `async_get_information_data()`: Retrieve information data
 - `async_heartbeat()`: Request a heartbeat message from the DTU
 - `async_get_alarm_list()`: Get alarm list from the DTU
-- `async_enable_performance_data_mode()`: Enabel a higher update interval (every ~30s or less)
+- `async_enable_performance_data_mode()`: _Experimental_: Enable higher update interval mode (30s or less)
 
 ## Note
 
-Please be aware of the following considerations:
+Please be aware:
 
-- No DTU Implementation: This library retrieves information directly from the (internal) DTU of Hoymiles Wifi inverters.
+> [!NOTE]
+> No DTU Implementation: This library retrieves information directly from the (internal) DTU of Hoymiles Wifi inverters.
 
 ## Caution
 
@@ -102,21 +104,26 @@ Use this library responsibly and be aware of potential risks. There are no guara
 ## Known Limitations
 
 ### Update Frequency:
+
 > [!NOTE]
->  The library may experience limitations in fetching updates, around twice per minute. This shows as the Data you recive back shows every time the same as the previos request. If this happens to you than you have 3 options:
-> 1. lower your update interval to ~35s between requestss.
-> 2. use `async_enable_performance_data_mode()`
-> 3. open the S-Miles Installer App, conect to DTU and open the Toolkit (sends the same Data as 2.)
+> The library may encounter limitations in fetching updates, restricting updates to approximately twice per minute.
+> This issue can be identified when the data returned matches the response from the previous request.
+> If you encounter this, you have three options:
 >
->This behavior apers to reset after each (re-)start!
+> 1. Set the update interval to 35 seconds or longer between requests.
+> 2. Use `async_enable_performance_data_mode()`
+> 3. Open the S-Miles Installer App, connect to the DTU, and access the Toolkit (which sends the same data as option 2).
+>
+> Options 2 and 3 need to be repeated whenever the DTU restarts.
 
 > [!IMPORTANT]
->Setting the update interval below approximately 32 seconds may disable Hoymiles cloud functionality. To ensure proper communication with Hoymiles servers, keep the update interval at or above this threshold.
+> Setting the update interval below approximately 32 seconds may disable Hoymiles cloud functionality. To ensure proper communication with Hoymiles servers, keep the update interval at or above this threshold.
 
 > [!CAUTION]
-> With a even higher update interval (1~2s) you can also also lose connectivity with the App.
+> Setting the update interval to 1–2 seconds could also cause disruptions in the App's connection.
 
 ### Compatibility:
+
 > [!IMPORTANT]
 > While developed for the HMS-800W-2T inverter, compatibility with other inverters from the series is untested at the time of writing. Exercise caution and conduct thorough testing if using with different inverter models.
 
