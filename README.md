@@ -30,7 +30,7 @@ You can integrate the library into your own project, or simply use it in the com
 ### Command line:
 
 ```
-hoymiles-wifi [-h] --host HOST [--local_addr IP_OF_INTERFACE_TO_USE] [--as-json] <command>
+hoymiles-wifi [-h] --host HOST [--local_addr IP_OF_INTERFACE_TO_USE] [--as-json] <command> [--disable-interactive]
 
 commands:
     get-real-data-new,
@@ -55,6 +55,8 @@ commands:
     enable-performance-data-mode,
 
 The `--as-json` option is optional and allows formatting the output as JSON.
+The `--disable-interactive` option is optional allows to disable interactive modes (e.g. for setting the power limit).
+For the `set-power-limit` command, you can also use the `--power-limit` parameter to specify the desired power limit. This requires the `--disable-interactive` option to be enabled.
 ```
 
 ### Python code
