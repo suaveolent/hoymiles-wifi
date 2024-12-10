@@ -134,6 +134,9 @@ class DTU:
             # Fetch additional data based on the value of response.ap
             for cp in range(1, response.ap):
                 request.cp = cp
+
+                # Wait for 2 seconds before issuing the next request as not to overload the DTU
+                await asyncio.sleep(2)
                 additional_response = await self.async_send_request(
                     command, request, RealDataNew_pb2.RealDataNewReqDTO
                 )
