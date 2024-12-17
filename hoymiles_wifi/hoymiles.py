@@ -21,6 +21,7 @@ class InverterSeries(Enum):
     HM = "HM"
     HMS = "HMS"
     HMT = "HMT"
+    SOL_H = "SOL_H"
 
 
 class InverterPower(Enum):
@@ -58,6 +59,7 @@ power_mapping = {
     0x1164: InverterPower.P_1600_1800_2000,
     0x1412: InverterPower.P_800W_1000W,
     0x1382: InverterPower.P_2250,
+    0x2821: InverterPower.P_1000,
 }
 
 
@@ -73,6 +75,7 @@ class DTUType(Enum):
     DTUBI = "DTUBI"
     DTU_W100_LITE_S = "DTU-W100/DTU-Lite-S"
     DTU_W_LITE = "DTU-WLite"
+    DTU_SLS = "DTU-SLS"
 
 
 type_mapping = {
@@ -117,6 +120,7 @@ type_mapping = {
     0x1382: DTUType.DTUBI,
     0x4143: DTUType.DTUBI,
     0x4144: DTUType.DTUBI,
+    0xd030: DTUType.DTU_SLS,
 }
 
 
@@ -129,6 +133,7 @@ class MeterType(Enum):
 
 meter_mapping = {
     0x10C0: MeterType.DDSU666,
+    0x37ff: MeterType.DTSU666,
 }
 
 
@@ -220,6 +225,9 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
             inverter_type = InverterType.ONE
         if serial_bytes[1] in [0x10, 0x12]:
             inverter_type = InverterType.TWO
+    elif serial_bytes[0] == 0x28:
+        if serial_bytes[1] in [0x21]:
+            inverter_type = InverterType.TWO
 
     if inverter_type is None:
         raise ValueError(
@@ -247,6 +255,8 @@ def get_inverter_series(serial_bytes: bytes) -> InverterSeries:
         series = InverterSeries.HMT
     elif serial_bytes[0] == 0x14:
         series = InverterSeries.HMS
+    elif serial_bytes[0] == 0x28:
+        series = InverterSeries.SOL_H
 
     if series is None:
         raise ValueError(
@@ -308,6 +318,9 @@ def get_dtu_model_type(serial_bytes: bytes) -> DTUType:
 
 def get_dtu_model_name(serial_number: str) -> str:
     """Get DTU model name."""
+
+    if serial_number[-1:] == "J":
+        serial_number = serial_number[:-1]
 
     serial_bytes = bytes.fromhex(serial_number)
 
