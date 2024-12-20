@@ -79,6 +79,7 @@ class DTU:
         self.state = NetworkState.Unknown
         self.sequence = 0
         self.mutex = asyncio.Lock()
+        self.last_request_time = 0
 
     def get_state(self) -> NetworkState:
         """Get DTU state."""
@@ -135,8 +136,6 @@ class DTU:
             for cp in range(1, response.ap):
                 request.cp = cp
 
-                # Wait for 2 seconds before issuing the next request as not to overload the DTU
-                await asyncio.sleep(2)
                 additional_response = await self.async_send_request(
                     command, request, RealDataNew_pb2.RealDataNewReqDTO
                 )
@@ -408,6 +407,15 @@ class DTU:
         ip_to_bind = (self.local_addr, 0) if self.local_addr is not None else None
 
         async with self.mutex:
+            current_time = time.time()
+            elapsed_time = current_time - self.last_request_time
+
+            if elapsed_time < 2:
+                logger.debug(
+                    f"Last request was sent less than 2s ago. Waiting for {2-elapsed_time}s"
+                )
+                await asyncio.sleep(2 - elapsed_time)
+
             try:
                 reader, writer = await asyncio.wait_for(
                     asyncio.open_connection(
@@ -433,6 +441,8 @@ class DTU:
                         await writer.wait_closed()
                 except Exception as e:
                     logger.debug(f"Error closing writer: {e}")
+
+        self.last_request_time = time.time()
 
         try:
             if len(buf) < 10:
