@@ -39,6 +39,7 @@ class InverterPower(Enum):
     P_1000_1200_1500 = "1000/1200/1500"
     P_1200_1500 = "1200/1500"
     P_1600_1800_2000 = "1600/1800/2000"
+    P_2000DW = "2000DW"
     P_2250 = "2250"
 
 
@@ -60,6 +61,7 @@ power_mapping = {
     0x1412: InverterPower.P_800W_1000W,
     0x1382: InverterPower.P_2250,
     0x2821: InverterPower.P_1000,
+    0x1222: InverterPower.P_2000DW,
 }
 
 
@@ -118,6 +120,7 @@ type_mapping = {
     0x1362: DTUType.DTUBI,
     0x1381: DTUType.DTUBI,
     0x1382: DTUType.DTUBI,
+    0x4141: DTUType.DTUBI,
     0x4143: DTUType.DTUBI,
     0x4144: DTUType.DTUBI,
     0xd030: DTUType.DTU_SLS,
@@ -218,6 +221,9 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
             inverter_type = InverterType.TWO
         elif serial_bytes[1] in [0x64, 0x62, 0x61]:
             inverter_type = InverterType.FOUR
+    elif serial_bytes[0] == 0x12:
+        if serial_bytes[1] in [0x22]:
+            inverter_type = InverterType.FOUR
     elif serial_bytes[0] == 0x13:
         inverter_type = InverterType.SIX
     elif serial_bytes[0] == 0x14:
@@ -251,6 +257,8 @@ def get_inverter_series(serial_bytes: bytes) -> InverterSeries:
             series = InverterSeries.HM
         else:
             series = InverterSeries.HMS
+    elif serial_bytes[0] == 0x12:
+        series = InverterSeries.HMS
     elif serial_bytes[0] == 0x13:
         series = InverterSeries.HMT
     elif serial_bytes[0] == 0x14:
