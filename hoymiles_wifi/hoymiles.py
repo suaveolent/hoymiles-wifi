@@ -123,7 +123,7 @@ type_mapping = {
     0x4141: DTUType.DTUBI,
     0x4143: DTUType.DTUBI,
     0x4144: DTUType.DTUBI,
-    0xd030: DTUType.DTU_SLS,
+    0xD030: DTUType.DTU_SLS,
 }
 
 
@@ -136,7 +136,7 @@ class MeterType(Enum):
 
 meter_mapping = {
     0x10C0: MeterType.DDSU666,
-    0x37ff: MeterType.DTSU666,
+    0x37FF: MeterType.DTSU666,
 }
 
 
@@ -247,16 +247,16 @@ def get_inverter_series(serial_bytes: bytes) -> InverterSeries:
     """Get inverter series."""
 
     series = None
-    if serial_bytes[0] == 0x11:
-        if (serial_bytes[1] & 0x0F) == 0x04:
-            series = InverterSeries.HMS
-        else:
-            series = InverterSeries.HM
-    elif serial_bytes[0] == 0x10:
+    if serial_bytes[0] == 0x10:
         if serial_bytes[1] & 0x03 == 0x02:
             series = InverterSeries.HM
         else:
             series = InverterSeries.HMS
+    elif serial_bytes[0] == 0x11:
+        if serial_bytes[1] & 0x0F == 0x04:
+            series = InverterSeries.HMS
+        else:
+            series = InverterSeries.HM
     elif serial_bytes[0] == 0x12:
         series = InverterSeries.HMS
     elif serial_bytes[0] == 0x13:
