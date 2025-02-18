@@ -24,6 +24,8 @@ from hoymiles_wifi.const import (
     CMD_APP_INFO_DATA_RES_DTO,
     CMD_CLOUD_COMMAND_RES_DTO,
     CMD_COMMAND_RES_DTO,
+    CMD_ES_DATA_DTO,
+    CMD_ES_REG_RES_DTO,
     CMD_GET_CONFIG,
     CMD_HB_RES_DTO,
     CMD_HEADER,
@@ -42,6 +44,8 @@ from hoymiles_wifi.protobuf import (
     APPHeartbeatPB_pb2,
     APPInfomationData_pb2,
     CommandPB_pb2,
+    ESRegPB_pb2,
+    ESData_pb2,
     GetConfig_pb2,
     InfomationData_pb2,
     NetworkInfo_pb2,
@@ -379,6 +383,20 @@ class DTU:
             command, request, CommandPB_pb2.CommandReqDTO
         )
 
+    async def async_get_energy_storage_registry(self) -> ESRegPB_pb2.ESRegReqDTO | None:
+        """Get energy storage registry."""
+
+        request = ESRegPB_pb2.ESRegResDTO()
+        request.time = int(time.time())
+        request.time_ymd_hms = (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        )
+        request.offset = OFFSET
+        request.cp = 0
+
+        command = CMD_ES_REG_RES_DTO
+        return await self.async_send_request(command, request, ESRegPB_pb2.ESRegReqDTO)
+
     async def async_send_request(
         self,
         command: bytes,
@@ -412,7 +430,7 @@ class DTU:
 
             if elapsed_time < 2:
                 logger.debug(
-                    f"Last request was sent less than 2s ago. Waiting for {2-elapsed_time}s"
+                    f"Last request was sent less than 2s ago. Waiting for {2 - elapsed_time}s"
                 )
                 await asyncio.sleep(2 - elapsed_time)
 

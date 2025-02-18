@@ -27,6 +27,8 @@ from hoymiles_wifi.protobuf import (
     APPHeartbeatPB_pb2,
     APPInfomationData_pb2,
     CommandPB_pb2,
+    ESData_pb2,
+    ESRegPB_pb2,
     GetConfig_pb2,
     InfomationData_pb2,
     NetworkInfo_pb2,
@@ -325,6 +327,12 @@ async def async_enable_performance_data_mode(dtu: DTU) -> None:
     return await dtu.async_enable_performance_data_mode()
 
 
+async def async_get_energy_storage_registry(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
+    """Get energy storage registry from the dtu asynchronously."""
+
+    return await dtu.async_get_energy_storage_registry()
+
+
 def print_invalid_command(command: str) -> None:
     """Print an invalid command message."""
 
@@ -388,6 +396,7 @@ async def main() -> None:
             "identify-meters",
             "get-alarm-list",
             "enable-performance-data-mode",
+            "get-energy-storage-registry",
         ],
         help="Command to execute",
     )
@@ -417,6 +426,7 @@ async def main() -> None:
         "identify-meters": async_identify_meters,
         "get-alarm-list": async_get_alarm_list,
         "enable-performance-data-mode": async_enable_performance_data_mode,
+        "get-energy-storage-registry": async_get_energy_storage_registry,
     }
 
     command_func = switch.get(args.command, print_invalid_command)

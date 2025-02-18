@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+message ChgCPMO {
+  int64 serial_number = 1;
+  int32 sw_ver = 2;
+  int32 hw_ver = 3;
+}
+
+message ESRegReqDTO {
+  int32 type = 1;
+  RegMeterMO meter = 2;
+  repeated RegInvMO inv = 3;
+  int32 gen_mode = 4;
+  int32 time = 5;
+  int32 offset = 6;
+  repeated RegMidMO mid = 7;
+  int64 dfs = 8;
+}
+
+message ESRegResDTO {
+  int32 time = 1;
+  string ymd_hms = 2;
+  int32 offset = 3;
+  int32 cp = 4;
+}
+
+message RegInvMO {
+  int64 serial_number = 1;
+  int32 type = 2;
+  string hw_ver = 3;
+  string sw_m_ver = 4;
+  string sw_s_ver = 5;
+  string sw_sys_ver = 6;
+  string bms_sn = 7;
+  string bms_hw_ver = 8;
+  string bms_sw_ver = 9;
+  int32 bms_cap = 10;
+  int32 pv_num = 11;
+  int32 addr = 12;
+  string model_name = 13;
+  int32 bms_prot = 14;
+  int32 bms_type = 15;
+  repeated ChgCPMO cps = 16;
+}
+
+message RegMeterMO {
+  string sn = 1;
+  string sn_pv = 2;
+}
+
+message RegMidMO {
+  int64 serial_number = 1;
+  string sw_ver = 2;
+  string hw_ver = 3;
+}
