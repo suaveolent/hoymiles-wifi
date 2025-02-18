@@ -19,7 +19,7 @@ message ESRegReqDTO {
 
 message ESRegResDTO {
   int32 time = 1;
-  string ymd_hms = 2;
+  string time_ymd_hms = 2;
   int32 offset = 3;
   int32 cp = 4;
 }
