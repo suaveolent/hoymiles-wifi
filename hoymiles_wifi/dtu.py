@@ -16,6 +16,7 @@ from hoymiles_wifi.const import (
     CMD_ACTION_ALARM_LIST,
     CMD_ACTION_DTU_REBOOT,
     CMD_ACTION_DTU_UPGRADE,
+    CMD_ACTION_INV_REBOOT,
     CMD_ACTION_LIMIT_POWER,
     CMD_ACTION_MI_SHUTDOWN,
     CMD_ACTION_MI_START,
@@ -319,6 +320,26 @@ class DTU:
             command, request, CommandPB_pb2.CommandReqDTO
         )
 
+    async def async_reboot_inverter(
+        self, inverter_serial: str
+    ) -> CommandPB_pb2.CommandResDTO | None:
+        """Reboot Inverter."""
+
+        inverter_serial_int = convert_inverter_serial_number(inverter_serial)
+
+        request = CommandPB_pb2.CommandResDTO()
+        request.action = CMD_ACTION_INV_REBOOT
+        request.package_nub = 1
+        request.dev_kind = DEV_DTU
+        request.tid = int(time.time())
+        request.mi_to_sn.extend([inverter_serial_int])
+
+        command = CMD_CLOUD_COMMAND_RES_DTO
+
+        return await self.async_send_request(
+            command, request, CommandPB_pb2.CommandReqDTO
+        )
+
     async def async_get_information_data(
         self,
     ) -> InfomationData_pb2.InfoDataResDTO | None:
@@ -412,7 +433,7 @@ class DTU:
 
             if elapsed_time < 2:
                 logger.debug(
-                    f"Last request was sent less than 2s ago. Waiting for {2-elapsed_time}s"
+                    f"Last request was sent less than 2s ago. Waiting for {2 - elapsed_time}s"
                 )
                 await asyncio.sleep(2 - elapsed_time)
 
