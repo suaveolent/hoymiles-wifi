@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.DevConfig;
-
 message DevConfigFetchResDTO {
   int32 response_time = 1;   // Timestamp of the response
   int64 transaction_id = 2;  // Transaction ID

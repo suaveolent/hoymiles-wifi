@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.GWNetInfo;
-
 message GWNetInfoReq {
   int64 serial_number = 1;
   int32 time = 2;

@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.GPSTData;
-
 message STValMO {
   int32 code = 1;
   int32 dflt_val = 2;

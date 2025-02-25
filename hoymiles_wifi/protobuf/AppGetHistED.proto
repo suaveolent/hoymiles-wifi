@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.AppGetHistED;
-
 message AppGetHistEDResDTO {
   int32 cp = 1;    // Control point identifier
   int32 oft = 2;   // Offset value

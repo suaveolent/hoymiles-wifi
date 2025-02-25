@@ -24,19 +24,19 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0eGPSTData.proto\x12#com.hoymiles_wifi.protobuf.GPSTData\"_\n\x07STValMO\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x10\n\x08\x64\x66lt_val\x18\x02 \x01(\x05\x12\x10\n\x08\x64\x66lt_tim\x18\x03 \x01(\x05\x12\x10\n\x08rslt_val\x18\x04 \x01(\x05\x12\x10\n\x08rslt_tim\x18\x05 \x01(\x05\"\xd9\x04\n\tGPSTValMO\x12\r\n\x05pv_sn\x18\x01 \x01(\x03\x12\x0b\n\x03ver\x18\x02 \x01(\x05\x12\n\n\x02st\x18\x03 \x01(\x05\x12\x0b\n\x03gpf\x18\x04 \x01(\x05\x12\x0f\n\x07gpf_ver\x18\x05 \x01(\x05\x12?\n\thv1_stval\x18\x06 \x01(\x0b\x32,.com.hoymiles_wifi.protobuf.GPSTData.STValMO\x12?\n\tlv1_stval\x18\x07 \x01(\x0b\x32,.com.hoymiles_wifi.protobuf.GPSTData.STValMO\x12?\n\thv2_stval\x18\x08 \x01(\x0b\x32,.com.hoymiles_wifi.protobuf.GPSTData.STValMO\x12?\n\tlv2_stval\x18\t \x01(\x0b\x32,.com.hoymiles_wifi.protobuf.GPSTData.STValMO\x12?\n\thf1_stval\x18\n \x01(\x0b\x32,.com.hoymiles_wifi.protobuf.GPSTData.STValMO\x12?\n\tlf1_stval\x18\x0b \x01(\x0b\x32,.com.hoymiles_wifi.protobuf.GPSTData.STValMO\x12?\n\thf2_stval\x18\x0c \x01(\x0b\x32,.com.hoymiles_wifi.protobuf.GPSTData.STValMO\x12?\n\tlf2_stval\x18\r \x01(\x0b\x32,.com.hoymiles_wifi.protobuf.GPSTData.STValMO\"\x97\x01\n\nGPSTReqDTO\x12\x0e\n\x06\x64tu_sn\x18\x01 \x01(\t\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x13\n\x0bpackage_nub\x18\x03 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x04 \x01(\x05\x12\x41\n\tmGPSTInfo\x18\x05 \x03(\x0b\x32..com.hoymiles_wifi.protobuf.GPSTData.GPSTValMO\"b\n\nGPSTResDTO\x12\x0f\n\x07ymd_hms\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x03 \x01(\x05\x12\x10\n\x08\x65rr_code\x18\x04 \x01(\x05\x12\x0c\n\x04time\x18\x05 \x01(\x05\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0eGPSTData.proto\"_\n\x07STValMO\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x10\n\x08\x64\x66lt_val\x18\x02 \x01(\x05\x12\x10\n\x08\x64\x66lt_tim\x18\x03 \x01(\x05\x12\x10\n\x08rslt_val\x18\x04 \x01(\x05\x12\x10\n\x08rslt_tim\x18\x05 \x01(\x05\"\xb9\x02\n\tGPSTValMO\x12\r\n\x05pv_sn\x18\x01 \x01(\x03\x12\x0b\n\x03ver\x18\x02 \x01(\x05\x12\n\n\x02st\x18\x03 \x01(\x05\x12\x0b\n\x03gpf\x18\x04 \x01(\x05\x12\x0f\n\x07gpf_ver\x18\x05 \x01(\x05\x12\x1b\n\thv1_stval\x18\x06 \x01(\x0b\x32\x08.STValMO\x12\x1b\n\tlv1_stval\x18\x07 \x01(\x0b\x32\x08.STValMO\x12\x1b\n\thv2_stval\x18\x08 \x01(\x0b\x32\x08.STValMO\x12\x1b\n\tlv2_stval\x18\t \x01(\x0b\x32\x08.STValMO\x12\x1b\n\thf1_stval\x18\n \x01(\x0b\x32\x08.STValMO\x12\x1b\n\tlf1_stval\x18\x0b \x01(\x0b\x32\x08.STValMO\x12\x1b\n\thf2_stval\x18\x0c \x01(\x0b\x32\x08.STValMO\x12\x1b\n\tlf2_stval\x18\r \x01(\x0b\x32\x08.STValMO\"s\n\nGPSTReqDTO\x12\x0e\n\x06\x64tu_sn\x18\x01 \x01(\t\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x13\n\x0bpackage_nub\x18\x03 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x04 \x01(\x05\x12\x1d\n\tmGPSTInfo\x18\x05 \x03(\x0b\x32\n.GPSTValMO\"b\n\nGPSTResDTO\x12\x0f\n\x07ymd_hms\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x03 \x01(\x05\x12\x10\n\x08\x65rr_code\x18\x04 \x01(\x05\x12\x0c\n\x04time\x18\x05 \x01(\x05\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'GPSTData_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_STVALMO']._serialized_start=55
-  _globals['_STVALMO']._serialized_end=150
-  _globals['_GPSTVALMO']._serialized_start=153
-  _globals['_GPSTVALMO']._serialized_end=754
-  _globals['_GPSTREQDTO']._serialized_start=757
-  _globals['_GPSTREQDTO']._serialized_end=908
-  _globals['_GPSTRESDTO']._serialized_start=910
-  _globals['_GPSTRESDTO']._serialized_end=1008
+  _globals['_STVALMO']._serialized_start=18
+  _globals['_STVALMO']._serialized_end=113
+  _globals['_GPSTVALMO']._serialized_start=116
+  _globals['_GPSTVALMO']._serialized_end=429
+  _globals['_GPSTREQDTO']._serialized_start=431
+  _globals['_GPSTREQDTO']._serialized_end=546
+  _globals['_GPSTRESDTO']._serialized_start=548
+  _globals['_GPSTRESDTO']._serialized_end=646
 # @@protoc_insertion_point(module_scope)

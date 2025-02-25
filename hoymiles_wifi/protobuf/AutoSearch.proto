@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.AutoSearch;
-
 message AutoSearchReqDTO {
   string dtu_serial_number = 1; // DTU serial number
   int32 time = 2;               // Timestamp of the request

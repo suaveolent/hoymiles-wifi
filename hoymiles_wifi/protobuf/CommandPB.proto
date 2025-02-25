@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.CommandPB;
-
 message CommandResDTO {
   int32 time = 1;               // Timestamp of the response
   int32 action = 2;             // Action code indicating the type of command

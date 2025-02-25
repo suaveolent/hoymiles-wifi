@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.EventData;
-
 message EventDataResDTO {
   int32 offset = 1;        // Offset in the response
   int32 time = 2;          // Timestamp of the response

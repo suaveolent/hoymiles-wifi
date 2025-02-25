@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.AlarmData;
-
 message WInfoMO {
   int64 pv_sn = 1;  // PV serial number
   int32 WCode = 2;  // WCode identifier

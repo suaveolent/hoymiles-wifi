@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.RealData;
-
 message MeterDataMO {
   int32 device_kind = 1;             // Device kind identifier
   int64 meter_sn = 2;                // Meter serial number

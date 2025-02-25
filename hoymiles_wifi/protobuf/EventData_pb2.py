@@ -24,17 +24,17 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x45ventData.proto\x12$com.hoymiles_wifi.protobuf.EventData\"E\n\x0f\x45ventDataResDTO\x12\x0e\n\x06offset\x18\x01 \x01(\x05\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x14\n\x0ctime_ymd_hms\x18\x03 \x01(\t\"\xdb\x01\n\x07MIEvent\x12\x12\n\nevent_code\x18\x01 \x01(\x05\x12\x14\n\x0c\x65vent_status\x18\x02 \x01(\x05\x12\x13\n\x0b\x65vent_count\x18\x03 \x01(\x05\x12\x12\n\npv_voltage\x18\x04 \x01(\x05\x12\x14\n\x0cgrid_voltage\x18\x05 \x01(\x05\x12\x16\n\x0egrid_frequency\x18\x06 \x01(\x05\x12\x12\n\ngrid_power\x18\x07 \x01(\x05\x12\x13\n\x0btemperature\x18\x08 \x01(\x05\x12\r\n\x05mi_id\x18\t \x01(\x03\x12\x17\n\x0fstart_timestamp\x18\n \x01(\x05\"q\n\x0f\x45ventDataReqDTO\x12\x0e\n\x06offset\x18\x01 \x01(\x05\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12@\n\tmi_events\x18\x03 \x03(\x0b\x32-.com.hoymiles_wifi.protobuf.EventData.MIEventb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x45ventData.proto\"E\n\x0f\x45ventDataResDTO\x12\x0e\n\x06offset\x18\x01 \x01(\x05\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x14\n\x0ctime_ymd_hms\x18\x03 \x01(\t\"\xdb\x01\n\x07MIEvent\x12\x12\n\nevent_code\x18\x01 \x01(\x05\x12\x14\n\x0c\x65vent_status\x18\x02 \x01(\x05\x12\x13\n\x0b\x65vent_count\x18\x03 \x01(\x05\x12\x12\n\npv_voltage\x18\x04 \x01(\x05\x12\x14\n\x0cgrid_voltage\x18\x05 \x01(\x05\x12\x16\n\x0egrid_frequency\x18\x06 \x01(\x05\x12\x12\n\ngrid_power\x18\x07 \x01(\x05\x12\x13\n\x0btemperature\x18\x08 \x01(\x05\x12\r\n\x05mi_id\x18\t \x01(\x03\x12\x17\n\x0fstart_timestamp\x18\n \x01(\x05\"L\n\x0f\x45ventDataReqDTO\x12\x0e\n\x06offset\x18\x01 \x01(\x05\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x1b\n\tmi_events\x18\x03 \x03(\x0b\x32\x08.MIEventb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'EventData_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_EVENTDATARESDTO']._serialized_start=57
-  _globals['_EVENTDATARESDTO']._serialized_end=126
-  _globals['_MIEVENT']._serialized_start=129
-  _globals['_MIEVENT']._serialized_end=348
-  _globals['_EVENTDATAREQDTO']._serialized_start=350
-  _globals['_EVENTDATAREQDTO']._serialized_end=463
+  _globals['_EVENTDATARESDTO']._serialized_start=19
+  _globals['_EVENTDATARESDTO']._serialized_end=88
+  _globals['_MIEVENT']._serialized_start=91
+  _globals['_MIEVENT']._serialized_end=310
+  _globals['_EVENTDATAREQDTO']._serialized_start=312
+  _globals['_EVENTDATAREQDTO']._serialized_end=388
 # @@protoc_insertion_point(module_scope)

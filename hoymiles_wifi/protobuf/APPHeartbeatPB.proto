@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.AppHeartbeatPB;
-
 message HBReqDTO {
   int32 offset = 1;                // Offset value
   int32 time = 2;                  // Timestamp of the request

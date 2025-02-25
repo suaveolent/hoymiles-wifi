@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.NetworkInfo;
-
 message NetworkInfoReqDTO {
   string dtu_sn = 1;        // DTU serial number
   uint32 time = 2;          // Timestamp of the request

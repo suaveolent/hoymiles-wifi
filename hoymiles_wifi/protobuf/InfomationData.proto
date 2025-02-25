@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.InformationData;
-
 message DtuInfoMO {
   int32 device_kind = 1;
   int32 dtu_sw = 2;

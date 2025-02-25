@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.ESRegPB;
-
 message ChgCPMO {
   int64 serial_number = 1;
   int32 sw_ver = 2;

@@ -400,7 +400,9 @@ class DTU:
 
         command = CMD_ES_REG_RES_DTO
 
-        return await self.async_send_request(command, request, ESRegPB_pb2.ESRegReqDTO)
+        return await self.async_send_request(
+            command, request, ESRegPB_pb2.ESRegReqDTO, is_extended_format=True
+        )
 
     async def async_get_gateway_info(self) -> GWInfo_pb2.GWInfoReqDTO | None:
         """Get gateway info."""
@@ -411,7 +413,13 @@ class DTU:
 
         command = CMD_GW_INFO_RES_DTO
 
-        return await self.async_send_request(command, request, GWInfo_pb2.GWInfoReqDTO)
+        return await self.async_send_request(
+            command,
+            request,
+            GWInfo_pb2.GWInfoReqDTO,
+            is_extended_format=True,
+            number=255,
+        )
 
     async def async_get_gateway_network_info(self) -> GWNetInfo_pb2.GWNetInfoReq | None:
         """Get gateway network info."""
@@ -423,7 +431,7 @@ class DTU:
         command = CMD_GW_NET_INFO_RES
 
         return await self.async_send_request(
-            command, request, GWNetInfo_pb2.GWNetInfoReq
+            command, request, GWNetInfo_pb2.GWNetInfoReq, is_extended_format=True
         )
 
     async def async_send_request(
@@ -432,6 +440,9 @@ class DTU:
         request: Any,
         response_type: Any,
         dtu_port: int = DTU_PORT,
+        is_extended_format: bool = False,
+        serial_number: int = 0,
+        number: int = 0,
     ):
         """Send request to DTU."""
 
@@ -445,11 +456,20 @@ class DTU:
 
         # compose request message
         header = CMD_HEADER + command
-        message = (
-            header
-            + struct.pack(">HHH", self.sequence, crc16, length)
-            + request_as_bytes
-        )
+        message = header + struct.pack(">HH", self.sequence, crc16)
+
+        if is_extended_format:
+            message += struct.pack(
+                ">HHQHH", 24 + len(request_as_bytes), 14, serial_number, 0, number
+            )
+        else:
+            message += struct.pack(">H", length)
+
+        message += request_as_bytes
+
+        logger.debug(f"Header: {header.hex()}")
+        logger.debug(f"Request: {request_as_bytes.hex()}")
+        logger.debug(f"Message: {message.hex()}")
 
         ip_to_bind = (self.local_addr, 0) if self.local_addr is not None else None
 
@@ -473,10 +493,12 @@ class DTU:
                     timeout=5,
                 )
 
+                logger.debug(f"Sending message: {message.hex()}")
+
                 writer.write(message)
                 await writer.drain()
 
-                buf = await asyncio.wait_for(reader.read(1024), timeout=5)
+                buffer = await asyncio.wait_for(reader.read(1024), timeout=5)
             except (OSError, asyncio.TimeoutError) as e:
                 logger.debug(f"{e}")
                 self.set_state(NetworkState.Offline)
@@ -491,18 +513,23 @@ class DTU:
 
         self.last_request_time = time.time()
 
+        return self.parse_response(buffer, response_type)
+
+    def parse_response(self, buffer, response_type: Any):
+        """Parse response from DTU."""
+
         try:
-            if len(buf) < 10:
+            if len(buffer) < 10:
                 raise ValueError("Buffer is too short for unpacking")
 
-            crc16_target, read_length = struct.unpack(">HH", buf[6:10])
+            crc16_target, read_length = struct.unpack(">HH", buffer[6:10])
 
             logger.debug(f"Read length: {read_length}")
 
-            if len(buf) != read_length:
+            if len(buffer) != read_length:
                 raise ValueError("Buffer is incomplete")
 
-            response_as_bytes = buf[10:read_length]
+            response_as_bytes = buffer[10:read_length]
 
             crc16_response = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
                 response_as_bytes

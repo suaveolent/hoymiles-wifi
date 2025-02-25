@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package com.hoymiles_wifi.protobuf.AppInformationData;
-
 message APPDtuInfoMO {
   int32 device_kind = 1;                 // Type of the device
   int32 dtu_sw_version = 2;              // DTU software version
