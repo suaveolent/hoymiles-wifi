@@ -421,7 +421,9 @@ class DTU:
             number=255,
         )
 
-    async def async_get_gateway_network_info(self) -> GWNetInfo_pb2.GWNetInfoReq | None:
+    async def async_get_gateway_network_info(
+        self, serial_number: int
+    ) -> GWNetInfo_pb2.GWNetInfoReq | None:
         """Get gateway network info."""
 
         request = GWNetInfo_pb2.GWNetInfoRes()
@@ -431,7 +433,12 @@ class DTU:
         command = CMD_GW_NET_INFO_RES
 
         return await self.async_send_request(
-            command, request, GWNetInfo_pb2.GWNetInfoReq, is_extended_format=True
+            command,
+            request,
+            GWNetInfo_pb2.GWNetInfoReq,
+            is_extended_format=True,
+            serial_number=serial_number,
+            number=255,
         )
 
     async def async_send_request(
@@ -446,30 +453,9 @@ class DTU:
     ):
         """Send request to DTU."""
 
-        self.sequence = (self.sequence + 1) & 0xFFFF
-
-        request_as_bytes = request.SerializeToString()
-        crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
-            request_as_bytes
+        message = self.generate_message(
+            command, request, is_extended_format, serial_number, number
         )
-        length = len(request_as_bytes) + 10
-
-        # compose request message
-        header = CMD_HEADER + command
-        message = header + struct.pack(">HH", self.sequence, crc16)
-
-        if is_extended_format:
-            message += struct.pack(
-                ">HHQHH", 24 + len(request_as_bytes), 14, serial_number, 0, number
-            )
-        else:
-            message += struct.pack(">H", length)
-
-        message += request_as_bytes
-
-        logger.debug(f"Header: {header.hex()}")
-        logger.debug(f"Request: {request_as_bytes.hex()}")
-        logger.debug(f"Message: {message.hex()}")
 
         ip_to_bind = (self.local_addr, 0) if self.local_addr is not None else None
 
@@ -493,8 +479,6 @@ class DTU:
                     timeout=5,
                 )
 
-                logger.debug(f"Sending message: {message.hex()}")
-
                 writer.write(message)
                 await writer.drain()
 
@@ -513,9 +497,45 @@ class DTU:
 
         self.last_request_time = time.time()
 
-        return self.parse_response(buffer, response_type)
+        return self.parse_response(buffer, response_type, is_extended_format)
 
-    def parse_response(self, buffer, response_type: Any):
+    def generate_message(
+        self,
+        command: bytes,
+        request: Any,
+        is_extended_format: bool,
+        serial_number: int,
+        number: int,
+    ) -> bytes:
+        """Generate message to send to DTU."""
+
+        self.sequence = (self.sequence + 1) & 0xFFFF
+
+        request_as_bytes = request.SerializeToString()
+        crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
+            request_as_bytes
+        )
+
+        header = CMD_HEADER + command
+        metadata = struct.pack(">HH", self.sequence, crc16)
+
+        if is_extended_format:
+            metadata += struct.pack(
+                ">HHQHH", 24 + len(request_as_bytes), 14, serial_number, 0, number
+            )
+        else:
+            metadata += struct.pack(">H", len(request_as_bytes) + 10)
+
+        message = header + metadata + request_as_bytes
+
+        logger.debug(f"Header: {header.hex()}")
+        logger.debug(f"Metadata: {metadata.hex()}")
+        logger.debug(f"Request: {request_as_bytes.hex()}")
+        logger.debug(f"Message: {message.hex()}")
+
+        return message
+
+    def parse_response(self, buffer, response_type: Any, is_extended_format: bool):
         """Parse response from DTU."""
 
         try:
@@ -529,7 +549,10 @@ class DTU:
             if len(buffer) != read_length:
                 raise ValueError("Buffer is incomplete")
 
-            response_as_bytes = buffer[10:read_length]
+            if is_extended_format:
+                response_as_bytes = buffer[24:read_length]
+            else:
+                response_as_bytes = buffer[10:read_length]
 
             crc16_response = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
                 response_as_bytes

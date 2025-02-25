@@ -344,7 +344,9 @@ async def async_get_gateway_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
 async def async_get_gateway_network_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
     """Get gateway network info."""
 
-    return await dtu.async_get_gateway_network_info()
+    gateway_info = await dtu.async_get_gateway_info()
+
+    return await dtu.async_get_gateway_network_info(gateway_info.serial_number)
 
 
 def print_invalid_command(command: str) -> None:
