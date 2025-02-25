@@ -1,62 +1,63 @@
 syntax = "proto3";
 
-// Definition of the response message for setting configuration.
+package com.hoymiles_wifi.protobuf.SetConfig;
+
 message SetConfigResDTO {
-  int32 offset = 1;                     // Offset value
-  uint32 time = 2;                      // Time value
-  int32 lock_password = 3;              // Lock password
-  int32 lock_time = 4;                  // Lock time
-  int32 limit_power_mypower = 5;        // Limit power for mypower
-  int32 zero_export_433_addr = 6;       // Zero export 433 address
-  int32 zero_export_enable = 7;         // Zero export enable flag
-  int32 netmode_select = 8;             // Network mode selection
-  int32 channel_select = 9;             // Channel selection
-  int32 server_send_time = 10;          // Server send time
-  int32 serverport = 11;                // Server port
-  string apn_set = 12;                  // Access Point Name (APN) setting
-  string meter_kind = 13;               // Meter kind
-  string meter_interface = 14;          // Meter interface
-  string wifi_ssid = 15;                // Wi-Fi SSID
-  string wifi_password = 16;            // Wi-Fi password
-  string server_domain_name = 17;       // Server domain name
-  int32 inv_type = 18;                  // Inverter type
-  string dtu_sn = 19;                   // Data Terminal Unit (DTU) serial number
-  int32 access_model = 20;              // Access model
-  int32 mac_0 = 21;                     // MAC address octet 0
-  int32 mac_1 = 22;                     // MAC address octet 1
-  int32 mac_2 = 23;                     // MAC address octet 2
-  int32 mac_3 = 24;                     // MAC address octet 3
-  int32 dhcp_switch = 25;               // DHCP switch
-  int32 ip_addr_0 = 26;                 // IP address octet 0
-  int32 ip_addr_1 = 27;                 // IP address octet 1
-  int32 ip_addr_2 = 28;                 // IP address octet 2
-  int32 ip_addr_3 = 29;                 // IP address octet 3
-  int32 subnet_mask_0 = 30;             // Subnet mask octet 0
-  int32 subnet_mask_1 = 31;             // Subnet mask octet 1
-  int32 subnet_mask_2 = 32;             // Subnet mask octet 2
-  int32 subnet_mask_3 = 33;             // Subnet mask octet 3
-  int32 default_gateway_0 = 34;         // Default gateway octet 0
-  int32 default_gateway_1 = 35;         // Default gateway octet 1
-  int32 default_gateway_2 = 36;         // Default gateway octet 2
-  int32 default_gateway_3 = 37;         // Default gateway octet 3
-  string apn_name = 38;                 // APN name
-  string apn_password = 39;             // APN password
-  int32 sub1g_sweep_switch = 40;        // Sub-1GHz sweep switch
-  int32 sub1g_work_channel = 41;        // Sub-1GHz work channel
-  int32 cable_dns_0 = 42;               // Cable DNS octet 0
-  int32 cable_dns_1 = 43;               // Cable DNS octet 1
-  int32 cable_dns_2 = 44;               // Cable DNS octet 2
-  int32 cable_dns_3 = 45;               // Cable DNS octet 3
-  int32 mac_4 = 46;                     // MAC address octet 4
-  int32 mac_5 = 47;                     // MAC address octet 5
-  string dtu_ap_ssid = 48;              // DTU AP SSID
-  string dtu_ap_pass = 49;              // DTU AP password
-  int32 app_page = 50;                  // App page
+  int32 offset = 1;               // Offset value
+  uint32 time = 2;                // Time value
+  int32 lock_password = 3;        // Lock password
+  int32 lock_time = 4;            // Lock time
+  int32 limit_power_mypower = 5;  // Limit power for mypower
+  int32 zero_export_433_addr = 6; // Zero export 433 address
+  int32 zero_export_enable = 7;   // Zero export enable flag
+  int32 netmode_select = 8;       // Network mode selection
+  int32 channel_select = 9;       // Channel selection
+  int32 server_send_time = 10;    // Server send time
+  int32 serverport = 11;          // Server port
+  string apn_set = 12;            // Access Point Name (APN) setting
+  string meter_kind = 13;         // Meter kind
+  string meter_interface = 14;    // Meter interface
+  string wifi_ssid = 15;          // Wi-Fi SSID
+  string wifi_password = 16;      // Wi-Fi password
+  string server_domain_name = 17; // Server domain name
+  int32 inv_type = 18;            // Inverter type
+  string dtu_sn = 19;             // Data Terminal Unit (DTU) serial number
+  int32 access_model = 20;        // Access model
+  int32 mac_0 = 21;               // MAC address octet 0
+  int32 mac_1 = 22;               // MAC address octet 1
+  int32 mac_2 = 23;               // MAC address octet 2
+  int32 mac_3 = 24;               // MAC address octet 3
+  int32 dhcp_switch = 25;         // DHCP switch
+  int32 ip_addr_0 = 26;           // IP address octet 0
+  int32 ip_addr_1 = 27;           // IP address octet 1
+  int32 ip_addr_2 = 28;           // IP address octet 2
+  int32 ip_addr_3 = 29;           // IP address octet 3
+  int32 subnet_mask_0 = 30;       // Subnet mask octet 0
+  int32 subnet_mask_1 = 31;       // Subnet mask octet 1
+  int32 subnet_mask_2 = 32;       // Subnet mask octet 2
+  int32 subnet_mask_3 = 33;       // Subnet mask octet 3
+  int32 default_gateway_0 = 34;   // Default gateway octet 0
+  int32 default_gateway_1 = 35;   // Default gateway octet 1
+  int32 default_gateway_2 = 36;   // Default gateway octet 2
+  int32 default_gateway_3 = 37;   // Default gateway octet 3
+  string apn_name = 38;           // APN name
+  string apn_password = 39;       // APN password
+  int32 sub1g_sweep_switch = 40;  // Sub-1GHz sweep switch
+  int32 sub1g_work_channel = 41;  // Sub-1GHz work channel
+  int32 cable_dns_0 = 42;         // Cable DNS octet 0
+  int32 cable_dns_1 = 43;         // Cable DNS octet 1
+  int32 cable_dns_2 = 44;         // Cable DNS octet 2
+  int32 cable_dns_3 = 45;         // Cable DNS octet 3
+  int32 mac_4 = 46;               // MAC address octet 4
+  int32 mac_5 = 47;               // MAC address octet 5
+  string dtu_ap_ssid = 48;        // DTU AP SSID
+  string dtu_ap_pass = 49;        // DTU AP password
+  int32 app_page = 50;            // App page
 }
 
 // Definition of the request message for setting configuration.
 message SetConfigReqDTO {
-  int32 offset = 1;                       // Offset value
-  uint32 time = 2;                        // Time value
-  int32 error_code = 3;                   // Error code
+  int32 offset = 1;     // Offset value
+  uint32 time = 2;      // Time value
+  int32 error_code = 3; // Error code
 }

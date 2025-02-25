@@ -24,29 +24,29 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x43ommandPB.proto\"\xb2\x02\n\rCommandResDTO\x12\x0c\n\x04time\x18\x01 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x02 \x01(\x05\x12\x10\n\x08\x64\x65v_kind\x18\x03 \x01(\x05\x12\x13\n\x0bpackage_nub\x18\x04 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x05 \x01(\x05\x12\x0b\n\x03tid\x18\x06 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x07 \x01(\t\x12\x10\n\x08\x65s_to_sn\x18\x08 \x03(\t\x12\x10\n\x08mi_to_sn\x18\t \x03(\x03\x12\x16\n\x0esystem_total_a\x18\n \x01(\x05\x12\x16\n\x0esystem_total_b\x18\x0b \x01(\x05\x12\x16\n\x0esystem_total_c\x18\x0c \x01(\x05\x12\x14\n\x0cmi_sn_item_a\x18\r \x03(\x03\x12\x14\n\x0cmi_sn_item_b\x18\x0e \x03(\x03\x12\x14\n\x0cmi_sn_item_c\x18\x0f \x03(\x03\"q\n\rCommandReqDTO\x12\x0e\n\x06\x64tu_sn\x18\x01 \x01(\t\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x03 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x04 \x01(\x05\x12\x10\n\x08\x65rr_code\x18\x05 \x01(\x05\x12\x0b\n\x03tid\x18\x06 \x01(\x03\";\n\x13\x45SOperatingStatusMO\x12\r\n\x05\x65s_sn\x18\x01 \x01(\t\x12\x15\n\rprogress_rate\x18\x02 \x01(\x05\";\n\x13MIOperatingStatusMO\x12\r\n\x05mi_sn\x18\x01 \x01(\x03\x12\x15\n\rprogress_rate\x18\x02 \x01(\x05\"4\n\x0fMIErrorStatusMO\x12\r\n\x05mi_sn\x18\x01 \x01(\x03\x12\x12\n\nerror_code\x18\x02 \x01(\x03\"\x1e\n\rESSucStatusMO\x12\r\n\x05\x65s_sn\x18\x01 \x01(\t\"4\n\x0f\x45SErrorStatusMO\x12\r\n\x05\x65s_sn\x18\x01 \x01(\t\x12\x12\n\nerror_code\x18\x02 \x01(\x03\"\xb5\x03\n\x13\x43ommandStatusReqDTO\x12\x0e\n\x06\x64tu_sn\x18\x01 \x01(\t\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x03 \x01(\x05\x12\x13\n\x0bpackage_nub\x18\x04 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x05 \x01(\x05\x12\x0b\n\x03tid\x18\x06 \x01(\x03\x12\x13\n\x0b\x65s_sns_sucs\x18\x07 \x03(\t\x12\x13\n\x0bmi_sns_sucs\x18\x08 \x03(\x03\x12\x15\n\res_sns_failds\x18\t \x03(\t\x12\x15\n\rmi_sns_failds\x18\n \x03(\x03\x12\x31\n\x13\x65s_mOperatingStatus\x18\x0b \x03(\x0b\x32\x14.ESOperatingStatusMO\x12\x31\n\x13mi_mOperatingStatus\x18\x0c \x03(\x0b\x32\x14.MIOperatingStatusMO\x12)\n\x0fmi_mErrorStatus\x18\r \x03(\x0b\x32\x10.MIErrorStatusMO\x12%\n\res_mSucStatus\x18\x0e \x03(\x0b\x32\x0e.ESSucStatusMO\x12)\n\x0f\x65s_mErrorStatus\x18\x0f \x03(\x0b\x32\x10.ESErrorStatusMO\"g\n\x13\x43ommandStatusResDTO\x12\x0c\n\x04time\x18\x01 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x02 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x03 \x01(\x05\x12\x0b\n\x03tid\x18\x04 \x01(\x03\x12\x10\n\x08\x65rr_code\x18\x05 \x01(\x05\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x43ommandPB.proto\x12$com.hoymiles_wifi.protobuf.CommandPB\"\xb2\x02\n\rCommandResDTO\x12\x0c\n\x04time\x18\x01 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x02 \x01(\x05\x12\x10\n\x08\x64\x65v_kind\x18\x03 \x01(\x05\x12\x13\n\x0bpackage_nub\x18\x04 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x05 \x01(\x05\x12\x0b\n\x03tid\x18\x06 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x07 \x01(\t\x12\x10\n\x08\x65s_to_sn\x18\x08 \x03(\t\x12\x10\n\x08mi_to_sn\x18\t \x03(\x03\x12\x16\n\x0esystem_total_a\x18\n \x01(\x05\x12\x16\n\x0esystem_total_b\x18\x0b \x01(\x05\x12\x16\n\x0esystem_total_c\x18\x0c \x01(\x05\x12\x14\n\x0cmi_sn_item_a\x18\r \x03(\x03\x12\x14\n\x0cmi_sn_item_b\x18\x0e \x03(\x03\x12\x14\n\x0cmi_sn_item_c\x18\x0f \x03(\x03\"q\n\rCommandReqDTO\x12\x0e\n\x06\x64tu_sn\x18\x01 \x01(\t\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x03 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x04 \x01(\x05\x12\x10\n\x08\x65rr_code\x18\x05 \x01(\x05\x12\x0b\n\x03tid\x18\x06 \x01(\x03\";\n\x13\x45SOperatingStatusMO\x12\r\n\x05\x65s_sn\x18\x01 \x01(\t\x12\x15\n\rprogress_rate\x18\x02 \x01(\x05\";\n\x13MIOperatingStatusMO\x12\r\n\x05mi_sn\x18\x01 \x01(\x03\x12\x15\n\rprogress_rate\x18\x02 \x01(\x05\"4\n\x0fMIErrorStatusMO\x12\r\n\x05mi_sn\x18\x01 \x01(\x03\x12\x12\n\nerror_code\x18\x02 \x01(\x03\"\x1e\n\rESSucStatusMO\x12\r\n\x05\x65s_sn\x18\x01 \x01(\t\"4\n\x0f\x45SErrorStatusMO\x12\r\n\x05\x65s_sn\x18\x01 \x01(\t\x12\x12\n\nerror_code\x18\x02 \x01(\x03\"\xee\x04\n\x13\x43ommandStatusReqDTO\x12\x0e\n\x06\x64tu_sn\x18\x01 \x01(\t\x12\x0c\n\x04time\x18\x02 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x03 \x01(\x05\x12\x13\n\x0bpackage_nub\x18\x04 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x05 \x01(\x05\x12\x0b\n\x03tid\x18\x06 \x01(\x03\x12\x13\n\x0b\x65s_sns_sucs\x18\x07 \x03(\t\x12\x13\n\x0bmi_sns_sucs\x18\x08 \x03(\x03\x12\x15\n\res_sns_failds\x18\t \x03(\t\x12\x15\n\rmi_sns_failds\x18\n \x03(\x03\x12V\n\x13\x65s_mOperatingStatus\x18\x0b \x03(\x0b\x32\x39.com.hoymiles_wifi.protobuf.CommandPB.ESOperatingStatusMO\x12V\n\x13mi_mOperatingStatus\x18\x0c \x03(\x0b\x32\x39.com.hoymiles_wifi.protobuf.CommandPB.MIOperatingStatusMO\x12N\n\x0fmi_mErrorStatus\x18\r \x03(\x0b\x32\x35.com.hoymiles_wifi.protobuf.CommandPB.MIErrorStatusMO\x12J\n\res_mSucStatus\x18\x0e \x03(\x0b\x32\x33.com.hoymiles_wifi.protobuf.CommandPB.ESSucStatusMO\x12N\n\x0f\x65s_mErrorStatus\x18\x0f \x03(\x0b\x32\x35.com.hoymiles_wifi.protobuf.CommandPB.ESErrorStatusMO\"g\n\x13\x43ommandStatusResDTO\x12\x0c\n\x04time\x18\x01 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x02 \x01(\x05\x12\x13\n\x0bpackage_now\x18\x03 \x01(\x05\x12\x0b\n\x03tid\x18\x04 \x01(\x03\x12\x10\n\x08\x65rr_code\x18\x05 \x01(\x05\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'CommandPB_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_COMMANDRESDTO']._serialized_start=20
-  _globals['_COMMANDRESDTO']._serialized_end=326
-  _globals['_COMMANDREQDTO']._serialized_start=328
-  _globals['_COMMANDREQDTO']._serialized_end=441
-  _globals['_ESOPERATINGSTATUSMO']._serialized_start=443
-  _globals['_ESOPERATINGSTATUSMO']._serialized_end=502
-  _globals['_MIOPERATINGSTATUSMO']._serialized_start=504
-  _globals['_MIOPERATINGSTATUSMO']._serialized_end=563
-  _globals['_MIERRORSTATUSMO']._serialized_start=565
-  _globals['_MIERRORSTATUSMO']._serialized_end=617
-  _globals['_ESSUCSTATUSMO']._serialized_start=619
-  _globals['_ESSUCSTATUSMO']._serialized_end=649
-  _globals['_ESERRORSTATUSMO']._serialized_start=651
-  _globals['_ESERRORSTATUSMO']._serialized_end=703
-  _globals['_COMMANDSTATUSREQDTO']._serialized_start=706
-  _globals['_COMMANDSTATUSREQDTO']._serialized_end=1143
-  _globals['_COMMANDSTATUSRESDTO']._serialized_start=1145
-  _globals['_COMMANDSTATUSRESDTO']._serialized_end=1248
+  _globals['_COMMANDRESDTO']._serialized_start=58
+  _globals['_COMMANDRESDTO']._serialized_end=364
+  _globals['_COMMANDREQDTO']._serialized_start=366
+  _globals['_COMMANDREQDTO']._serialized_end=479
+  _globals['_ESOPERATINGSTATUSMO']._serialized_start=481
+  _globals['_ESOPERATINGSTATUSMO']._serialized_end=540
+  _globals['_MIOPERATINGSTATUSMO']._serialized_start=542
+  _globals['_MIOPERATINGSTATUSMO']._serialized_end=601
+  _globals['_MIERRORSTATUSMO']._serialized_start=603
+  _globals['_MIERRORSTATUSMO']._serialized_end=655
+  _globals['_ESSUCSTATUSMO']._serialized_start=657
+  _globals['_ESSUCSTATUSMO']._serialized_end=687
+  _globals['_ESERRORSTATUSMO']._serialized_start=689
+  _globals['_ESERRORSTATUSMO']._serialized_end=741
+  _globals['_COMMANDSTATUSREQDTO']._serialized_start=744
+  _globals['_COMMANDSTATUSREQDTO']._serialized_end=1366
+  _globals['_COMMANDSTATUSRESDTO']._serialized_start=1368
+  _globals['_COMMANDSTATUSRESDTO']._serialized_end=1471
 # @@protoc_insertion_point(module_scope)

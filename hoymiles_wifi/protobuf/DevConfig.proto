@@ -1,76 +1,78 @@
 syntax = "proto3";
 
+package com.hoymiles_wifi.protobuf.DevConfig;
+
 message DevConfigFetchResDTO {
-  int32 response_time = 1;          // Timestamp of the response
-  int64 transaction_id = 2;         // Transaction ID
-  string dtu_sn = 3;                // DTU serial number
-  string dev_sn = 4;                // Device serial number
-  int32 current_package = 5;        // Current package number
-  int32 rule_type = 6;              // Rule type
+  int32 response_time = 1;   // Timestamp of the response
+  int64 transaction_id = 2;  // Transaction ID
+  string dtu_sn = 3;         // DTU serial number
+  string dev_sn = 4;         // Device serial number
+  int32 current_package = 5; // Current package number
+  int32 rule_type = 6;       // Rule type
 }
 
 message DevConfigFetchReqDTO {
-  int32 request_time = 1;           // Timestamp of the request
-  int64 transaction_id = 2;         // Transaction ID
-  int32 rule_id = 3;                // Rule ID
-  string data = 4;                  // Data
-  int32 crc = 5;                    // CRC value
-  string dtu_sn = 6;                // DTU serial number
-  string dev_sn = 7;                // Device serial number
-  string cfg_data = 8;              // Configuration data
-  int32 cfg_crc = 9;                // Configuration CRC value
-  int32 total_packages = 10;        // Total number of packages
-  int32 current_package = 11;       // Current package number
-  int32 rule_type = 12;             // Rule type
+  int32 request_time = 1;     // Timestamp of the request
+  int64 transaction_id = 2;   // Transaction ID
+  int32 rule_id = 3;          // Rule ID
+  string data = 4;            // Data
+  int32 crc = 5;              // CRC value
+  string dtu_sn = 6;          // DTU serial number
+  string dev_sn = 7;          // Device serial number
+  string cfg_data = 8;        // Configuration data
+  int32 cfg_crc = 9;          // Configuration CRC value
+  int32 total_packages = 10;  // Total number of packages
+  int32 current_package = 11; // Current package number
+  int32 rule_type = 12;       // Rule type
 }
 
 message DevConfigPutResDTO {
-  int32 response_time = 1;          // Timestamp of the response
-  int64 transaction_id = 2;         // Transaction ID
-  int32 rule_id = 3;                // Rule ID
-  string data = 4;                  // Data
-  int32 crc = 5;                    // CRC value
-  string dtu_sn = 6;                // DTU serial number
-  string dev_sn = 7;                // Device serial number
-  string cfg_data = 8;              // Configuration data
-  int32 cfg_crc = 9;                // Configuration CRC value
-  int32 total_packages = 10;        // Total number of packages
-  int32 current_package = 11;       // Current package number
-  repeated int64 mi_to_sn = 12;     // List of MI (Meter Interface) serial numbers
-  int32 rule_type = 13;             // Rule type
+  int32 response_time = 1;      // Timestamp of the response
+  int64 transaction_id = 2;     // Transaction ID
+  int32 rule_id = 3;            // Rule ID
+  string data = 4;              // Data
+  int32 crc = 5;                // CRC value
+  string dtu_sn = 6;            // DTU serial number
+  string dev_sn = 7;            // Device serial number
+  string cfg_data = 8;          // Configuration data
+  int32 cfg_crc = 9;            // Configuration CRC value
+  int32 total_packages = 10;    // Total number of packages
+  int32 current_package = 11;   // Current package number
+  repeated int64 mi_to_sn = 12; // List of MI (Meter Interface) serial numbers
+  int32 rule_type = 13;         // Rule type
 }
 
 message DevConfigPutReqDTO {
-  int32 request_time = 1;           // Timestamp of the request
-  int64 transaction_id = 2;         // Transaction ID
-  string dtu_sn = 3;                // DTU serial number
-  string dev_sn = 4;                // Device serial number
-  int32 status = 5;                 // Status indicator
-  int32 current_package = 6;        // Current package number
-  repeated int64 mi_to_sn = 7;      // List of MI (Meter Interface) serial numbers
-  int32 rule_type = 8;              // Rule type
+  int32 request_time = 1;      // Timestamp of the request
+  int64 transaction_id = 2;    // Transaction ID
+  string dtu_sn = 3;           // DTU serial number
+  string dev_sn = 4;           // Device serial number
+  int32 status = 5;            // Status indicator
+  int32 current_package = 6;   // Current package number
+  repeated int64 mi_to_sn = 7; // List of MI (Meter Interface) serial numbers
+  int32 rule_type = 8;         // Rule type
 }
 
 message DevConfigReportReqDTO {
-  int32 request_time = 1;           // Timestamp of the request
-  int64 transaction_id = 2;         // Transaction ID
-  int32 rule_id = 3;                // Rule ID
-  string data = 4;                  // Data
-  int32 crc = 5;                    // CRC value
-  string dtu_sn = 6;                // DTU serial number
-  string dev_sn = 7;                // Device serial number
-  string cfg_data = 8;              // Configuration data
-  int32 cfg_crc = 9;                // Configuration CRC value
-  int32 total_packages = 10;        // Total number of packages
-  int32 current_package = 11;       // Current package number
-  int32 rule_type = 12;             // Rule type
+  int32 request_time = 1;     // Timestamp of the request
+  int64 transaction_id = 2;   // Transaction ID
+  int32 rule_id = 3;          // Rule ID
+  string data = 4;            // Data
+  int32 crc = 5;              // CRC value
+  string dtu_sn = 6;          // DTU serial number
+  string dev_sn = 7;          // Device serial number
+  string cfg_data = 8;        // Configuration data
+  int32 cfg_crc = 9;          // Configuration CRC value
+  int32 total_packages = 10;  // Total number of packages
+  int32 current_package = 11; // Current package number
+  int32 rule_type = 12;       // Rule type
 }
 
 message DevConfigReportResDTO {
-  int32 response_time = 1;          // Timestamp of the response
-  int64 transaction_id = 2;         // Transaction ID
-  string dtu_sn = 3;                // DTU serial number
-  string dev_sn = 4;                // Device serial number
-  int32 current_package = 5;        // Current package number
-  int32 rule_type = 6;              // Rule type
+  int32 response_time = 1;   // Timestamp of the response
+  int64 transaction_id = 2;  // Transaction ID
+  string dtu_sn = 3;         // DTU serial number
+  string dev_sn = 4;         // Device serial number
+  int32 current_package = 5; // Current package number
+  int32 rule_type = 6;       // Rule type
 }

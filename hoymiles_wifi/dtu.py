@@ -27,6 +27,8 @@ from hoymiles_wifi.const import (
     CMD_ES_DATA_DTO,
     CMD_ES_REG_RES_DTO,
     CMD_GET_CONFIG,
+    CMD_GW_INFO_RES_DTO,
+    CMD_GW_NET_INFO_RES,
     CMD_HB_RES_DTO,
     CMD_HEADER,
     CMD_NETWORK_INFO_RES,
@@ -44,9 +46,11 @@ from hoymiles_wifi.protobuf import (
     APPHeartbeatPB_pb2,
     APPInfomationData_pb2,
     CommandPB_pb2,
-    ESRegPB_pb2,
     ESData_pb2,
+    ESRegPB_pb2,
     GetConfig_pb2,
+    GWInfo_pb2,
+    GWNetInfo_pb2,
     InfomationData_pb2,
     NetworkInfo_pb2,
     RealData_pb2,
@@ -395,7 +399,32 @@ class DTU:
         request.cp = 0
 
         command = CMD_ES_REG_RES_DTO
+
         return await self.async_send_request(command, request, ESRegPB_pb2.ESRegReqDTO)
+
+    async def async_get_gateway_info(self) -> GWInfo_pb2.GWInfoReqDTO | None:
+        """Get gateway info."""
+
+        request = GWInfo_pb2.GWInfoResDTO()
+        request.time = int(time.time())
+        request.offset = OFFSET
+
+        command = CMD_GW_INFO_RES_DTO
+
+        return await self.async_send_request(command, request, GWInfo_pb2.GWInfoReqDTO)
+
+    async def async_get_gateway_network_info(self) -> GWNetInfo_pb2.GWNetInfoReq | None:
+        """Get gateway network info."""
+
+        request = GWNetInfo_pb2.GWNetInfoRes()
+        request.time = int(time.time())
+        request.offset = OFFSET
+
+        command = CMD_GW_NET_INFO_RES
+
+        return await self.async_send_request(
+            command, request, GWNetInfo_pb2.GWNetInfoReq
+        )
 
     async def async_send_request(
         self,

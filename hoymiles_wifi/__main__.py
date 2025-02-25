@@ -30,6 +30,8 @@ from hoymiles_wifi.protobuf import (
     ESData_pb2,
     ESRegPB_pb2,
     GetConfig_pb2,
+    GWInfo_pb2,
+    GWNetInfo_pb2,
     InfomationData_pb2,
     NetworkInfo_pb2,
     RealData_pb2,
@@ -333,6 +335,18 @@ async def async_get_energy_storage_registry(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO
     return await dtu.async_get_energy_storage_registry()
 
 
+async def async_get_gateway_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
+    """Get gateway info."""
+
+    return await dtu.async_get_gateway_info()
+
+
+async def async_get_gateway_network_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
+    """Get gateway network info."""
+
+    return await dtu.async_get_gateway_network_info()
+
+
 def print_invalid_command(command: str) -> None:
     """Print an invalid command message."""
 
@@ -397,6 +411,8 @@ async def main() -> None:
             "get-alarm-list",
             "enable-performance-data-mode",
             "get-energy-storage-registry",
+            "get-gateway-info",
+            "get-gateway-network-info",
         ],
         help="Command to execute",
     )
@@ -427,6 +443,8 @@ async def main() -> None:
         "get-alarm-list": async_get_alarm_list,
         "enable-performance-data-mode": async_enable_performance_data_mode,
         "get-energy-storage-registry": async_get_energy_storage_registry,
+        "get-gateway-info": async_get_gateway_info,
+        "get-gateway-network-info": async_get_gateway_network_info,
     }
 
     command_func = switch.get(args.command, print_invalid_command)

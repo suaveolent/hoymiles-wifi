@@ -1,89 +1,90 @@
 syntax = "proto3";
 
+package com.hoymiles_wifi.protobuf.AppInformationData;
+
 message APPDtuInfoMO {
-  int32 device_kind = 1;               // Type of the device
-  int32 dtu_sw_version = 2;            // DTU software version
-  int32 dtu_hw_version = 3;            // DTU hardware version
-  int32 dtu_step_time = 4;             // DTU step time
-  int32 dtu_rf_hw_version = 5;         // DTU RF hardware version
-  int32 dtu_rf_sw_version = 6;         // DTU RF software version
-  int32 access_model = 7;              // Access model
-  int32 communication_time = 8;       // Communication time
-  int32 signal_strength = 9;           // Signal strength
-  string gprs_version = 10;            // GPRS version
-  string wifi_version = 11;            // Wifi version
-  string ka_number = 12;               // KA number
-  int32 dtu_rule_id = 13;              // DTU rule ID
-  int32 dtu_error_code = 14;           // DTU error code
-  int32 dtu485_mode = 15;              // DTU485 mode
-  int32 dtu485_address = 16;           // DTU485 address
-  int32 sub1g_frequency_band = 17;     // Sub1G frequency band
+  int32 device_kind = 1;                 // Type of the device
+  int32 dtu_sw_version = 2;              // DTU software version
+  int32 dtu_hw_version = 3;              // DTU hardware version
+  int32 dtu_step_time = 4;               // DTU step time
+  int32 dtu_rf_hw_version = 5;           // DTU RF hardware version
+  int32 dtu_rf_sw_version = 6;           // DTU RF software version
+  int32 access_model = 7;                // Access model
+  int32 communication_time = 8;          // Communication time
+  int32 signal_strength = 9;             // Signal strength
+  string gprs_version = 10;              // GPRS version
+  string wifi_version = 11;              // Wifi version
+  string ka_number = 12;                 // KA number
+  int32 dtu_rule_id = 13;                // DTU rule ID
+  int32 dtu_error_code = 14;             // DTU error code
+  int32 dtu485_mode = 15;                // DTU485 mode
+  int32 dtu485_address = 16;             // DTU485 address
+  int32 sub1g_frequency_band = 17;       // Sub1G frequency band
   int32 sub1g_channel_total_number = 18; // Sub1G channel total number
-  int32 sub1g_channel_number = 19;     // Sub1G channel number
-  int32 sub1g_rp = 20;                 // Sub1G RP
-  int32 sub1g_channel_total = 21;      // Sub1G channel total
-  string gprs_imei = 22;               // GPRS IMEI
+  int32 sub1g_channel_number = 19;       // Sub1G channel number
+  int32 sub1g_rp = 20;                   // Sub1G RP
+  int32 sub1g_channel_total = 21;        // Sub1G channel total
+  string gprs_imei = 22;                 // GPRS IMEI
 }
 
 message APPMeterInfoMO {
-  int32 device_kind = 1;               // Type of the device
-  int64 meter_serial_number = 2;       // Meter serial number
-  int32 meter_model = 3;               // Meter model
-  int32 meter_ct = 4;                  // Meter current transformer
-  int32 communication_way = 5;         // Communication way
-  int32 access_mode = 6;               // Access mode
-  int32 sw_version = 7;                // Software version
-  string meter_value = 8;              // Meter value
+  int32 device_kind = 1;         // Type of the device
+  int64 meter_serial_number = 2; // Meter serial number
+  int32 meter_model = 3;         // Meter model
+  int32 meter_ct = 4;            // Meter current transformer
+  int32 communication_way = 5;   // Communication way
+  int32 access_mode = 6;         // Access mode
+  int32 sw_version = 7;          // Software version
+  string meter_value = 8;        // Meter value
 }
 
 message APPRpInfoMO {
-  int32 device_kind = 1;               // Type of the device
-  int64 rp_serial_number = 2;          // RP serial number
-  int32 rp_sw_version = 3;             // RP software version
-  int32 rp_hw_version = 4;             // RP hardware version
-  int32 rp_rule_id = 5;                // RP rule ID
+  int32 device_kind = 1;      // Type of the device
+  int64 rp_serial_number = 2; // RP serial number
+  int32 rp_sw_version = 3;    // RP software version
+  int32 rp_hw_version = 4;    // RP hardware version
+  int32 rp_rule_id = 5;       // RP rule ID
 }
 
 message APPPvInfoMO {
-  int32 device_kind = 1;               // Type of the device
-  int64 pv_serial_number = 2;          // PV serial number
-  int32 pv_usfw = 3;                   // PV US firmware
-  int32 pv_sw_version = 4;             // PV software version
-  int32 pv_hw_part_number = 5;         // PV hardware part number
-  int32 pv_hw_version = 6;             // PV hardware version
-  int32 pv_grid_profile_code = 7;      // PV grid profile code
-  int32 pv_grid_profile = 8;           // PV grid profile
-  int32 pv_rf_hw_version = 9;          // PV RF hardware version
-  int32 pv_rf_sw_version = 10;         // PV RF software version
-  int32 mi_rule_id = 11;               // MI rule ID
+  int32 device_kind = 1;          // Type of the device
+  int64 pv_serial_number = 2;     // PV serial number
+  int32 pv_usfw = 3;              // PV US firmware
+  int32 pv_sw_version = 4;        // PV software version
+  int32 pv_hw_part_number = 5;    // PV hardware part number
+  int32 pv_hw_version = 6;        // PV hardware version
+  int32 pv_grid_profile_code = 7; // PV grid profile code
+  int32 pv_grid_profile = 8;      // PV grid profile
+  int32 pv_rf_hw_version = 9;     // PV RF hardware version
+  int32 pv_rf_sw_version = 10;    // PV RF software version
+  int32 mi_rule_id = 11;          // MI rule ID
 }
 
 message APPFeatureMO {
-  int32 key = 1;                       // Feature key
-  string value = 2;                    // Feature value
+  int32 key = 1;    // Feature key
+  string value = 2; // Feature value
 }
 
 message APPInfoDataReqDTO {
-  string dtu_serial_number = 1;        // DTU serial number
-  uint32 timestamp = 2;                // Timestamp
-  int32 device_number = 3;             // Device number
-  int32 pv_number = 4;                 // PV number
-  int32 package_number = 5;            // Package number
-  int32 current_package = 6;           // Current package
-  int32 channel = 7;                   // Channel
-  APPDtuInfoMO dtu_info = 8;           // DTU information
-  repeated APPMeterInfoMO meter_info = 9;   // Meter information
+  string dtu_serial_number = 1;            // DTU serial number
+  uint32 timestamp = 2;                    // Timestamp
+  int32 device_number = 3;                 // Device number
+  int32 pv_number = 4;                     // PV number
+  int32 package_number = 5;                // Package number
+  int32 current_package = 6;               // Current package
+  int32 channel = 7;                       // Channel
+  APPDtuInfoMO dtu_info = 8;               // DTU information
+  repeated APPMeterInfoMO meter_info = 9;  // Meter information
   repeated APPRpInfoMO rp_info = 10;       // RP information
   repeated APPPvInfoMO pv_info = 11;       // PV information
-  uint32 unknown_field = 12;          // Unknown field
+  uint32 unknown_field = 12;               // Unknown field
   repeated APPFeatureMO app_features = 13; // Application features
 }
 
 message APPInfoDataResDTO {
-  string time_ymd_hms = 1;                // Date and time
-  int32 offset = 2;                    // Offset
-  int32 current_package = 3;           // Current package
-  int32 error_code = 4;                // Error code
-  uint32 time = 5;                // Timestamp
+  string time_ymd_hms = 1;   // Date and time
+  int32 offset = 2;          // Offset
+  int32 current_package = 3; // Current package
+  int32 error_code = 4;      // Error code
+  uint32 time = 5;           // Timestamp
 }
-

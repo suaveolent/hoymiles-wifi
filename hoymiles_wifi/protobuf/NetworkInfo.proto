@@ -1,19 +1,21 @@
 syntax = "proto3";
 
+package com.hoymiles_wifi.protobuf.NetworkInfo;
+
 message NetworkInfoReqDTO {
-  string dtu_sn = 1;          // DTU serial number
-  uint32 time = 2;            // Timestamp of the request
-  int32 net_set_mod = 3;      // Network setting mode
-  int32 net_set_time = 4;     // Network setting time
-  int32 net_set_state = 5;    // Network setting state
-  int32 net_work_mod = 6;     // Network working mode
-  int32 net_work_time = 7;    // Network working time
-  int32 csq = 8;              // Carrier Signal Quality (CSQ)
-  int32 net_work_state = 9;   // Network working state
-  int32 ap_set_state = 10;    // Access Point (AP) setting state
+  string dtu_sn = 1;        // DTU serial number
+  uint32 time = 2;          // Timestamp of the request
+  int32 net_set_mod = 3;    // Network setting mode
+  int32 net_set_time = 4;   // Network setting time
+  int32 net_set_state = 5;  // Network setting state
+  int32 net_work_mod = 6;   // Network working mode
+  int32 net_work_time = 7;  // Network working time
+  int32 csq = 8;            // Carrier Signal Quality (CSQ)
+  int32 net_work_state = 9; // Network working state
+  int32 ap_set_state = 10;  // Access Point (AP) setting state
 }
 
 message NetworkInfoResDTO {
-  int32 offset = 1;           // Offset value for response
-  uint32 time = 2;            // Timestamp of the response
+  int32 offset = 1; // Offset value for response
+  uint32 time = 2;  // Timestamp of the response
 }
