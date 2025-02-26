@@ -421,7 +421,12 @@ class DTU:
         command = CMD_ES_DATA_DTO
 
         return await self.async_send_request(
-            command, request, ESData_pb2.ESDataReqDTO, is_extended_format=True, number=1
+            command,
+            request,
+            ESData_pb2.ESDataReqDTO,
+            is_extended_format=True,
+            serial_number=serial_number,
+            number=1,
         )
 
     async def async_get_gateway_info(self) -> GWInfo_pb2.GWInfoReqDTO | None:
