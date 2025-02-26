@@ -401,7 +401,27 @@ class DTU:
         command = CMD_ES_REG_RES_DTO
 
         return await self.async_send_request(
-            command, request, ESRegPB_pb2.ESRegReqDTO, is_extended_format=True
+            command, request, ESRegPB_pb2.ESRegReqDTO, is_extended_format=True, number=1
+        )
+
+    async def async_get_energy_storage_data(
+        self, serial_number: int
+    ) -> ESData_pb2.ESDataReqDTO | None:
+        """Get energy storage registry."""
+
+        request = ESData_pb2.ESDataResDTO()
+        request.time = int(time.time())
+        request.time_ymd_hms = (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        )
+        request.offset = OFFSET
+        request.cp = 0
+        request.serial_number = serial_number
+
+        command = CMD_ES_DATA_DTO
+
+        return await self.async_send_request(
+            command, request, ESData_pb2.ESDataReqDTO, is_extended_format=True, number=1
         )
 
     async def async_get_gateway_info(self) -> GWInfo_pb2.GWInfoReqDTO | None:

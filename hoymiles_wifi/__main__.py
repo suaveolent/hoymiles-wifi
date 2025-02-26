@@ -335,6 +335,14 @@ async def async_get_energy_storage_registry(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO
     return await dtu.async_get_energy_storage_registry()
 
 
+async def async_get_energy_storage_data(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
+    """Get energy storage registry from the dtu asynchronously."""
+
+    registry = await dtu.async_get_energy_storage_registry()
+
+    return await dtu.async_get_energy_storage_data(registry.serial_number)
+
+
 async def async_get_gateway_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
     """Get gateway info."""
 
@@ -413,6 +421,7 @@ async def main() -> None:
             "get-alarm-list",
             "enable-performance-data-mode",
             "get-energy-storage-registry",
+            "get-energy-storage-data",
             "get-gateway-info",
             "get-gateway-network-info",
         ],
@@ -447,6 +456,7 @@ async def main() -> None:
         "get-energy-storage-registry": async_get_energy_storage_registry,
         "get-gateway-info": async_get_gateway_info,
         "get-gateway-network-info": async_get_gateway_network_info,
+        "get-energy-storage-data": async_get_energy_storage_data,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
