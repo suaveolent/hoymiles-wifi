@@ -150,7 +150,7 @@ message ESDataReqDTO {
   DLoadMO load = 11;
   DInvMO inverter = 12;
   DGenMO generator = 13;
-  DGenMO photovoltaic_inverter = 14;
+  DGenMO pv_inverter = 14;
   IPSMO integrated_power_system = 15;
   repeated DSmartLoadMO smart_loads = 16;
   DFlowMO power_flow = 17;
