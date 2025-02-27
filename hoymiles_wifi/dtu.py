@@ -387,48 +387,6 @@ class DTU:
             command, request, CommandPB_pb2.CommandReqDTO
         )
 
-    async def async_get_energy_storage_registry(self) -> ESRegPB_pb2.ESRegReqDTO | None:
-        """Get energy storage registry."""
-
-        request = ESRegPB_pb2.ESRegResDTO()
-        request.time = int(time.time())
-        request.time_ymd_hms = (
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
-        )
-        request.offset = OFFSET
-        request.cp = 0
-
-        command = CMD_ES_REG_RES_DTO
-
-        return await self.async_send_request(
-            command, request, ESRegPB_pb2.ESRegReqDTO, is_extended_format=True, number=1
-        )
-
-    async def async_get_energy_storage_data(
-        self, serial_number: int
-    ) -> ESData_pb2.ESDataReqDTO | None:
-        """Get energy storage registry."""
-
-        request = ESData_pb2.ESDataResDTO()
-        request.time = int(time.time())
-        request.time_ymd_hms = (
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
-        )
-        request.offset = OFFSET
-        request.cp = 0
-        request.serial_number = serial_number
-
-        command = CMD_ES_DATA_DTO
-
-        return await self.async_send_request(
-            command,
-            request,
-            ESData_pb2.ESDataReqDTO,
-            is_extended_format=True,
-            serial_number=serial_number,
-            number=1,
-        )
-
     async def async_get_gateway_info(self) -> GWInfo_pb2.GWInfoReqDTO | None:
         """Get gateway info."""
 
@@ -447,7 +405,7 @@ class DTU:
         )
 
     async def async_get_gateway_network_info(
-        self, serial_number: int
+        self, dtu_serial_number: int
     ) -> GWNetInfo_pb2.GWNetInfoReq | None:
         """Get gateway network info."""
 
@@ -462,8 +420,57 @@ class DTU:
             request,
             GWNetInfo_pb2.GWNetInfoReq,
             is_extended_format=True,
-            serial_number=serial_number,
+            dtu_serial_number=dtu_serial_number,
             number=255,
+        )
+
+    async def async_get_energy_storage_registry(
+        self, dtu_serial_number: int
+    ) -> ESRegPB_pb2.ESRegReqDTO | None:
+        """Get energy storage registry."""
+
+        request = ESRegPB_pb2.ESRegResDTO()
+        request.time = int(time.time())
+        request.time_ymd_hms = (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        )
+        request.offset = OFFSET
+        request.cp = 0
+
+        command = CMD_ES_REG_RES_DTO
+
+        return await self.async_send_request(
+            command,
+            request,
+            ESRegPB_pb2.ESRegReqDTO,
+            is_extended_format=True,
+            dtu_serial_number=dtu_serial_number,
+            number=1,
+        )
+
+    async def async_get_energy_storage_data(
+        self, dtu_serial_number: int, inverter_serial_number: int
+    ) -> ESData_pb2.ESDataReqDTO | None:
+        """Get energy storage registry."""
+
+        request = ESData_pb2.ESDataResDTO()
+        request.time = int(time.time())
+        request.time_ymd_hms = (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        )
+        request.offset = OFFSET
+        request.cp = 0
+        request.serial_number = inverter_serial_number
+
+        command = CMD_ES_DATA_DTO
+
+        return await self.async_send_request(
+            command,
+            request,
+            ESData_pb2.ESDataReqDTO,
+            is_extended_format=True,
+            dtu_serial_number=dtu_serial_number,
+            number=1,
         )
 
     async def async_send_request(
@@ -473,13 +480,13 @@ class DTU:
         response_type: Any,
         dtu_port: int = DTU_PORT,
         is_extended_format: bool = False,
-        serial_number: int = 0,
+        dtu_serial_number: int = 0,
         number: int = 0,
     ):
         """Send request to DTU."""
 
         message = self.generate_message(
-            command, request, is_extended_format, serial_number, number
+            command, request, is_extended_format, dtu_serial_number, number
         )
 
         ip_to_bind = (self.local_addr, 0) if self.local_addr is not None else None

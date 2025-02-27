@@ -329,20 +329,6 @@ async def async_enable_performance_data_mode(dtu: DTU) -> None:
     return await dtu.async_enable_performance_data_mode()
 
 
-async def async_get_energy_storage_registry(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
-    """Get energy storage registry from the dtu asynchronously."""
-
-    return await dtu.async_get_energy_storage_registry()
-
-
-async def async_get_energy_storage_data(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
-    """Get energy storage registry from the dtu asynchronously."""
-
-    registry = await dtu.async_get_energy_storage_registry()
-
-    return await dtu.async_get_energy_storage_data(registry.serial_number)
-
-
 async def async_get_gateway_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
     """Get gateway info."""
 
@@ -355,6 +341,37 @@ async def async_get_gateway_network_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | 
     gateway_info = await dtu.async_get_gateway_info()
 
     return await dtu.async_get_gateway_network_info(gateway_info.serial_number)
+
+
+async def async_get_energy_storage_registry(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
+    """Get energy storage registry from the dtu asynchronously."""
+
+    gateway_info = await dtu.async_get_gateway_info()
+
+    return await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
+
+
+async def async_get_energy_storage_data(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
+    """Get energy storage registry from the dtu asynchronously."""
+
+    gateway_info = await dtu.async_get_gateway_info()
+
+    registry = await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
+
+    responses = []
+    for inverter in registry.inverters:
+        storage_data = await dtu.async_get_energy_storage_data(
+            dtu_serial_number=gateway_info.serial_number,
+            inverter_serial_number=inverter.serial_number,
+        )
+        if storage_data is not None:
+            responses.append(storage_data)
+
+    return responses
 
 
 def print_invalid_command(command: str) -> None:

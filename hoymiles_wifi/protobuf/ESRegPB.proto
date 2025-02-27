@@ -9,7 +9,7 @@ message ChgCPMO {
 message ESRegReqDTO {
   int32 type = 1;
   RegMeterMO meter = 2;
-  repeated RegInvMO inv = 3;
+  repeated RegInvMO inverters = 3;
   int32 gen_mode = 4;
   int32 time = 5;
   int32 offset = 6;
@@ -44,7 +44,7 @@ message RegInvMO {
 }
 
 message RegMeterMO {
-  string sn = 1;
+  string serial_number = 1;
   string sn_pv = 2;
 }
 
