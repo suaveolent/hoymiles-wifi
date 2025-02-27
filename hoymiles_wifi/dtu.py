@@ -560,10 +560,10 @@ class DTU:
 
         message = header + metadata + request_as_bytes
 
-        logger.debug(f"Header: {header.hex()}")
-        logger.debug(f"Metadata: {metadata.hex()}")
+        logger.debug(f"Request header: {header.hex()}")
+        logger.debug(f"Request metadata: {metadata.hex()}")
         logger.debug(f"Request: {request_as_bytes.hex()}")
-        logger.debug(f"Message: {message.hex()}")
+        logger.debug(f"Request message: {message.hex()}")
 
         return message
 
@@ -595,6 +595,8 @@ class DTU:
                     f"CRC16 mismatch: {hex(crc16_response)} != {hex(crc16_target)}"
                 )
                 raise ValueError("CRC16 mismatch")
+
+            logger.debug(f"Response: {response_as_bytes.hex()}")
 
             parsed = response_type.FromString(response_as_bytes)
 
