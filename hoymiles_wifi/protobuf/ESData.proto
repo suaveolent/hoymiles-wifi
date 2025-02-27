@@ -160,7 +160,7 @@ message ESDataReqDTO {
 // Energy Storage Request
 message ESDataResDTO {
   int32 time = 1;
-  int32 ymd_hms = 2;
+  int32 time_ymd_hms = 2;
   int32 offset = 3;
   int32 cp = 4;
   int64 serial_number = 5;
