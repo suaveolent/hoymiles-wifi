@@ -9,7 +9,7 @@ message HBReqDTO {
 }
 
 message HBResDTO {
-  int32 offset = 1;        // Offset value
-  int32 time = 2;          // Timestamp of the response
-  string time_ymd_hms = 3; // Timestamp in the format YMD_HMS
+  int32 offset = 1;       // Offset value
+  int32 time = 2;         // Timestamp of the response
+  bytes time_ymd_hms = 3; // Timestamp in the format YMD_HMS
 }

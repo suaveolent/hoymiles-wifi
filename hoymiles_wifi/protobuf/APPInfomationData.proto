@@ -80,7 +80,7 @@ message APPInfoDataReqDTO {
 }
 
 message APPInfoDataResDTO {
-  string time_ymd_hms = 1;   // Date and time
+  bytes time_ymd_hms = 1;    // Date and time
   int32 offset = 2;          // Offset
   int32 current_package = 3; // Current package
   int32 error_code = 4;      // Error code

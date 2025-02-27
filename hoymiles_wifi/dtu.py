@@ -453,6 +453,7 @@ class DTU:
     ) -> ESData_pb2.ESDataReqDTO | None:
         """Get energy storage registry."""
 
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8"))
         request = ESData_pb2.ESDataResDTO()
         request.time = int(time.time())
         request.time_ymd_hms = (

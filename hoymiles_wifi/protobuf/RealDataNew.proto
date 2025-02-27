@@ -115,9 +115,9 @@ message RealDataNewReqDTO {
 }
 
 message RealDataNewResDTO {
-  string time_ymd_hms = 1; // Timestamp in the format YMD_HMS
-  int32 cp = 2;            // Current Package
-  int32 error_code = 3;    // Error code indicator
-  int32 offset = 4;        // Offset value
-  int32 time = 5;          // Timestamp value
+  bytes time_ymd_hms = 1; // Timestamp in the format YMD_HMS
+  int32 cp = 2;           // Current Package
+  int32 error_code = 3;   // Error code indicator
+  int32 offset = 4;       // Offset value
+  int32 time = 5;         // Timestamp value
 }
