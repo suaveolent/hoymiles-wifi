@@ -101,7 +101,7 @@ class DTU:
             self.state = new_state
             logger.debug(f"DTU is {new_state}")
 
-    async def async_get_real_data(self) -> RealData_pb2.RealDataResDTO | None:
+    async def async_get_real_data(self) -> RealData_pb2.RealDataReqDTO | None:
         """Get real data."""
 
         request = RealData_pb2.RealDataResDTO()
@@ -117,7 +117,7 @@ class DTU:
             command, request, RealData_pb2.RealDataReqDTO
         )
 
-    async def async_get_real_data_new(self) -> RealDataNew_pb2.RealDataNewResDTO | None:
+    async def async_get_real_data_new(self) -> RealDataNew_pb2.RealDataNewReqDTO | None:
         """Get real data new."""
 
         combined_response = RealDataNew_pb2.RealDataNewReqDTO()
@@ -152,7 +152,7 @@ class DTU:
 
         return combined_response if combined_response.ByteSize() > 0 else None
 
-    async def async_get_config(self) -> GetConfig_pb2.GetConfigResDTO | None:
+    async def async_get_config(self) -> GetConfig_pb2.GetConfigReqDTO | None:
         """Get config."""
 
         request = GetConfig_pb2.GetConfigResDTO()
@@ -165,7 +165,7 @@ class DTU:
             GetConfig_pb2.GetConfigReqDTO,
         )
 
-    async def async_network_info(self) -> NetworkInfo_pb2.NetworkInfoResDTO | None:
+    async def async_network_info(self) -> NetworkInfo_pb2.NetworkInfoReqDTO | None:
         """Get network info."""
 
         request = NetworkInfo_pb2.NetworkInfoResDTO()
@@ -178,7 +178,7 @@ class DTU:
 
     async def async_app_information_data(
         self,
-    ) -> APPInfomationData_pb2.APPInfoDataResDTO:
+    ) -> APPInfomationData_pb2.APPInfoDataReqDTO:
         """Get app information data."""
         request = APPInfomationData_pb2.APPInfoDataResDTO()
         request.time_ymd_hms = (
@@ -193,7 +193,7 @@ class DTU:
 
     async def async_app_get_hist_power(
         self,
-    ) -> AppGetHistPower_pb2.AppGetHistPowerResDTO | None:
+    ) -> AppGetHistPower_pb2.AppGetHistPowerReqDTO | None:
         """Get historical power."""
 
         request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
@@ -211,7 +211,7 @@ class DTU:
     async def async_set_power_limit(
         self,
         power_limit: int,
-    ) -> CommandPB_pb2.CommandResDTO | None:
+    ) -> CommandPB_pb2.CommandReqDTO | None:
         """Set power limit."""
         if power_limit < 0 or power_limit > 100:
             logger.error("Error. Invalid power limit!")
@@ -234,7 +234,7 @@ class DTU:
 
     async def async_set_wifi(
         self, ssid: str, password: str
-    ) -> SetConfig_pb2.SetConfigResDTO | None:
+    ) -> SetConfig_pb2.SetConfigReqDTO | None:
         """Set wifi."""
 
         get_config_req = await self.async_get_config()
@@ -260,7 +260,7 @@ class DTU:
     async def async_update_dtu_firmware(
         self,
         firmware_url: str = DTU_FIRMWARE_URL_00_01_11,
-    ) -> CommandPB_pb2.CommandResDTO | None:
+    ) -> CommandPB_pb2.CommandReqDTO | None:
         """Update DTU firmware."""
 
         request = CommandPB_pb2.CommandResDTO()
@@ -274,7 +274,7 @@ class DTU:
             command, request, CommandPB_pb2.CommandReqDTO
         )
 
-    async def async_restart_dtu(self) -> CommandPB_pb2.CommandResDTO | None:
+    async def async_restart_dtu(self) -> CommandPB_pb2.CommandReqDTO | None:
         """Restart DTU."""
 
         request = CommandPB_pb2.CommandResDTO()
@@ -289,7 +289,7 @@ class DTU:
 
     async def async_turn_on_inverter(
         self, inverter_serial: str
-    ) -> CommandPB_pb2.CommandResDTO | None:
+    ) -> CommandPB_pb2.CommandReqDTO | None:
         """Turn on Inverter."""
 
         inverter_serial_int = convert_inverter_serial_number(inverter_serial)
@@ -309,7 +309,7 @@ class DTU:
 
     async def async_turn_off_inverter(
         self, inverter_serial: str
-    ) -> CommandPB_pb2.CommandResDTO | None:
+    ) -> CommandPB_pb2.CommandReqDTO | None:
         """Turn off Inverter."""
 
         inverter_serial_int = convert_inverter_serial_number(inverter_serial)

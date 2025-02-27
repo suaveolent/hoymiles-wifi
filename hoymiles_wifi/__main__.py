@@ -269,7 +269,7 @@ async def async_get_version_info(dtu: DTU) -> VersionInfo | None:
     )
 
 
-async def async_heatbeat(dtu: DTU) -> APPHeartbeatPB_pb2.APPHeartbeatResDTO | None:
+async def async_heatbeat(dtu: DTU) -> APPHeartbeatPB_pb2.HBReqDTO | None:
     """Request a heartbeat from the dtu asynchronously."""
 
     return await dtu.async_heartbeat()
