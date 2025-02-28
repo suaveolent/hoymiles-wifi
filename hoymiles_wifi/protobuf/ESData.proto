@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+// Charging Checkpoint Billing
+message ChgCPBillMO {
+  int64 serial_number = 1;
+  int32 timestamp = 2;
+  int32 transaction_id = 3;
+  int32 start_time = 4;
+  int32 end_time = 5;
+  int32 energy_consumed = 6;
+  int32 status = 7;
+  repeated int32 transaction_history = 8;
+}
+
+// Charging Checkpoint Parameter
+message ChgCPParamMO {
+  int32 status = 1;
+  int32 error_code = 2;
+  int32 duration = 3;
+  int32 voltage = 4;
+  int32 current = 5;
+  int32 power = 6;
+  int32 watt_hours = 7;
+  int64 serial_number = 8;
+}
+
+// Battery Management System
+message DBmsMO {
+  int32 type = 1;
+  int32 status = 2;
+  int32 fault_code = 3;
+  int32 state_of_charge = 4;
+  int32 state_of_health = 5;
+  int32 voltage = 6;
+  int32 current = 7;
+  int32 power = 8;
+  int32 internal_charge_mode = 9;
+  int32 internal_discharge_mode = 10;
+  int32 cell_voltage_high = 11;
+  int32 cell_voltage_low = 12;
+  int32 temp_high_charge = 13;
+  int32 temp_low_charge = 14;
+  int32 temp_high_module = 15;
+  int32 temp_low_module = 16;
+  int32 energy_charged = 17;
+  int32 energy_discharged = 18;
+  int32 voltage_charge_high = 19;
+  int32 voltage_charge_low = 20;
+  int32 voltage_module_high = 21;
+  int32 voltage_module_low = 22;
+}
+
+// Charging Checkpoint Data
+message DChgCPMO {
+  repeated ChgCPBillMO bills = 2;
+  repeated ChgCPParamMO params = 1;
+}
+
+// Power Flow Data Message
+message DFlowMO {
+  int32 pv_to_load = 1;
+  int32 pv_to_battery = 2;
+  int32 pv_to_grid = 3;
+  int32 battery_to_load = 4;
+  int32 grid_to_load = 5;
+  int32 battery_to_grid = 6;
+  int32 state_of_charge = 7;
+}
+
+// Generator Data
+message DGenMO {
+  GenParamMO param = 1;
+  repeated GenPhaseMO phases = 2;
+}
+
+// Grid Data
+message DGridMO {
+  GridParamMO param = 1;
+  repeated GridPhaseMO phases = 2;
+}
+
+// Inverter Phase
+message InvPhaseMO {
+  int32 phase = 1;
+  int32 voltage = 2;
+  int32 current = 3;
+  int32 active_power = 4;
+  int32 reactive_power = 5;
+  int32 dc_current = 6;
+  int32 dc_voltage = 7;
+  int32 eps_voltage = 8;
+  int32 eps_current = 9;
+  int32 eps_power = 10;
+}
+
+// Inverter Data
+message DInvMO {
+  InvParamMO param = 1;
+  repeated InvPhaseMO phases = 2;
+}
+
+// Load Consumption
+message DLoadConsMO {
+  int32 energy_from_pv = 1;
+  int32 energy_from_battery = 2;
+  int32 energy_from_grid = 3;
+}
+
+// Load Data
+message DLoadMO {
+  LoadParamMO param = 1;
+  repeated LoadPhaseMO phases = 2;
+}
+
+// PV Production Data
+message DPVProdMO {
+  int32 energy_to_load = 1;
+  int32 energy_to_battery = 2;
+  int32 energy_to_grid = 3;
+}
+
+// PV Data
+message DPvMO {
+  int32 solar_irradiance = 1;
+  int32 voltage = 2;
+  int32 current = 3;
+  int32 power = 4;
+  int32 energy = 5;
+}
+
+// Smart Load Data
+message DSmartLoadMO {
+  LoadParamMO param = 1;
+  repeated SmartLoadPhaseMO phases = 2;
+  int32 total_power = 3;
+}
+
+// Energy Storage Data Response
+message ESDataReqDTO {
+  int64 serial_number = 1;
+  int32 timestamp = 2;
+  int32 offset = 3;
+  int32 active_power = 4;
+  int32 cp = 5;
+  DPVProdMO production = 6;
+  DLoadConsMO consumption = 7;
+  repeated DPvMO pv_panels = 8;
+  DBmsMO battery_management = 9;
+  DGridMO grid = 10;
+  DLoadMO load = 11;
+  DInvMO inverter = 12;
+  DGenMO generator = 13;
+  DGenMO pv_inverter = 14;
+  IPSMO integrated_power_system = 15;
+  repeated DSmartLoadMO smart_loads = 16;
+  DFlowMO power_flow = 17;
+  repeated DChgCPMO charging_sessions = 18;
+}
+
+// Energy Storage Request
+message ESDataResDTO {
+  int32 time = 1;
+  bytes time_ymd_hms = 2;
+  int32 offset = 3;
+  int32 cp = 4;
+  int64 serial_number = 5;
+}
+
+// Generator Parameter
+message GenParamMO {
+  int32 status = 1;
+  int32 frequency = 2;
+}
+
+// Generator Phase
+message GenPhaseMO {
+  int32 phase = 1;
+  int32 voltage = 2;
+  int32 current = 3;
+  int32 active_power = 4;
+  int32 reactive_power = 5;
+  int32 energy = 6;
+}
+
+// Grid Parameter
+message GridParamMO {
+  int32 status = 1;
+  int32 frequency = 2;
+  int32 power_factor_deviation = 3;
+}
+
+// Grid Phase
+message GridPhaseMO {
+  int32 phase = 1;
+  int32 voltage = 2;
+  int32 current = 3;
+  int32 active_power = 4;
+  int32 reactive_power = 5;
+  int32 power_factor = 6;
+  int32 energy_frequency = 7;
+  int32 energy_consumed = 8;
+}
+
+// Integrated Power System
+message IPSMO {
+  int32 step = 1;
+  int32 status = 2;
+  int32 error_code = 3;
+}
+
+// Inverter Parameter
+message InvParamMO {
+  int32 role = 1;
+  int32 status = 2;
+  int32 main_frequency = 3;
+  int32 secondary_frequency = 4;
+  int32 frequency = 5;
+  int32 isolation_resistance = 6;
+  int32 leakage_current = 7;
+  int32 drm_signal = 8;
+  int32 anti_islanding_fault = 9;
+}
+
+// Load Parameter
+message LoadParamMO {
+  int32 status = 1;
+  int32 frequency = 2;
+}
+
+// Load Phase
+message LoadPhaseMO {
+  int32 phase = 1;
+  int32 voltage = 2;
+  int32 active_power = 3;
+  int32 energy_consumed = 4;
+}
+
+// Smart Load Phase
+message SmartLoadPhaseMO {
+  int32 phase = 1;
+  int32 voltage = 2;
+  int32 current = 3;
+  int32 active_power = 4;
+  int32 energy_consumed = 5;
+}

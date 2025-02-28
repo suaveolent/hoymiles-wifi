@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+message DevInfoMO {
+  int64 serial_number = 1;
+  int32 type = 2;
+  int32 addr = 3;
+}
+
+message FMO {
+  int32 key = 1;
+  bytes value = 2;
+}
+
+message GWInfoMO {
+  int32 mod = 1;
+  int32 sw = 2;
+  int32 hw = 3;
+  int32 c_mod = 4;
+  bytes wifi_v = 5;
+  bytes gprs_v = 6;
+  bytes gprs_imei = 7;
+  bytes ka_nub = 8;
+  int32 rid = 9;
+  int32 ssl = 10;
+  int64 dfs = 11;
+  int64 sv = 12;
+}
+
+message GWInfoReqDTO {
+  int64 serial_number = 1;
+  int32 time = 2;
+  int32 ap = 3;
+  int32 cp = 4;
+  repeated GWInfoMO mgwinfo = 5;
+  repeated DevInfoMO mdevinfo = 6;
+  repeated FMO mf = 7;
+}
+
+message GWInfoResDTO {
+  int32 cp = 1;
+  int32 time = 2;
+  int32 offset = 3;
+}

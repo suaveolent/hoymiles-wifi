@@ -1,15 +1,14 @@
 syntax = "proto3";
 
 message MeterDataMO {
-  int32 device_kind = 1;         // Device kind identifier
-  int64 meter_sn = 2;            // Meter serial number
-  int32 meter_total_power = 3;   // Total power by the meter (Watts)
-  int32 meter_phase_A_power = 4; // Power in phase A (Watts)
-  int32 meter_phase_B_power = 5; // Power in phase B (Watts)
-  int32 meter_phase_C_power = 6; // Power in phase C (Watts)
-  int32 meter_factor = 7;        // Meter factor
-  int32 meter_total_energy =
-      8; // Total energy produced by the meter (Watt-hours)
+  int32 device_kind = 1;             // Device kind identifier
+  int64 meter_sn = 2;                // Meter serial number
+  int32 meter_total_power = 3;       // Total power by the meter (Watts)
+  int32 meter_phase_A_power = 4;     // Power in phase A (Watts)
+  int32 meter_phase_B_power = 5;     // Power in phase B (Watts)
+  int32 meter_phase_C_power = 6;     // Power in phase C (Watts)
+  int32 meter_factor = 7;            // Meter factor
+  int32 meter_total_energy = 8;      // Total energy produced (Watt-hours)
   int32 meter_phase_A_energy = 9;    // Energy produced in phase A (Watt-hours)
   int32 meter_phase_B_energy = 10;   // Energy produced in phase B (Watt-hours)
   int32 meter_phase_C_energy = 11;   // Energy produced in phase C (Watt-hours)
@@ -70,9 +69,9 @@ message RealDataReqDTO {
 }
 
 message RealDataResDTO {
-  string time_ymd_hms = 1; // Timestamp in the format YMD_HMS
-  int32 package_now = 2;   // Package now
-  int32 error_code = 3;    // Error code indicator
-  int32 offset = 4;        // Offset value
-  int32 time = 5;          // Timestamp value
+  bytes time_ymd_hms = 1; // Timestamp in the format YMD_HMS
+  int32 package_now = 2;  // Package now
+  int32 error_code = 3;   // Error code indicator
+  int32 offset = 4;       // Offset value
+  int32 time = 5;         // Timestamp value
 }

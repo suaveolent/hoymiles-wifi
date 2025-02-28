@@ -25,7 +25,11 @@ from hoymiles_wifi.const import (
     CMD_APP_INFO_DATA_RES_DTO,
     CMD_CLOUD_COMMAND_RES_DTO,
     CMD_COMMAND_RES_DTO,
+    CMD_ES_DATA_DTO,
+    CMD_ES_REG_RES_DTO,
     CMD_GET_CONFIG,
+    CMD_GW_INFO_RES_DTO,
+    CMD_GW_NET_INFO_RES,
     CMD_HB_RES_DTO,
     CMD_HEADER,
     CMD_NETWORK_INFO_RES,
@@ -43,7 +47,11 @@ from hoymiles_wifi.protobuf import (
     APPHeartbeatPB_pb2,
     APPInfomationData_pb2,
     CommandPB_pb2,
+    ESData_pb2,
+    ESRegPB_pb2,
     GetConfig_pb2,
+    GWInfo_pb2,
+    GWNetInfo_pb2,
     InfomationData_pb2,
     NetworkInfo_pb2,
     RealData_pb2,
@@ -94,7 +102,7 @@ class DTU:
             self.state = new_state
             logger.debug(f"DTU is {new_state}")
 
-    async def async_get_real_data(self) -> RealData_pb2.RealDataResDTO | None:
+    async def async_get_real_data(self) -> RealData_pb2.RealDataReqDTO | None:
         """Get real data."""
 
         request = RealData_pb2.RealDataResDTO()
@@ -110,7 +118,7 @@ class DTU:
             command, request, RealData_pb2.RealDataReqDTO
         )
 
-    async def async_get_real_data_new(self) -> RealDataNew_pb2.RealDataNewResDTO | None:
+    async def async_get_real_data_new(self) -> RealDataNew_pb2.RealDataNewReqDTO | None:
         """Get real data new."""
 
         combined_response = RealDataNew_pb2.RealDataNewReqDTO()
@@ -145,7 +153,7 @@ class DTU:
 
         return combined_response if combined_response.ByteSize() > 0 else None
 
-    async def async_get_config(self) -> GetConfig_pb2.GetConfigResDTO | None:
+    async def async_get_config(self) -> GetConfig_pb2.GetConfigReqDTO | None:
         """Get config."""
 
         request = GetConfig_pb2.GetConfigResDTO()
@@ -158,7 +166,7 @@ class DTU:
             GetConfig_pb2.GetConfigReqDTO,
         )
 
-    async def async_network_info(self) -> NetworkInfo_pb2.NetworkInfoResDTO | None:
+    async def async_network_info(self) -> NetworkInfo_pb2.NetworkInfoReqDTO | None:
         """Get network info."""
 
         request = NetworkInfo_pb2.NetworkInfoResDTO()
@@ -171,7 +179,7 @@ class DTU:
 
     async def async_app_information_data(
         self,
-    ) -> APPInfomationData_pb2.APPInfoDataResDTO:
+    ) -> APPInfomationData_pb2.APPInfoDataReqDTO:
         """Get app information data."""
         request = APPInfomationData_pb2.APPInfoDataResDTO()
         request.time_ymd_hms = (
@@ -186,7 +194,7 @@ class DTU:
 
     async def async_app_get_hist_power(
         self,
-    ) -> AppGetHistPower_pb2.AppGetHistPowerResDTO | None:
+    ) -> AppGetHistPower_pb2.AppGetHistPowerReqDTO | None:
         """Get historical power."""
 
         request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
@@ -204,7 +212,7 @@ class DTU:
     async def async_set_power_limit(
         self,
         power_limit: int,
-    ) -> CommandPB_pb2.CommandResDTO | None:
+    ) -> CommandPB_pb2.CommandReqDTO | None:
         """Set power limit."""
         if power_limit < 0 or power_limit > 100:
             logger.error("Error. Invalid power limit!")
@@ -227,7 +235,7 @@ class DTU:
 
     async def async_set_wifi(
         self, ssid: str, password: str
-    ) -> SetConfig_pb2.SetConfigResDTO | None:
+    ) -> SetConfig_pb2.SetConfigReqDTO | None:
         """Set wifi."""
 
         get_config_req = await self.async_get_config()
@@ -253,7 +261,7 @@ class DTU:
     async def async_update_dtu_firmware(
         self,
         firmware_url: str = DTU_FIRMWARE_URL_00_01_11,
-    ) -> CommandPB_pb2.CommandResDTO | None:
+    ) -> CommandPB_pb2.CommandReqDTO | None:
         """Update DTU firmware."""
 
         request = CommandPB_pb2.CommandResDTO()
@@ -267,7 +275,7 @@ class DTU:
             command, request, CommandPB_pb2.CommandReqDTO
         )
 
-    async def async_restart_dtu(self) -> CommandPB_pb2.CommandResDTO | None:
+    async def async_restart_dtu(self) -> CommandPB_pb2.CommandReqDTO | None:
         """Restart DTU."""
 
         request = CommandPB_pb2.CommandResDTO()
@@ -282,7 +290,7 @@ class DTU:
 
     async def async_turn_on_inverter(
         self, inverter_serial: str
-    ) -> CommandPB_pb2.CommandResDTO | None:
+    ) -> CommandPB_pb2.CommandReqDTO | None:
         """Turn on Inverter."""
 
         inverter_serial_int = convert_inverter_serial_number(inverter_serial)
@@ -302,7 +310,7 @@ class DTU:
 
     async def async_turn_off_inverter(
         self, inverter_serial: str
-    ) -> CommandPB_pb2.CommandResDTO | None:
+    ) -> CommandPB_pb2.CommandReqDTO | None:
         """Turn off Inverter."""
 
         inverter_serial_int = convert_inverter_serial_number(inverter_serial)
@@ -400,29 +408,107 @@ class DTU:
             command, request, CommandPB_pb2.CommandReqDTO
         )
 
+    async def async_get_gateway_info(self) -> GWInfo_pb2.GWInfoReqDTO | None:
+        """Get gateway info."""
+
+        request = GWInfo_pb2.GWInfoResDTO()
+        request.time = int(time.time())
+        request.offset = OFFSET
+
+        command = CMD_GW_INFO_RES_DTO
+
+        return await self.async_send_request(
+            command,
+            request,
+            GWInfo_pb2.GWInfoReqDTO,
+            is_extended_format=True,
+            number=255,
+        )
+
+    async def async_get_gateway_network_info(
+        self, dtu_serial_number: int
+    ) -> GWNetInfo_pb2.GWNetInfoReq | None:
+        """Get gateway network info."""
+
+        request = GWNetInfo_pb2.GWNetInfoRes()
+        request.time = int(time.time())
+        request.offset = OFFSET
+
+        command = CMD_GW_NET_INFO_RES
+
+        return await self.async_send_request(
+            command,
+            request,
+            GWNetInfo_pb2.GWNetInfoReq,
+            is_extended_format=True,
+            dtu_serial_number=dtu_serial_number,
+            number=255,
+        )
+
+    async def async_get_energy_storage_registry(
+        self, dtu_serial_number: int
+    ) -> ESRegPB_pb2.ESRegReqDTO | None:
+        """Get energy storage registry."""
+
+        request = ESRegPB_pb2.ESRegResDTO()
+        request.time = int(time.time())
+        request.time_ymd_hms = (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        )
+        request.offset = OFFSET
+        request.cp = 0
+
+        command = CMD_ES_REG_RES_DTO
+
+        return await self.async_send_request(
+            command,
+            request,
+            ESRegPB_pb2.ESRegReqDTO,
+            is_extended_format=True,
+            dtu_serial_number=dtu_serial_number,
+            number=1,
+        )
+
+    async def async_get_energy_storage_data(
+        self, dtu_serial_number: int, inverter_serial_number: int
+    ) -> ESData_pb2.ESDataReqDTO | None:
+        """Get energy storage registry."""
+
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8"))
+        request = ESData_pb2.ESDataResDTO()
+        request.time = int(time.time())
+        request.time_ymd_hms = (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
+        )
+        request.offset = OFFSET
+        request.cp = 0
+        request.serial_number = inverter_serial_number
+
+        command = CMD_ES_DATA_DTO
+
+        return await self.async_send_request(
+            command,
+            request,
+            ESData_pb2.ESDataReqDTO,
+            is_extended_format=True,
+            dtu_serial_number=dtu_serial_number,
+            number=1,
+        )
+
     async def async_send_request(
         self,
         command: bytes,
         request: Any,
         response_type: Any,
         dtu_port: int = DTU_PORT,
+        is_extended_format: bool = False,
+        dtu_serial_number: int = 0,
+        number: int = 0,
     ):
         """Send request to DTU."""
 
-        self.sequence = (self.sequence + 1) & 0xFFFF
-
-        request_as_bytes = request.SerializeToString()
-        crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
-            request_as_bytes
-        )
-        length = len(request_as_bytes) + 10
-
-        # compose request message
-        header = CMD_HEADER + command
-        message = (
-            header
-            + struct.pack(">HHH", self.sequence, crc16, length)
-            + request_as_bytes
+        message = self.generate_message(
+            command, request, is_extended_format, dtu_serial_number, number
         )
 
         ip_to_bind = (self.local_addr, 0) if self.local_addr is not None else None
@@ -450,7 +536,7 @@ class DTU:
                 writer.write(message)
                 await writer.drain()
 
-                buf = await asyncio.wait_for(reader.read(1024), timeout=5)
+                buffer = await asyncio.wait_for(reader.read(1024), timeout=5)
             except (OSError, asyncio.TimeoutError) as e:
                 logger.debug(f"{e}")
                 self.set_state(NetworkState.Offline)
@@ -465,18 +551,62 @@ class DTU:
 
         self.last_request_time = time.time()
 
+        return self.parse_response(buffer, response_type, is_extended_format)
+
+    def generate_message(
+        self,
+        command: bytes,
+        request: Any,
+        is_extended_format: bool,
+        serial_number: int,
+        number: int,
+    ) -> bytes:
+        """Generate message to send to DTU."""
+
+        self.sequence = (self.sequence + 1) & 0xFFFF
+
+        request_as_bytes = request.SerializeToString()
+        crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
+            request_as_bytes
+        )
+
+        header = CMD_HEADER + command
+        metadata = struct.pack(">HH", self.sequence, crc16)
+
+        if is_extended_format:
+            metadata += struct.pack(
+                ">HHQHH", 24 + len(request_as_bytes), 14, serial_number, 0, number
+            )
+        else:
+            metadata += struct.pack(">H", len(request_as_bytes) + 10)
+
+        message = header + metadata + request_as_bytes
+
+        logger.debug(f"Request header: {header.hex()}")
+        logger.debug(f"Request metadata: {metadata.hex()}")
+        logger.debug(f"Request: {request_as_bytes.hex()}")
+        logger.debug(f"Request message: {message.hex()}")
+
+        return message
+
+    def parse_response(self, buffer, response_type: Any, is_extended_format: bool):
+        """Parse response from DTU."""
+
         try:
-            if len(buf) < 10:
+            if len(buffer) < 10:
                 raise ValueError("Buffer is too short for unpacking")
 
-            crc16_target, read_length = struct.unpack(">HH", buf[6:10])
+            crc16_target, read_length = struct.unpack(">HH", buffer[6:10])
 
             logger.debug(f"Read length: {read_length}")
 
-            if len(buf) != read_length:
+            if len(buffer) != read_length:
                 raise ValueError("Buffer is incomplete")
 
-            response_as_bytes = buf[10:read_length]
+            if is_extended_format:
+                response_as_bytes = buffer[24:read_length]
+            else:
+                response_as_bytes = buffer[10:read_length]
 
             crc16_response = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
                 response_as_bytes
@@ -487,6 +617,8 @@ class DTU:
                     f"CRC16 mismatch: {hex(crc16_response)} != {hex(crc16_target)}"
                 )
                 raise ValueError("CRC16 mismatch")
+
+            logger.debug(f"Response: {response_as_bytes.hex()}")
 
             parsed = response_type.FromString(response_as_bytes)
 

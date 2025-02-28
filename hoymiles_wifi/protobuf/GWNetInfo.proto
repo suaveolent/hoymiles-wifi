@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message GWNetInfoReq {
+  int64 serial_number = 1;
+  int32 time = 2;
+  int32 net_set_mod = 3;
+  int32 net_set_time = 4;
+  int32 net_set_state = 5;
+  int32 net_mod = 6;
+  int32 net_time = 7;
+  int32 csq = 8;
+  int32 net_state = 9;
+  int32 ap_set_tate = 10;
+}
+
+message GWNetInfoRes {
+  int32 offset = 1;
+  int32 time = 2;
+}

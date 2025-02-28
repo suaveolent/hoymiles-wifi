@@ -27,7 +27,11 @@ from hoymiles_wifi.protobuf import (
     APPHeartbeatPB_pb2,
     APPInfomationData_pb2,
     CommandPB_pb2,
+    ESData_pb2,
+    ESRegPB_pb2,
     GetConfig_pb2,
+    GWInfo_pb2,
+    GWNetInfo_pb2,
     InfomationData_pb2,
     NetworkInfo_pb2,
     RealData_pb2,
@@ -265,7 +269,7 @@ async def async_get_version_info(dtu: DTU) -> VersionInfo | None:
     )
 
 
-async def async_heatbeat(dtu: DTU) -> APPHeartbeatPB_pb2.APPHeartbeatResDTO | None:
+async def async_heatbeat(dtu: DTU) -> APPHeartbeatPB_pb2.HBReqDTO | None:
     """Request a heartbeat from the dtu asynchronously."""
 
     return await dtu.async_heartbeat()
@@ -323,6 +327,51 @@ async def async_enable_performance_data_mode(dtu: DTU) -> None:
     """Enable performance data mode asynchronously."""
 
     return await dtu.async_enable_performance_data_mode()
+
+
+async def async_get_gateway_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
+    """Get gateway info."""
+
+    return await dtu.async_get_gateway_info()
+
+
+async def async_get_gateway_network_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
+    """Get gateway network info."""
+
+    gateway_info = await dtu.async_get_gateway_info()
+
+    return await dtu.async_get_gateway_network_info(gateway_info.serial_number)
+
+
+async def async_get_energy_storage_registry(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
+    """Get energy storage registry from the dtu asynchronously."""
+
+    gateway_info = await dtu.async_get_gateway_info()
+
+    return await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
+
+
+async def async_get_energy_storage_data(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
+    """Get energy storage registry from the dtu asynchronously."""
+
+    gateway_info = await dtu.async_get_gateway_info()
+
+    registry = await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
+
+    responses = []
+    for inverter in registry.inverters:
+        storage_data = await dtu.async_get_energy_storage_data(
+            dtu_serial_number=gateway_info.serial_number,
+            inverter_serial_number=inverter.serial_number,
+        )
+        if storage_data is not None:
+            responses.append(storage_data)
+
+    return responses
 
 
 def print_invalid_command(command: str) -> None:
@@ -388,6 +437,10 @@ async def main() -> None:
             "identify-meters",
             "get-alarm-list",
             "enable-performance-data-mode",
+            "get-energy-storage-registry",
+            "get-energy-storage-data",
+            "get-gateway-info",
+            "get-gateway-network-info",
         ],
         help="Command to execute",
     )
@@ -417,6 +470,10 @@ async def main() -> None:
         "identify-meters": async_identify_meters,
         "get-alarm-list": async_get_alarm_list,
         "enable-performance-data-mode": async_enable_performance_data_mode,
+        "get-energy-storage-registry": async_get_energy_storage_registry,
+        "get-gateway-info": async_get_gateway_info,
+        "get-gateway-network-info": async_get_gateway_network_info,
+        "get-energy-storage-data": async_get_energy_storage_data,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
