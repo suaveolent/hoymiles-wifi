@@ -470,9 +470,9 @@ async def main() -> None:
         "identify-meters": async_identify_meters,
         "get-alarm-list": async_get_alarm_list,
         "enable-performance-data-mode": async_enable_performance_data_mode,
-        "get-energy-storage-registry": async_get_energy_storage_registry,
         "get-gateway-info": async_get_gateway_info,
         "get-gateway-network-info": async_get_gateway_network_info,
+        "get-energy-storage-registry": async_get_energy_storage_registry,
         "get-energy-storage-data": async_get_energy_storage_data,
     }
 

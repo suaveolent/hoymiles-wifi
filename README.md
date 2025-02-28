@@ -58,6 +58,10 @@ commands:
     identify-meters,
     get-alarm-list,
     enable-performance-data-mode,
+    get-gateway-info,
+    get-gateway-network-info,
+    get-energy-storage-registry,
+    get-energy-storage-data
 
 The `--as-json` option is optional and allows formatting the output as JSON.
 The `--disable-interactive` option is optional allows to disable interactive modes (e.g. for setting the power limit).
@@ -96,6 +100,10 @@ else:
 - `async_heartbeat()`: Request a heartbeat message from the DTU
 - `async_get_alarm_list()`: Get alarm list from the DTU
 - `async_enable_performance_data_mode()`: _Experimental_: Enable higher update interval mode (30s or less)
+- `async_get_gateway_info()`: Get gateway information for hybrid-inverters
+- `async_get_gateway_network_info()` : Get network information for hybrid-inverters
+- `async_get_energy_storage_registry()`: Get information about the hybrid-inverter
+- `async_get_energy_storage_data()`: Get live data of the hybrid-inverter
 
 ## Note
 
