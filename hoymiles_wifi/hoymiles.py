@@ -379,3 +379,20 @@ def get_meter_model_name(serial_number: str) -> str:
         return "Unknown"
     else:
         return meter_type.value
+
+
+def encode_time_range(from_time: str, to_time: str, delimiter: str = ":") -> int:
+    def parse_time(time_str):
+        """Splits the time string and ensures it has two numeric parts."""
+        parts = (time_str or "00-00").split(delimiter)
+        if len(parts) != 2:
+            raise ValueError(f"Invalid time format: {time_str}")
+        return [int(p) for p in parts]
+
+    # Extract hours and minutes for both times
+    from_hours, from_minutes = parse_time(from_time)
+    to_hours, to_minutes = parse_time(to_time)
+
+    # Encode into a 32-bit integer
+    encoded = (from_hours << 24) | (from_minutes << 16) | (to_hours << 8) | to_minutes
+    return encoded
