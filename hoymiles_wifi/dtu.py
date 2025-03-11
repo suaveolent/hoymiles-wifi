@@ -27,6 +27,7 @@ from hoymiles_wifi.const import (
     CMD_COMMAND_RES_DTO,
     CMD_ES_DATA_DTO,
     CMD_ES_REG_RES_DTO,
+    CMD_ES_USER_SET_RES_DTO,
     CMD_GET_CONFIG,
     CMD_GW_INFO_RES_DTO,
     CMD_GW_NET_INFO_RES,
@@ -41,7 +42,7 @@ from hoymiles_wifi.const import (
     DTU_PORT,
     OFFSET,
 )
-from hoymiles_wifi.hoymiles import convert_inverter_serial_number
+from hoymiles_wifi.hoymiles import BMSWorkingMode, convert_inverter_serial_number
 from hoymiles_wifi.protobuf import (
     AppGetHistPower_pb2,
     APPHeartbeatPB_pb2,
@@ -49,6 +50,7 @@ from hoymiles_wifi.protobuf import (
     CommandPB_pb2,
     ESData_pb2,
     ESRegPB_pb2,
+    ESUserSet_pb2,
     GetConfig_pb2,
     GWInfo_pb2,
     GWNetInfo_pb2,
@@ -474,7 +476,6 @@ class DTU:
     ) -> ESData_pb2.ESDataReqDTO | None:
         """Get energy storage registry."""
 
-        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8"))
         request = ESData_pb2.ESDataResDTO()
         request.time = int(time.time())
         request.time_ymd_hms = (
@@ -490,6 +491,51 @@ class DTU:
             command,
             request,
             ESData_pb2.ESDataReqDTO,
+            is_extended_format=True,
+            dtu_serial_number=dtu_serial_number,
+            number=1,
+        )
+
+    async def async_set_energy_storage_working_mode(
+        self,
+        dtu_serial_number: int,
+        inverter_serial_number: int,
+        bms_working_mode: BMSWorkingMode,
+        rev_soc: int = None,
+        max_charging_power: int = None,
+        peak_soc: int = None,
+        peak_meter_power: int = None,
+    ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
+        """Get energy storage registry."""
+
+        request = ESUserSet_pb2.ESUserSetPutResDTO()
+        request.time = int(time.time())
+        request.tid = int(time.time())
+        request.serial_number = [inverter_serial_number]
+        request.mode = bms_working_mode.value
+
+        if rev_soc is not None:
+            request.rev_soc = rev_soc
+
+        if max_charging_power is not None:
+            if max_charging_power < 0 or max_charging_power > 100:
+                logger.error("Error. Max chariging power!")
+                return
+        request.max_power = max_charging_power
+
+        if bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
+            if peak_soc is None or peak_meter_power is None:
+                logger.error("Error. Peak SOC or peak meter power!")
+                return
+            request.peak_soc = peak_soc
+            request.peak_meterpwr = peak_meter_power
+
+        command = CMD_ES_USER_SET_RES_DTO
+
+        return await self.async_send_request(
+            command,
+            request,
+            ESUserSet_pb2.ESUserSetPutReqDTO,
             is_extended_format=True,
             dtu_serial_number=dtu_serial_number,
             number=1,

@@ -140,6 +140,19 @@ meter_mapping = {
 }
 
 
+class BMSWorkingMode(Enum):
+    """BMS working mode."""
+
+    SELF_USE = 1
+    ECONOMIC = 2
+    BACKUP_POWER = 3
+    PURE_OFF_GRID = 4
+    FORCED_CHARGING = 5
+    FORCED_DISCHARGE = 6
+    PEAK_SHAVING = 7
+    TIME_OF_USE = 8
+
+
 def format_number(number: int) -> str:
     """Format number to two digits."""
 

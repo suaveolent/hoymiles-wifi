@@ -33,6 +33,7 @@ CMD_ES_REG_RES_DTO = b"\xc3\x02"
 CMD_ES_DATA_DTO = b"\xc3\x03"
 CMD_GW_INFO_RES_DTO = b"\xdb\x01"
 CMD_GW_NET_INFO_RES = b"\xdb\x06"
+CMD_ES_USER_SET_RES_DTO = b"\xc3\x08"
 
 
 CMD_CLOUD_INFO_DATA_RES_DTO = b"\x23\x01"
