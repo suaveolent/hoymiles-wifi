@@ -197,17 +197,39 @@ class DTU:
     ) -> AppGetHistPower_pb2.AppGetHistPowerReqDTO | None:
         """Get historical power."""
 
-        request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
-        request.control_point = 0
-        request.offset = OFFSET
-        request.requested_time = int(time.time())
-        request.requested_day = 0
-        command = CMD_APP_GET_HIST_POWER_RES
-        return await self.async_send_request(
-            command,
-            request,
-            AppGetHistPower_pb2.AppGetHistPowerReqDTO,
-        )
+        control_point = 0
+        new_results = True
+        app_hist_data = any
+        while new_results:
+
+            request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
+            request.control_point = control_point
+            request.offset = OFFSET
+            request.requested_time = int(time.time())
+            request.requested_day = 0
+            command = CMD_APP_GET_HIST_POWER_RES
+
+            app_hist_data_request = await self.async_send_request(
+                command,
+                request,
+                AppGetHistPower_pb2.AppGetHistPowerReqDTO,
+            )
+            if len(app_hist_data_request.power_array) == 0:
+                # no more data received
+                new_results = False
+                break
+            elif control_point == 0:
+                # first request
+                app_hist_data = app_hist_data_request
+                control_point+= 1
+            else:
+                # subsequent requests
+                control_point += 1
+                app_hist_data.power_array.extend(
+                    app_hist_data_request.power_array
+                )
+                
+        return app_hist_data
 
     async def async_set_power_limit(
         self,
