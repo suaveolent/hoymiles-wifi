@@ -14,6 +14,8 @@ from google.protobuf.message import Message
 from hoymiles_wifi.const import DTU_FIRMWARE_URL_00_01_11, MAX_POWER_LIMIT
 from hoymiles_wifi.dtu import DTU
 from hoymiles_wifi.hoymiles import (
+    BMSWorkingMode,
+    DateBean,
     generate_dtu_version_string,
     generate_inverter_serial_number,
     generate_sw_version_string,
@@ -29,6 +31,7 @@ from hoymiles_wifi.protobuf import (
     CommandPB_pb2,
     ESData_pb2,
     ESRegPB_pb2,
+    ESUserSet_pb2,
     GetConfig_pb2,
     GWInfo_pb2,
     GWNetInfo_pb2,
@@ -36,6 +39,10 @@ from hoymiles_wifi.protobuf import (
     NetworkInfo_pb2,
     RealData_pb2,
     RealDataNew_pb2,
+)
+from hoymiles_wifi.utils import (
+    prompt_user_for_bms_working_mode,
+    promt_user_for_rate_time_range,
 )
 
 RED = "\033[91m"
@@ -335,7 +342,7 @@ async def async_get_gateway_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
     return await dtu.async_get_gateway_info()
 
 
-async def async_get_gateway_network_info(dtu: DTU) -> GWInfo_pb2.GWInfoReqDTO | None:
+async def async_get_gateway_network_info(dtu: DTU) -> GWNetInfo_pb2.GWNetInfoReq | None:
     """Get gateway network info."""
 
     gateway_info = await dtu.async_get_gateway_info()
@@ -353,7 +360,7 @@ async def async_get_energy_storage_registry(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO
     )
 
 
-async def async_get_energy_storage_data(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | None:
+async def async_get_energy_storage_data(dtu: DTU) -> ESData_pb2.ESDataReqDTO | None:
     """Get energy storage registry from the dtu asynchronously."""
 
     gateway_info = await dtu.async_get_gateway_info()
@@ -372,6 +379,115 @@ async def async_get_energy_storage_data(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO | N
             responses.append(storage_data)
 
     return responses
+
+
+async def async_set_energy_storage_working_mode(
+    dtu: DTU,
+    bms_working_mode: BMSWorkingMode = None,
+    rev_soc: int = None,
+    max_charging_power: int = None,
+    peak_soc: int = None,
+    peak_meter_power: int = None,
+    charge_time_from: str = None,
+    charge_time_to: str = None,
+    discharge_time_from: str = None,
+    discharge_time_to: str = None,
+    charge_power: int = None,
+    discharge_power: int = None,
+    max_soc: int = None,
+    min_soc: int = None,
+    interactive_mode: bool = True,
+) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
+    """Set the working mode of the energy storage."""
+
+    gateway_info = await dtu.async_get_gateway_info()
+
+    registry = await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
+
+    for inverter in registry.inverters:
+        if interactive_mode:
+            print(  # noqa: T201
+                RED
+                + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+                + "!!! Danger zone! This will change the working mode of the energy storage. !!!\n"
+                + "!!!      Please be careful and make sure you know what you are doing.     !!!\n"
+                + "!!!              Only proceed if you know what you are doing.             !!!\n"
+                + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+                + END,
+            )
+
+            print(f"Inverter serial number: {inverter.serial_number}")  # noqa: T201
+
+            cont = input("Do you want to continue? (y/n): ")
+            if cont != "y":
+                continue
+
+            bms_working_mode = prompt_user_for_bms_working_mode()
+
+            if bms_working_mode is None:
+                print("Error. Invalid working mode!")  # noqa: T201
+                return None
+
+            rev_soc = int(input("Enter the SOC to reserve: (0-100): "))
+            if rev_soc < 0 or rev_soc > 100:
+                print("Error. Invalid SOC!")  # noqa: T201
+                return None
+
+            if bms_working_mode == BMSWorkingMode.ECONOMY_MODE:
+                time_settings: list[DateBean] = []
+                while True:
+                    print("Configuring time settings...")  # noqa: T201
+
+                    time_setting = DateBean()
+
+                    time_setting.start_date = input(
+                        "Please enter the start date (DD-MM): "
+                    ).strip()
+                    time_setting.end_date = input(
+                        "Please enter the end date (DD-MM): "
+                    ).strip()
+
+                    print("Configuring  time range 1...")  # noqa: T201
+                    time_setting.time = promt_user_for_rate_time_range()
+
+                    print("Configuring  time range 2...")  # noqa: T201
+                    time_setting.time = promt_user_for_rate_time_range()
+
+                    time_settings.append(time_setting)
+
+                    cont = input("Do you want to add another time setting? (y/n): ")
+                    if cont != "y":
+                        break
+                    else:
+                        continue
+                print(f"Your time settings: {time_settings}")  # noqa: T201
+
+                cont = input("Do you want to continue with these settings? (y/n): ")
+                if cont != "y":
+                    return None
+
+        return None
+
+        # return await dtu.async_set_energy_storage_working_mode(
+        #     dtu_serial_number=gateway_info.serial_number,
+        #     inverter_serial_number=inverter.serial_number,
+        #     bms_working_mode=bms_working_mode,
+        #     rev_soc=rev_soc,
+        #     time_settings=time_settings,
+        #     max_charging_power=max_charging_power,
+        #     peak_soc=peak_soc,
+        #     peak_meter_power=peak_meter_power,
+        #     charge_time_from=charge_time_from,
+        #     charge_time_to=charge_time_to,
+        #     discharge_time_from=discharge_time_from,
+        #     discharge_time_to=discharge_time_to,
+        #     charge_power=charge_power,
+        #     discharge_power=discharge_power,
+        #     max_soc=max_soc,
+        #     min_soc=min_soc,
+        # )
 
 
 def print_invalid_command(command: str) -> None:
@@ -414,6 +530,28 @@ async def main() -> None:
     )
 
     parser.add_argument(
+        "--bms_working_mode",
+        type=int,
+        choices=range(1, 9),  # Restrict input to 1 through 8
+        default=-1,
+        help="BMS working mode to set (1...8).",
+    )
+
+    parser.add_argument(
+        "--rev-soc",
+        type=int,
+        default=-1,
+        help="Reserved SOC to set (0...100).",
+    )
+
+    parser.add_argument(
+        "--max-charging-power",
+        type=int,
+        default=-1,
+        help="Max charing power to set (0...100).",
+    )
+
+    parser.add_argument(
         "command",
         type=str,
         choices=[
@@ -441,6 +579,7 @@ async def main() -> None:
             "get-energy-storage-data",
             "get-gateway-info",
             "get-gateway-network-info",
+            "set-energy-storage-working-mode",
         ],
         help="Command to execute",
     )
@@ -474,12 +613,30 @@ async def main() -> None:
         "get-gateway-network-info": async_get_gateway_network_info,
         "get-energy-storage-registry": async_get_energy_storage_registry,
         "get-energy-storage-data": async_get_energy_storage_data,
+        "set-energy-storage-working-mode": async_set_energy_storage_working_mode,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
     if args.command == "set-power-limit":
         kwargs = {}
         kwargs["power_limit"] = args.power_limit
+        kwargs["interactive_mode"] = not args.disable_interactive
+        response = await command_func(dtu, **kwargs)
+    if args.command == "set-energy-storage-working-mode":
+        kwargs = {}
+        kwargs["bms_working_mode"] = BMSWorkingMode(args.bms_working_mode)
+        kwargs["rev_soc"] = args.rev_soc
+        kwargs["max_charging_power"] = args.max_charging_power
+        kwargs["peak_soc"] = args.peak_soc
+        kwargs["peak_meter_power"] = args.peak_meter_power
+        kwargs["charge_time_from"] = args.charge_time_from
+        kwargs["charge_time_to"] = args.charge_time_to
+        kwargs["discharge_time_from"] = args.discharge_time_from
+        kwargs["discharge_time_to"] = args.discharge_time_to
+        kwargs["charge_power"] = args.charge_power
+        kwargs["discharge_power"] = args.discharge_power
+        kwargs["max_soc"] = args.max_soc
+        kwargs["min_soc"] = args.min_soc
         kwargs["interactive_mode"] = not args.disable_interactive
         response = await command_func(dtu, **kwargs)
     else:

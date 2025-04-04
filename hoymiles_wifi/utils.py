@@ -1,5 +1,6 @@
 """Utils for interacting with Hoymiles WiFi API."""
 
+from hoymiles_wifi.hoymiles import BMSWorkingMode, DurationBean, TariffType, TimeBean
 from hoymiles_wifi.protobuf import (
     GetConfig_pb2,
     SetConfig_pb2,
@@ -59,3 +60,56 @@ def initialize_set_config(get_config_req: GetConfig_pb2.GetConfigReqDTO):
     set_config_res.dtu_ap_pass = get_config_req.dtu_ap_pass
 
     return set_config_res
+
+
+def prompt_user_for_bms_working_mode() -> BMSWorkingMode:
+    """Prompt user for BMS working mode."""
+
+    print("Please select the working mode:")  # noqa: T201
+    print("1.) Self-consumption mode")  # noqa: T201
+    print("2.) Economy mode")  # noqa: T201
+    print("3.) Backup mode")  # noqa: T201
+    print("4.) Off-grid mode")  # noqa: T201
+    print("5.) Force charge mode")  # noqa: T201
+    print("6.) Force discharge mode")  # noqa: T201
+    print("7.) Peak shaving mode")  # noqa: T201
+    print("8.) Time of use mode")  # noqa: T201
+
+    return BMSWorkingMode(int(input("Working mode: (0-100): ")))
+
+
+def promt_user_for_rate_time_range() -> TimeBean:
+    """Prompt user for electricity rate time range."""
+
+    time_bean = TimeBean()
+    user_input = input(
+        "Enter the weekdays as numbers (Monday = 1, Sunday = 7), separated by commas (e.g., 1,3,5): "
+    )
+    time_bean.week = [
+        int(day.strip()) for day in user_input.split(",") if day.strip().isdigit()
+    ]
+
+    print("Configuring peak time...")  # noqa: T201
+    duration_bean = prompt_user_for_tariff_details(TariffType.PEAK)
+    time_bean.duration.append(duration_bean)
+
+    print("Configuring off-peak time...")  # noqa: T201
+    duration_bean = prompt_user_for_tariff_details(TariffType.OFF_PEAK)
+    time_bean.duration.append(duration_bean)
+
+    print("Configuring partial-peak time...")  # noqa: T201
+    duration_bean = prompt_user_for_tariff_details(TariffType.PARTIAL_PEAK)
+    time_bean.duration.append(duration_bean)
+
+
+def prompt_user_for_tariff_details(tariff: TariffType) -> DurationBean:
+    """Query duration for a given tariff type from user."""
+    duration_bean = DurationBean()
+    duration_bean.start_time = input("Please enter the start time (HH:MM): ").strip()
+    duration_bean.end_time = input("Please enter the end time (HH:MM): ").strip()
+
+    duration_bean.in_price = float("Please enter the price for a kWh to buy: ")
+    duration_bean.out_price = float("Please enter the price for a kWh to sell: ")
+    duration_bean.type = tariff
+
+    return duration_bean

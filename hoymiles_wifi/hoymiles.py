@@ -2,6 +2,8 @@
 
 import struct
 from enum import Enum
+from dataclasses import dataclass
+
 
 from hoymiles_wifi import logger
 
@@ -151,6 +153,35 @@ class BMSWorkingMode(Enum):
     FORCED_DISCHARGE = 6
     PEAK_SHAVING = 7
     TIME_OF_USE = 8
+    UNKNOWN = -1
+
+
+class TariffType(Enum):
+    PEAK = 1
+    OFF_PEAK = 2
+    PARTIAL_PEAK = 3
+
+
+@dataclass
+class DurationBean:
+    start_time: str = None
+    end_time: str = None
+    in_price: float = None
+    out_price: float = None
+    type: TariffType = None
+
+
+@dataclass
+class TimeBean:
+    duration: list[DurationBean] = None
+    week: list[int] = None
+
+
+@dataclass
+class DateBean:
+    end_date: str = None
+    start_date: str = None
+    time: list[TimeBean] = None
 
 
 def format_number(number: int) -> str:

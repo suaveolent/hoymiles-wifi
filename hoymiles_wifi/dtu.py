@@ -44,6 +44,7 @@ from hoymiles_wifi.const import (
 )
 from hoymiles_wifi.hoymiles import (
     BMSWorkingMode,
+    DateBean,
     convert_inverter_serial_number,
     encode_time_range,
 )
@@ -506,6 +507,7 @@ class DTU:
         inverter_serial_number: int,
         bms_working_mode: BMSWorkingMode,
         rev_soc: int = None,
+        time_settings: list[DateBean] = None,
         max_charging_power: int = None,
         peak_soc: int = None,
         peak_meter_power: int = None,
@@ -518,7 +520,7 @@ class DTU:
         max_soc: int = None,
         min_soc: int = None,
     ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
-        """Get energy storage registry."""
+        """Set energy storage working mode."""
 
         request = ESUserSet_pb2.ESUserSetPutResDTO()
         request.time = int(time.time())
