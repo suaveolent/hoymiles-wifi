@@ -9,8 +9,8 @@ message AppGetHistPowerResDTO {
 
 message AppGetHistPowerReqDTO {
   int64 serial_number = 1;         // Device serial number
-  int32 access_point = 2;          // Access point identifier
-  int32 control_point = 3;         // Control point identifier
+  int32 ap = 2;                    // All Pages identifier
+  int32 cp = 3;                    // Current Page identifier
   int32 offset = 4;                // Offset value
   uint32 request_time = 5;         // Timestamp of the request
   uint32 start_time = 6;           // Start timestamp

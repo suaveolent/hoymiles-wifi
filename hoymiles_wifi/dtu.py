@@ -197,39 +197,37 @@ class DTU:
     ) -> AppGetHistPower_pb2.AppGetHistPowerReqDTO | None:
         """Get historical power."""
 
-        control_point = 0
-        new_results = True
-        app_hist_data = any
-        while new_results:
+        combined_response = AppGetHistPower_pb2.AppGetHistPowerReqDTO()
 
-            request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
-            request.control_point = control_point
-            request.offset = OFFSET
-            request.requested_time = int(time.time())
-            request.requested_day = 0
-            command = CMD_APP_GET_HIST_POWER_RES
+        request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
+        request.cp = 0
+        request.offset = OFFSET
+        request.requested_time = int(time.time())
+        request.requested_day = 0
+        command = CMD_APP_GET_HIST_POWER_RES
+        
+        response = await self.async_send_request(
+            command,
+            request,
+            AppGetHistPower_pb2.AppGetHistPowerReqDTO,
+        )
 
-            app_hist_data_request = await self.async_send_request(
-                command,
-                request,
-                AppGetHistPower_pb2.AppGetHistPowerReqDTO,
-            )
-            if len(app_hist_data_request.power_array) == 0:
-                # no more data received
-                new_results = False
-                break
-            elif control_point == 0:
-                # first request
-                app_hist_data = app_hist_data_request
-                control_point+= 1
-            else:
-                # subsequent requests
-                control_point += 1
-                app_hist_data.power_array.extend(
-                    app_hist_data_request.power_array
+        if response is not None:
+            combined_response.MergeFrom(response)
+
+            # Fetch additional data based on the value of response.ap
+            for cp in range(1, response.ap):
+                request.cp = cp
+
+                additional_response = await self.async_send_request(
+                    command,
+                    request,
+                    AppGetHistPower_pb2.AppGetHistPowerReqDTO,
                 )
-                
-        return app_hist_data
+                if additional_response is not None:
+                    combined_response.MergeFrom(additional_response)
+
+        return combined_response if combined_response.ByteSize() > 0 else None
 
     async def async_set_power_limit(
         self,
