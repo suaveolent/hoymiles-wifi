@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 message AppGetHistPowerResDTO {
-  int32 control_point = 1;   // Control point identifier
+  int32 cp = 1;   // Control point identifier
   int32 offset = 2;          // Offset value
   uint32 requested_time = 3; // Time requested
   uint32 requested_day = 4;  // Day requested
