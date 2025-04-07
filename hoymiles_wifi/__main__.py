@@ -526,6 +526,7 @@ async def main() -> None:
         "--power-limit",
         type=int,
         default=-1,
+        choices=range(0, 101),
         help="Power limit to set (0...100).",
     )
 
@@ -541,6 +542,7 @@ async def main() -> None:
         "--rev-soc",
         type=int,
         default=-1,
+        choices=range(0, 101),
         help="Reserved SOC to set (0...100).",
     )
 
@@ -548,7 +550,84 @@ async def main() -> None:
         "--max-charging-power",
         type=int,
         default=-1,
+        choices=range(0, 101),
         help="Max charing power to set (0...100).",
+    )
+
+    parser.add_argument(
+        "--peak-soc",
+        type=int,
+        default=-1,
+        choices=range(0, 101),
+        help="Peak SOC to set (0...100).",
+    )
+
+    parser.add_argument(
+        "--peak-meter-power",
+        type=int,
+        default=-1,
+        choices=range(0, 101),
+        help="Peak meter power to set (0...100).",
+    )
+
+    parser.add_argument(
+        "--charge_time_from",
+        type=str,
+        required=False,
+        help="Charge time from (HH:MM)",
+    )
+
+    parser.add_argument(
+        "--charge_time_to",
+        type=str,
+        required=False,
+        help="Charge time to (HH:MM)",
+    )
+
+    parser.add_argument(
+        "--discharge_time_from",
+        type=str,
+        required=False,
+        help="Discharge time from (HH:MM)",
+    )
+
+    parser.add_argument(
+        "--discharge_time_to",
+        type=str,
+        required=False,
+        help="Discharge time to (HH:MM)",
+    )
+
+    parser.add_argument(
+        "--charge-power",
+        type=int,
+        default=-1,
+        choices=range(0, 101),
+        help="Charge power to set (0...100).",
+    )
+
+    parser.add_argument(
+        "--discharge-power",
+        type=int,
+        default=-1,
+        choices=range(0, 101),
+        help="Charge power to set (0...100).",
+    )
+
+    parser.add_argument(
+        "--max-soc",
+        type=int,
+        default=-1,
+        choices=range(0, 101),
+        help="Max SOC to set (0...100).",
+    )
+
+    parser.add_argument(
+        "--min-soc",
+        type=int,
+        default=-1,
+        choices=range(0, 101),
+        help="Min SOC to set (0...100).",
     )
 
     parser.add_argument(
