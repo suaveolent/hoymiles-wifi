@@ -365,9 +365,15 @@ async def async_get_energy_storage_data(dtu: DTU) -> ESData_pb2.ESDataReqDTO | N
 
     gateway_info = await dtu.async_get_gateway_info()
 
+    if gateway_info is None:
+        return None
+
     registry = await dtu.async_get_energy_storage_registry(
         dtu_serial_number=gateway_info.serial_number
     )
+
+    if registry is None:
+        return None
 
     responses = []
     for inverter in registry.inverters:
@@ -402,9 +408,15 @@ async def async_set_energy_storage_working_mode(
 
     gateway_info = await dtu.async_get_gateway_info()
 
+    if gateway_info is None:
+        return None
+
     registry = await dtu.async_get_energy_storage_registry(
         dtu_serial_number=gateway_info.serial_number
     )
+
+    if registry is None:
+        return None
 
     for inverter in registry.inverters:
         if interactive_mode:
