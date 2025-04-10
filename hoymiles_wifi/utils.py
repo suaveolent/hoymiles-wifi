@@ -104,12 +104,17 @@ def promt_user_for_rate_time_range() -> TimeBean:
 
 def prompt_user_for_tariff_details(tariff: TariffType) -> DurationBean:
     """Query duration for a given tariff type from user."""
+
     duration_bean = DurationBean()
     duration_bean.start_time = input("Please enter the start time (HH:MM): ").strip()
     duration_bean.end_time = input("Please enter the end time (HH:MM): ").strip()
 
-    duration_bean.in_price = float("Please enter the price for a kWh to buy: ")
-    duration_bean.out_price = float("Please enter the price for a kWh to sell: ")
+    duration_bean.in_price = float(
+        input("Please enter the price for a kWh to buy (e.g. 0.12):".strip())
+    )
+    duration_bean.out_price = float(
+        input("Please enter the price for a kWh to sell: (e.g. 0.05)".strip())
+    )
     duration_bean.type = tariff
 
     return duration_bean

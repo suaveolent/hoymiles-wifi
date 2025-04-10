@@ -480,6 +480,14 @@ async def async_set_energy_storage_working_mode(
                 if cont != "y":
                     return None
 
+            elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
+                peak_soc = int(input("Enter baseline SOC to reserve: (0-100): "))
+                if peak_soc < 0 or peak_soc > 100:
+                    print("Error. Invalid SOC!")  # noqa: T201
+                    return None
+
+                peak_meter_power = int(input("Enter the peak meter power meter: "))
+
         return None
 
         # return await dtu.async_set_energy_storage_working_mode(
