@@ -75,7 +75,7 @@ def prompt_user_for_bms_working_mode() -> BMSWorkingMode:
     print("7.) Peak shaving mode")  # noqa: T201
     print("8.) Time of use mode")  # noqa: T201
 
-    return BMSWorkingMode(int(input("Working mode: (0-100): ")))
+    return BMSWorkingMode(int(input("Working mode: (1-8): ")))
 
 
 def promt_user_for_rate_time_range() -> TimeBean:

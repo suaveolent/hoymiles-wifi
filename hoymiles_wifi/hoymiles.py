@@ -184,6 +184,18 @@ class DateBean:
     time: list[TimeBean] = None
 
 
+@dataclass
+class TimePeriodBean:
+    charge_time_from: str = None
+    charge_time_to: str = None
+    discharge_time_from: str = None
+    discharge_time_to: str = None
+    charge_power: int = None
+    discharge_power: int = None
+    max_soc: int = None
+    min_soc: int = None
+
+
 def format_number(number: int) -> str:
     """Format number to two digits."""
 

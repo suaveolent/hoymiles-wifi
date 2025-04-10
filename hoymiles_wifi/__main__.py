@@ -16,6 +16,7 @@ from hoymiles_wifi.dtu import DTU
 from hoymiles_wifi.hoymiles import (
     BMSWorkingMode,
     DateBean,
+    TimePeriodBean,
     generate_dtu_version_string,
     generate_inverter_serial_number,
     generate_sw_version_string,
@@ -454,18 +455,19 @@ async def async_set_energy_storage_working_mode(
 
                     time_setting = DateBean()
 
-                    time_setting.start_date = input(
-                        "Please enter the start date (DD-MM): "
-                    ).strip()
-                    time_setting.end_date = input(
-                        "Please enter the end date (DD-MM): "
-                    ).strip()
+                    start_date = input("Please enter the start date (DD-MM): ").strip()
+                    end_date = input("Please enter the end date (DD-MM): ").strip()
 
                     print("Configuring  time range 1...")  # noqa: T201
-                    time_setting.time = promt_user_for_rate_time_range()
+                    time_range_1 = promt_user_for_rate_time_range()
 
                     print("Configuring  time range 2...")  # noqa: T201
-                    time_setting.time = promt_user_for_rate_time_range()
+                    time_range_2 = promt_user_for_rate_time_range()
+
+                    time_setting = DateBean()
+                    time_setting.start_date = start_date
+                    time_setting.end_date = end_date
+                    time_setting.time.append(time_range_1, time_range_2)
 
                     time_settings.append(time_setting)
 
@@ -474,6 +476,7 @@ async def async_set_energy_storage_working_mode(
                         break
                     else:
                         continue
+
                 print(f"Your time settings: {time_settings}")  # noqa: T201
 
                 cont = input("Do you want to continue with these settings? (y/n): ")
@@ -487,6 +490,70 @@ async def async_set_energy_storage_working_mode(
                     return None
 
                 peak_meter_power = int(input("Enter the peak meter power meter: "))
+
+            elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
+                time_periods: list[TimePeriodBean] = []
+
+                while True:
+                    charge_time_from = input(
+                        "Enter the charge time from (HH:MM): "
+                    ).strip()
+                    charge_time_to = input("Enter the charge time to (HH:MM): ").strip()
+
+                    charge_power = int(input("Enter the charge power to set (0-100): "))
+
+                    if charge_power < 0 or charge_power > 100:
+                        print("Error. Invalid charge power!")
+                        return None
+
+                    max_soc = int(input("Enter the max SOC to set (0-100): "))
+                    if max_soc < 0 or max_soc > 100:
+                        print("Error. Invalid SOC!")  # noqa: T201
+                        return None
+
+                    discharge_time_from = input(
+                        "Enter the discharge time from (HH:MM): "
+                    ).strip()
+                    discharge_time_to = input(
+                        "Enter the discharge time to (HH:MM): "
+                    ).strip()
+
+                    discharge_power = int(
+                        input("Enter the discharge power to set (0-100): ")
+                    )
+
+                    if discharge_power < 0 or discharge_power > 100:
+                        print("Error. Invalid discharge power!")  # noqa: T201
+                        return None
+
+                    min_soc = int(input("Enter the min SOC to set (0-100): "))
+                    if min_soc < 0 or min_soc > 100:
+                        print("Error. Invalid SOC!")  # noqa: T201
+                        return None
+
+                    time_period = TimePeriodBean()
+                    time_period.charge_time_from = charge_time_from
+                    time_period.charge_time_to = charge_time_to
+                    time_period.discharge_time_from = discharge_time_from
+                    time_period.discharge_time_to = discharge_time_to
+                    time_period.charge_power = charge_power
+                    time_period.discharge_power = discharge_power
+                    time_period.max_soc = max_soc
+                    time_period.min_soc = min_soc
+
+                    time_periods.append(time_period)
+
+                    cont = input("Do you want to add another time period? (y/n): ")
+                    if cont != "y":
+                        break
+                    else:
+                        continue
+
+                print(f"Your time periods: {time_periods}")  # noqa: T201
+
+                cont = input("Do you want to continue with these settings? (y/n): ")
+                if cont != "y":
+                    return None
 
         return None
 
