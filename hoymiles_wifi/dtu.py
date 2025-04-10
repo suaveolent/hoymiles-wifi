@@ -45,6 +45,7 @@ from hoymiles_wifi.const import (
 from hoymiles_wifi.hoymiles import (
     BMSWorkingMode,
     DateBean,
+    TimePeriodBean,
     convert_inverter_serial_number,
     encode_time_range,
 )
@@ -511,14 +512,7 @@ class DTU:
         max_charging_power: int = None,
         peak_soc: int = None,
         peak_meter_power: int = None,
-        charge_time_from: str = None,
-        charge_time_to: str = None,
-        discharge_time_from: str = None,
-        discharge_time_to: str = None,
-        charge_power: int = None,
-        discharge_power: int = None,
-        max_soc: int = None,
-        min_soc: int = None,
+        time_periods: list[TimePeriodBean] = None,
     ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
         """Set energy storage working mode."""
 
@@ -544,45 +538,46 @@ class DTU:
             request.peak_soc = peak_soc
             request.peak_meterpwr = peak_meter_power
         elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
-            if (
-                charge_time_from is None
-                or charge_time_to is None
-                or discharge_time_from is None
-                or discharge_time_to is None
-                or charge_power is None
-                or discharge_power is None
-                or max_soc is None
-                or min_soc is None
-            ):
-                logger.error("Error. Check parameters for Time of Use!")
-                return
+            for time_period in time_periods:
+                if (
+                    time_period.charge_time_from is None
+                    or time_period.charge_time_to is None
+                    or time_period.discharge_time_from is None
+                    or time_period.discharge_time_to is None
+                    or time_period.charge_power is None
+                    or time_period.discharge_power is None
+                    or time_period.max_soc is None
+                    or time_period.min_soc is None
+                ):
+                    logger.error("Error. Check parameters for Time of Use!")
+                    return
 
-            if (
-                charge_power < 0
-                or charge_power > 100
-                or discharge_power < 0
-                or discharge_power > 100
-                or max_soc < 0
-                or max_soc > 100
-                or min_soc < 0
-                or min_soc > 100
-            ):
-                logger.error("Error. Check power values for Time of Use!")
-                return
+                if (
+                    time_period.charge_power < 0
+                    or time_period.charge_power > 100
+                    or time_period.discharge_power < 0
+                    or time_period.discharge_power > 100
+                    or time_period.max_soc < 0
+                    or time_period.max_soc > 100
+                    or time_period.min_soc < 0
+                    or time_period.min_soc > 100
+                ):
+                    logger.error("Error. Check power values for Time of Use!")
+                    return
 
-            time_of_use = ESUserSet_pb2.TimeOfUseSetMO()
-            time_of_use.chrg_tr = encode_time_range(
-                charge_time_from, charge_time_to, ":"
-            )
-            time_of_use.disch_tr = encode_time_range(
-                discharge_time_from, discharge_time_to, ":"
-            )
-            time_of_use.chrg_pwr = charge_power
-            time_of_use.disch_pwr = discharge_power
-            time_of_use.max_soc = max_soc
-            time_of_use.min_soc = min_soc
+                time_of_use = ESUserSet_pb2.TimeOfUseSetMO()
+                time_of_use.chrg_tr = encode_time_range(
+                    time_period.charge_time_from, time_period.charge_time_to, ":"
+                )
+                time_of_use.disch_tr = encode_time_range(
+                    time_period.discharge_time_from, time_period.discharge_time_to, ":"
+                )
+                time_of_use.chrg_pwr = time_period.charge_power
+                time_of_use.disch_pwr = time_period.discharge_power
+                time_of_use.max_soc = time_period.max_soc
+                time_of_use.min_soc = time_period.min_soc
 
-            request.time_of_use.extend([time_of_use])
+                request.time_of_use.extend([time_of_use])
 
         command = CMD_ES_USER_SET_RES_DTO
 
