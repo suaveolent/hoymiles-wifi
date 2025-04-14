@@ -7,6 +7,7 @@ import asyncio
 import json
 import sys
 from dataclasses import asdict, dataclass
+from pprint import pprint
 
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.message import Message
@@ -407,17 +408,25 @@ async def async_set_energy_storage_working_mode(
 ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
     """Set the working mode of the energy storage."""
 
-    gateway_info = await dtu.async_get_gateway_info()
+    # gateway_info = await dtu.async_get_gateway_info()
 
-    if gateway_info is None:
-        return None
+    # if gateway_info is None:
+    #     return None
 
-    registry = await dtu.async_get_energy_storage_registry(
-        dtu_serial_number=gateway_info.serial_number
-    )
+    # registry = await dtu.async_get_energy_storage_registry(
+    #     dtu_serial_number=gateway_info.serial_number
+    # )
 
-    if registry is None:
-        return None
+    # if registry is None:
+    #     return None
+
+    registry = ESRegPB_pb2.ESRegReqDTO()
+
+    inverter = ESRegPB_pb2.RegInvMO()
+    inverter.serial_number = 1
+    registry.inverters.append(inverter)
+
+    gateway_info = GWInfo_pb2.GWInfoReqDTO()
 
     for inverter in registry.inverters:
         if interactive_mode:
@@ -448,15 +457,13 @@ async def async_set_energy_storage_working_mode(
                 print("Error. Invalid SOC!")  # noqa: T201
                 return None
 
-            if bms_working_mode == BMSWorkingMode.ECONOMY_MODE:
+            if bms_working_mode == BMSWorkingMode.ECONOMIC:
                 time_settings: list[DateBean] = []
                 while True:
                     print("Configuring time settings...")  # noqa: T201
 
-                    time_setting = DateBean()
-
-                    start_date = input("Please enter the start date (DD-MM): ").strip()
-                    end_date = input("Please enter the end date (DD-MM): ").strip()
+                    start_date = input("Please enter the start date (DD.MM): ").strip()
+                    end_date = input("Please enter the end date (DD.MM): ").strip()
 
                     print("Configuring  time range 1...")  # noqa: T201
                     time_range_1 = promt_user_for_rate_time_range()
@@ -467,7 +474,7 @@ async def async_set_energy_storage_working_mode(
                     time_setting = DateBean()
                     time_setting.start_date = start_date
                     time_setting.end_date = end_date
-                    time_setting.time.append(time_range_1, time_range_2)
+                    time_setting.time = [time_range_1, time_range_2]
 
                     time_settings.append(time_setting)
 
@@ -477,7 +484,11 @@ async def async_set_energy_storage_working_mode(
                     else:
                         continue
 
-                print(f"Your time settings: {time_settings}")  # noqa: T201
+                print()  # noqa: T201
+                print("Your time settings:")  # noqa: T201
+                for time_setting in time_settings:
+                    pprint(asdict(time_setting))  # noqa: T203
+                print()  # noqa: T201
 
                 cont = input("Do you want to continue with these settings? (y/n): ")
                 if cont != "y":
@@ -557,24 +568,17 @@ async def async_set_energy_storage_working_mode(
 
         return None
 
-        # return await dtu.async_set_energy_storage_working_mode(
-        #     dtu_serial_number=gateway_info.serial_number,
-        #     inverter_serial_number=inverter.serial_number,
-        #     bms_working_mode=bms_working_mode,
-        #     rev_soc=rev_soc,
-        #     time_settings=time_settings,
-        #     max_charging_power=max_charging_power,
-        #     peak_soc=peak_soc,
-        #     peak_meter_power=peak_meter_power,
-        #     charge_time_from=charge_time_from,
-        #     charge_time_to=charge_time_to,
-        #     discharge_time_from=discharge_time_from,
-        #     discharge_time_to=discharge_time_to,
-        #     charge_power=charge_power,
-        #     discharge_power=discharge_power,
-        #     max_soc=max_soc,
-        #     min_soc=min_soc,
-        # )
+        return await dtu.async_set_energy_storage_working_mode(
+            dtu_serial_number=gateway_info.serial_number,
+            inverter_serial_number=inverter.serial_number,
+            bms_working_mode=bms_working_mode,
+            rev_soc=rev_soc,
+            time_settings=time_settings,
+            max_charging_power=max_charging_power,
+            peak_soc=peak_soc,
+            peak_meter_power=peak_meter_power,
+            time_periods=time_periods,
+        )
 
 
 def print_invalid_command(command: str) -> None:
