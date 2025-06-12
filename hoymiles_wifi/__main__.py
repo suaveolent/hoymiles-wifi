@@ -408,25 +408,32 @@ async def async_set_energy_storage_working_mode(
 ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
     """Set the working mode of the energy storage."""
 
-    # gateway_info = await dtu.async_get_gateway_info()
+    ## DEBUG ONLY
+    # registry = ESRegPB_pb2.ESRegReqDTO()
 
-    # if gateway_info is None:
-    #     return None
+    # inverter = ESRegPB_pb2.RegInvMO()
+    # inverter.serial_number = 1
+    # registry.inverters.append(inverter)
 
-    # registry = await dtu.async_get_energy_storage_registry(
-    #     dtu_serial_number=gateway_info.serial_number
-    # )
+    # gateway_info = GWInfo_pb2.GWInfoReqDTO()
+    ## Remove in release
 
-    # if registry is None:
-    #     return None
+    # Put into release
+    gateway_info = await dtu.async_get_gateway_info()
 
-    registry = ESRegPB_pb2.ESRegReqDTO()
+    if gateway_info is None:
+        return None
 
-    inverter = ESRegPB_pb2.RegInvMO()
-    inverter.serial_number = 1
-    registry.inverters.append(inverter)
+    registry = await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
 
-    gateway_info = GWInfo_pb2.GWInfoReqDTO()
+    if registry is None:
+        return None
+    # put into release end
+
+    time_settings = None
+    time_periods = None
 
     for inverter in registry.inverters:
         if interactive_mode:
@@ -566,8 +573,6 @@ async def async_set_energy_storage_working_mode(
                 if cont != "y":
                     return None
 
-        return None
-
         return await dtu.async_set_energy_storage_working_mode(
             dtu_serial_number=gateway_info.serial_number,
             inverter_serial_number=inverter.serial_number,
@@ -640,7 +645,7 @@ async def main() -> None:
     parser.add_argument(
         "--max-charging-power",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Max charing power to set (0...100).",
     )
@@ -692,7 +697,7 @@ async def main() -> None:
     parser.add_argument(
         "--charge-power",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Charge power to set (0...100).",
     )
@@ -700,7 +705,7 @@ async def main() -> None:
     parser.add_argument(
         "--discharge-power",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Charge power to set (0...100).",
     )
@@ -708,7 +713,7 @@ async def main() -> None:
     parser.add_argument(
         "--max-soc",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Max SOC to set (0...100).",
     )
@@ -716,7 +721,7 @@ async def main() -> None:
     parser.add_argument(
         "--min-soc",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Min SOC to set (0...100).",
     )

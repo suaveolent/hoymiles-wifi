@@ -527,9 +527,11 @@ class DTU:
 
         if max_charging_power is not None:
             if max_charging_power < 0 or max_charging_power > 100:
-                logger.error("Error. Max charging power!")
+                logger.error(
+                    "Error. Max charging power! (" + str(max_charging_power) + ")"
+                )
                 return
-        request.max_power = max_charging_power
+            request.max_power = max_charging_power
 
         if bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
             if peak_soc is None or peak_meter_power is None:
@@ -569,17 +571,19 @@ class DTU:
                 time_of_use.chrg_tr = encode_time_range(
                     time_period.charge_time_from, time_period.charge_time_to, ":"
                 )
-                time_of_use.disch_tr = encode_time_range(
+                time_of_use.dischrg_tr = encode_time_range(
                     time_period.discharge_time_from, time_period.discharge_time_to, ":"
                 )
                 time_of_use.chrg_pwr = time_period.charge_power
-                time_of_use.disch_pwr = time_period.discharge_power
+                time_of_use.dischrg_pwr = time_period.discharge_power
                 time_of_use.max_soc = time_period.max_soc
                 time_of_use.min_soc = time_period.min_soc
 
-                request.time_of_use.extend([time_of_use])
+                request.tou.extend([time_of_use])
 
         command = CMD_ES_USER_SET_RES_DTO
+
+        logger.debug("Set energy storage working mode: " + str(request))
 
         return await self.async_send_request(
             command,

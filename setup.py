@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name="hoymiles-wifi",
     packages=["hoymiles_wifi", "hoymiles_wifi.protobuf"],
-    install_requires=["protobuf", "crcmod"],
+    install_requires=["protobuf>=6.31.1", "crcmod"],
     version="0.4.0",
     description="A python library for interfacing with the Hoymiles DTUs and the HMS-XXXXW-2T series of micro-inverters using protobuf messages.",
     author="suaveolent",
