@@ -529,7 +529,7 @@ class DTU:
             if max_power < 0 or max_power > 100:
                 logger.error("Error. Max power! (" + str(max_power) + ")")
                 return
-            request.max_power = max_power
+            request.max_power = max_power * 10
 
         if bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
             if peak_soc is None or peak_meter_power is None:
