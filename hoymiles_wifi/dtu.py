@@ -509,7 +509,7 @@ class DTU:
         bms_working_mode: BMSWorkingMode,
         rev_soc: int = None,
         time_settings: list[DateBean] = None,
-        max_charging_power: int = None,
+        max_power: int = None,
         peak_soc: int = None,
         peak_meter_power: int = None,
         time_periods: list[TimePeriodBean] = None,
@@ -525,13 +525,11 @@ class DTU:
         if rev_soc is not None:
             request.rev_soc = rev_soc
 
-        if max_charging_power is not None:
-            if max_charging_power < 0 or max_charging_power > 100:
-                logger.error(
-                    "Error. Max charging power! (" + str(max_charging_power) + ")"
-                )
+        if max_power is not None:
+            if max_power < 0 or max_power > 100:
+                logger.error("Error. Max power! (" + str(max_power) + ")")
                 return
-            request.max_power = max_charging_power
+            request.max_power = max_power
 
         if bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
             if peak_soc is None or peak_meter_power is None:

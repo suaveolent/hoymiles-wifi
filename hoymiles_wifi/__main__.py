@@ -393,7 +393,7 @@ async def async_set_energy_storage_working_mode(
     dtu: DTU,
     bms_working_mode: BMSWorkingMode = None,
     rev_soc: int = None,
-    max_charging_power: int = None,
+    max_power: int = None,
     peak_soc: int = None,
     peak_meter_power: int = None,
     charge_time_from: str = None,
@@ -501,6 +501,18 @@ async def async_set_energy_storage_working_mode(
                 if cont != "y":
                     return None
 
+            elif bms_working_mode == BMSWorkingMode.FORCED_CHARGING:
+                max_power = int(input("Enter the max charging power to set (0-100): "))
+                if max_power < 0 or max_power > 100:
+                    print("Error. Invalid charging power!")
+                    return None
+
+            elif bms_working_mode == BMSWorkingMode.FORCED_DISCHARGE:
+                max_power = int(input("Enter the min discharge power to set (0-100): "))
+                if max_power < 0 or max_power > 100:
+                    print("Error. Invalid discharge power!")
+                    return None
+
             elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
                 peak_soc = int(input("Enter baseline SOC to reserve: (0-100): "))
                 if peak_soc < 0 or peak_soc > 100:
@@ -579,7 +591,7 @@ async def async_set_energy_storage_working_mode(
             bms_working_mode=bms_working_mode,
             rev_soc=rev_soc,
             time_settings=time_settings,
-            max_charging_power=max_charging_power,
+            max_power=max_power,
             peak_soc=peak_soc,
             peak_meter_power=peak_meter_power,
             time_periods=time_periods,
@@ -643,17 +655,17 @@ async def main() -> None:
     )
 
     parser.add_argument(
-        "--max-charging-power",
+        "--max-power",
         type=int,
         default=None,
         choices=range(0, 101),
-        help="Max charing power to set (0...100).",
+        help="Max (dis-)charging power to set (0...100).",
     )
 
     parser.add_argument(
         "--peak-soc",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Peak SOC to set (0...100).",
     )
@@ -661,7 +673,7 @@ async def main() -> None:
     parser.add_argument(
         "--peak-meter-power",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Peak meter power to set (0...100).",
     )
@@ -801,7 +813,7 @@ async def main() -> None:
         kwargs = {}
         kwargs["bms_working_mode"] = BMSWorkingMode(args.bms_working_mode)
         kwargs["rev_soc"] = args.rev_soc
-        kwargs["max_charging_power"] = args.max_charging_power
+        kwargs["max_power"] = args.max_power
         kwargs["peak_soc"] = args.peak_soc
         kwargs["peak_meter_power"] = args.peak_meter_power
         kwargs["charge_time_from"] = args.charge_time_from
