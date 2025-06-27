@@ -70,20 +70,20 @@ hoymiles-wifi --host HOST <command> [additional-arguments]
 
 The following arguments are available when using the CLI:
 
-| Argument                | Type | Description                                                                                                                             |
-| ----------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------- | --------- | ----------- |
-| `--host`                | str  | IP address or hostname of the DTU (required)                                                                                            |
-| `--local_addr`          | str  | IP address of the interface to bind to (optional)                                                                                       |
-| `--as-json`             | flag | Format output as JSON                                                                                                                   |
-| `--disable-interactive` | flag | Disables interactive prompts                                                                                                            |
-| `--power-limit`         | int  | Power limit to set (0–100)                                                                                                              |
-| `--bms_working_mode`    | int  | BMS mode: 1=SELF_USE, 2=ECONOMIC, 3=BACKUP_POWER, 4=PURE_OFF_GRID, 5=FORCED_CHARGING, 6=FORCED_DISCHARGE, 7=PEAK_SHAVING, 8=TIME_OF_USE |
-| `--rev-soc`             | int  | Reserved SOC to set (0–100)                                                                                                             |
-| `--max-power`           | int  | Max (dis)charging power to set (0–100)                                                                                                  |
-| `--peak-soc`            | int  | Peak SOC to set (0–100)                                                                                                                 |
-| `--peak-meter-power`    | int  | Peak meter power to set (0–100)                                                                                                         |
-| `--time-settings`       | str  | Economic mode config: `START-END:WEEKDAYS=DURATION,DURATION,DURATION, ...`                                                              |
-| `--time-periods`        | str  | Time of use config: `CHARGE                                                                                                             | DISCHARGE | ...` format |
+| Argument                | Type | Description                                       |
+| ----------------------- | ---- | ------------------------------------------------- |
+| `--host`                | str  | IP address or hostname of the DTU (required)      |
+| `--local_addr`          | str  | IP address of the interface to bind to (optional) |
+| `--as-json`             | flag | Format output as JSON                             |
+| `--disable-interactive` | flag | Disables interactive prompts                      |
+| `--power-limit`         | int  | Power limit to set (0–100)                        |
+| `--bms_working_mode`    | int  | BMS mode (1-8)                                    |
+| `--rev-soc`             | int  | Reserved SOC to set (0–100)                       |
+| `--max-power`           | int  | Max (dis)charging power to set (0–100)            |
+| `--peak-soc`            | int  | Peak SOC to set (0–100)                           |
+| `--peak-meter-power`    | int  | Peak meter power to set (0–100)                   |
+| `--time-settings`       | str  | See Economic working mode                         |
+| `--time-periods`        | str  | See Time of Use working mode                      |
 
 ## 🔧 BMS Working Modes & Required Parameters
 
