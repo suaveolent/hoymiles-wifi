@@ -405,28 +405,17 @@ async def async_set_energy_storage_working_mode(
 ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
     """Set the working mode of the energy storage."""
 
-    ## DEBUG ONLY
-    registry = ESRegPB_pb2.ESRegReqDTO()
+    gateway_info = await dtu.async_get_gateway_info()
 
-    inverter = ESRegPB_pb2.RegInvMO()
-    inverter.serial_number = 1
-    registry.inverters.append(inverter)
+    if gateway_info is None:
+        return None
 
-    gateway_info = GWInfo_pb2.GWInfoReqDTO()
-    gateway_info.serial_number = 1234567890
-    ## Remove in release
+    registry = await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
 
-    # gateway_info = await dtu.async_get_gateway_info()
-
-    # if gateway_info is None:
-    #     return None
-
-    # registry = await dtu.async_get_energy_storage_registry(
-    #     dtu_serial_number=gateway_info.serial_number
-    # )
-
-    # if registry is None or not registry.inverters:
-    #     return None
+    if registry is None or not registry.inverters:
+        return None
 
     if interactive_mode:
         return await async_set_energy_storage_working_mode_interactive(
