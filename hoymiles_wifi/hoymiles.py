@@ -157,9 +157,9 @@ class BMSWorkingMode(Enum):
 
 
 class TariffType(Enum):
-    PEAK = 1
-    OFF_PEAK = 2
-    PARTIAL_PEAK = 3
+    OFF_PEAK = 1
+    PARTIAL_PEAK = 2
+    PEAK = 3
 
 
 @dataclass
@@ -173,7 +173,7 @@ class DurationBean:
 
 @dataclass
 class TimeBean:
-    duration: list[DurationBean] = None
+    durations: list[DurationBean] = None
     week: list[int] = None
 
 
@@ -465,3 +465,8 @@ def encode_week_range(week: list[int]):
             i3 |= 64
 
     return i3
+
+
+def float_to_scaled_int(float_value: float) -> int:
+    """Convert a float value to an integer scaled by 100."""
+    return int((float_value if float_value is not None else 0.0) * 100)

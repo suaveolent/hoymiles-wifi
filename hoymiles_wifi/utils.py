@@ -89,7 +89,7 @@ def promt_user_for_rate_time_range() -> TimeBean:
     """Prompt user for electricity rate time range."""
 
     time_bean = TimeBean()
-    time_bean.duration = []
+    time_bean.durations = []
     user_input = input(
         "Enter the weekdays as numbers (Monday = 1, Sunday = 7), separated by commas (e.g., 1,3,5): "
     )
@@ -100,28 +100,36 @@ def promt_user_for_rate_time_range() -> TimeBean:
     print("")  # noqa: T201
     print("Configuring peak time...")  # noqa: T201
     duration_bean = prompt_user_for_tariff_details(TariffType.PEAK)
-    time_bean.duration.append(duration_bean)
+    time_bean.durations.append(duration_bean)
     print("")  # noqa: T201
 
     print("Configuring off-peak time...")  # noqa: T201
     duration_bean = prompt_user_for_tariff_details(TariffType.OFF_PEAK)
-    time_bean.duration.append(duration_bean)
+    time_bean.durations.append(duration_bean)
     print("")  # noqa: T201
 
     print("Configuring partial-peak time...")  # noqa: T201
-    duration_bean = prompt_user_for_tariff_details(TariffType.PARTIAL_PEAK)
-    time_bean.duration.append(duration_bean)
+    duration_bean = prompt_user_for_tariff_details(
+        TariffType.PARTIAL_PEAK, include_time=False
+    )
+    time_bean.durations.append(duration_bean)
     print("")  # noqa: T201
 
     return time_bean
 
 
-def prompt_user_for_tariff_details(tariff: TariffType) -> DurationBean:
+def prompt_user_for_tariff_details(
+    tariff: TariffType, include_time: bool = True
+) -> DurationBean:
     """Query duration for a given tariff type from user."""
 
     duration_bean = DurationBean()
-    duration_bean.start_time = input("Please enter the start time (HH:MM): ").strip()
-    duration_bean.end_time = input("Please enter the end time (HH:MM): ").strip()
+
+    if include_time:
+        duration_bean.start_time = input(
+            "Please enter the start time (HH:MM): "
+        ).strip()
+        duration_bean.end_time = input("Please enter the end time (HH:MM): ").strip()
 
     duration_bean.in_price = float(
         input("Please enter the price for a kWh to buy (e.g. 0.12): ").strip()
@@ -188,7 +196,7 @@ def parse_time_settings_input(time_settings_str: str) -> list[DateBean]:
                         )
                     )
 
-                parsed_time_ranges.append(TimeBean(duration=durations, week=week))
+                parsed_time_ranges.append(TimeBean(durations=durations, week=week))
 
             time_settings.append(
                 DateBean(

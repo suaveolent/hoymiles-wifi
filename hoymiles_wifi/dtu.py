@@ -45,10 +45,12 @@ from hoymiles_wifi.const import (
 from hoymiles_wifi.hoymiles import (
     BMSWorkingMode,
     DateBean,
+    TariffType,
     TimePeriodBean,
     convert_inverter_serial_number,
     encode_date_time_range,
     encode_week_range,
+    float_to_scaled_int,
 )
 from hoymiles_wifi.protobuf import (
     AppGetHistPower_pb2,
@@ -539,23 +541,43 @@ class DTU:
                     time_setting.start_date, time_setting.end_date, "."
                 )
 
-                if time_setting.time is None or len(time_setting.time) > 3:
+                if time_setting.time is None or len(time_setting.time) != 2:
                     logger.error(
                         "Error. No time settings or too many time settings provided!"
                     )
                     return
 
-                for time_bean in time_setting.time:
+                for idx, time_range in enumerate(time_setting.time):
                     set_week = ESUserSet_pb2.EconomicsSetWeekMO()
-                    set_week.in_price = -1
-                    set_week.out_price = -1
-                    set_week.peak_in = -1
-                    set_week.peak_out = -1
-                    set_week.peak_time = -1
-                    set_week.valley_in = -1
-                    set_week.valley_out = -1
-                    set_week.valley_time = -1
-                    set_week.wr = encode_week_range(time_bean.week)
+                    set_week.wr = encode_week_range(time_range.week)
+
+                    for duration in time_range.durations:
+                        if duration.type == TariffType.PEAK:
+                            set_week.peak_in = float_to_scaled_int(duration.in_price)
+                            set_week.peak_out = float_to_scaled_int(duration.out_price)
+                            set_week.peak_time = encode_date_time_range(
+                                duration.start_time, duration.end_time, ":"
+                            )
+                        elif duration.type == TariffType.OFF_PEAK:
+                            set_week.valley_in = float_to_scaled_int(duration.in_price)
+                            set_week.valley_out = float_to_scaled_int(
+                                duration.out_price
+                            )
+                            set_week.valley_time = encode_date_time_range(
+                                duration.start_time, duration.end_time, ":"
+                            )
+                        elif duration.type == TariffType.PARTIAL_PEAK:
+                            set_week.partial_peak_in = float_to_scaled_int(
+                                duration.in_price
+                            )
+                            set_week.partial_peak_out = float_to_scaled_int(
+                                duration.out_price
+                            )
+
+                        if idx == 0:
+                            set_date.w1.CopyFrom(set_week)
+                        elif idx == 1:
+                            set_date.w2.CopyFrom(set_week)
 
                 request.date.extend([set_date])
 
