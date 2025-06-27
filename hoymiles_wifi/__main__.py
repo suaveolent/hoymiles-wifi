@@ -6,7 +6,7 @@ import argparse
 import asyncio
 import json
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, is_dataclass
 from pprint import pprint
 
 from google.protobuf.json_format import MessageToJson
@@ -863,8 +863,12 @@ async def main() -> None:
                 print(MessageToJson(response))  # noqa: T201
             elif isinstance(response, dict):
                 print(json.dumps(response, indent=4))  # noqa: T201
-            else:
+            elif is_dataclass(response):
                 print(json.dumps(asdict(response), indent=4))  # noqa: T201
+            else:
+                print("ERROR: Response is not a valid dataclass instance.")  # noqa: T201
+                print(f"Response type: {type(response)}")  # noqa: T201
+
         else:
             print(f"{args.command.capitalize()} Response: \n{response}")  # noqa: T201
     else:
