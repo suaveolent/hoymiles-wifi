@@ -43,6 +43,8 @@ from hoymiles_wifi.protobuf import (
     RealDataNew_pb2,
 )
 from hoymiles_wifi.utils import (
+    parse_time_periods_input,
+    parse_time_settings_input,
     prompt_user_for_bms_working_mode,
     promt_user_for_rate_time_range,
 )
@@ -392,19 +394,14 @@ async def async_get_energy_storage_data(dtu: DTU) -> ESData_pb2.ESDataReqDTO | N
 async def async_set_energy_storage_working_mode(
     dtu: DTU,
     bms_working_mode: BMSWorkingMode = None,
+    inverter_serial_number: int = None,
+    interactive_mode: bool = True,
     rev_soc: int = None,
     max_power: int = None,
     peak_soc: int = None,
     peak_meter_power: int = None,
-    charge_time_from: str = None,
-    charge_time_to: str = None,
-    discharge_time_from: str = None,
-    discharge_time_to: str = None,
-    charge_power: int = None,
-    discharge_power: int = None,
-    max_soc: int = None,
-    min_soc: int = None,
-    interactive_mode: bool = True,
+    time_settings_str: str = None,
+    time_periods_str: str = None,
 ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
     """Set the working mode of the energy storage."""
 
@@ -418,166 +415,41 @@ async def async_set_energy_storage_working_mode(
         dtu_serial_number=gateway_info.serial_number
     )
 
-    if registry is None:
+    if registry is None or not registry.inverters:
         return None
-    # put into release end
 
-    time_settings = None
-    time_periods = None
+    if interactive_mode:
+        return await async_set_energy_storage_working_mode_interactive(
+            dtu,
+            dtu_serial_number=gateway_info.serial_number,
+            registry=registry,
+            bms_working_mode=bms_working_mode,
+        )
 
-    for inverter in registry.inverters:
-        if interactive_mode:
-            print(  # noqa: T201
-                RED
-                + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
-                + "!!! Danger zone! This will change the working mode of the energy storage. !!!\n"
-                + "!!!      Please be careful and make sure you know what you are doing.     !!!\n"
-                + "!!!              Only proceed if you know what you are doing.             !!!\n"
-                + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
-                + END,
+    else:
+        time_settings = None
+        time_periods = None
+
+        if bms_working_mode == BMSWorkingMode.ECONOMIC:
+            time_settings: list[DateBean] = parse_time_settings_input(time_settings_str)
+            if not time_settings:
+                print("Error. Invalid time settings!")  # noqa: T201
+
+            for time_setting in time_settings:
+                pprint(asdict(time_setting))  # noqa: T203
+
+        elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
+            time_periods: list[TimePeriodBean] = parse_time_periods_input(
+                time_periods_str
             )
 
-            print(f"Inverter serial number: {inverter.serial_number}")  # noqa: T201
-
-            cont = input("Do you want to continue? (y/n): ")
-            if cont != "y":
-                continue
-
-            bms_working_mode = prompt_user_for_bms_working_mode()
-
-            if bms_working_mode is None:
-                print("Error. Invalid working mode!")  # noqa: T201
+            if not time_periods:
+                print("Error. Invalid time periods!")  # noqa: T201
                 return None
-
-            rev_soc = int(input("Enter the SOC to reserve: (0-100): "))
-            if rev_soc < 0 or rev_soc > 100:
-                print("Error. Invalid SOC!")  # noqa: T201
-                return None
-
-            if bms_working_mode == BMSWorkingMode.ECONOMIC:
-                time_settings: list[DateBean] = []
-                while True:
-                    print("Configuring time settings...")  # noqa: T201
-
-                    start_date = input("Please enter the start date (DD.MM): ").strip()
-                    end_date = input("Please enter the end date (DD.MM): ").strip()
-
-                    print("Configuring  time range 1...")  # noqa: T201
-                    time_range_1 = promt_user_for_rate_time_range()
-
-                    print("Configuring  time range 2...")  # noqa: T201
-                    time_range_2 = promt_user_for_rate_time_range()
-
-                    time_setting = DateBean()
-                    time_setting.start_date = start_date
-                    time_setting.end_date = end_date
-                    time_setting.time = [time_range_1, time_range_2]
-
-                    time_settings.append(time_setting)
-
-                    cont = input("Do you want to add another time setting? (y/n): ")
-                    if cont != "y":
-                        break
-                    else:
-                        continue
-
-                print()  # noqa: T201
-                print("Your time settings:")  # noqa: T201
-                for time_setting in time_settings:
-                    pprint(asdict(time_setting))  # noqa: T203
-                print()  # noqa: T201
-
-                cont = input("Do you want to continue with these settings? (y/n): ")
-                if cont != "y":
-                    return None
-
-            elif bms_working_mode == BMSWorkingMode.FORCED_CHARGING:
-                max_power = int(input("Enter the max charging power to set (0-100): "))
-                if max_power < 0 or max_power > 100:
-                    print("Error. Invalid charging power!")
-                    return None
-
-            elif bms_working_mode == BMSWorkingMode.FORCED_DISCHARGE:
-                max_power = int(input("Enter the min discharge power to set (0-100): "))
-                if max_power < 0 or max_power > 100:
-                    print("Error. Invalid discharge power!")
-                    return None
-
-            elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
-                peak_soc = int(input("Enter baseline SOC to reserve: (0-100): "))
-                if peak_soc < 0 or peak_soc > 100:
-                    print("Error. Invalid SOC!")  # noqa: T201
-                    return None
-
-                peak_meter_power = int(input("Enter the peak meter power meter: "))
-
-            elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
-                time_periods: list[TimePeriodBean] = []
-
-                while True:
-                    charge_time_from = input(
-                        "Enter the charge time from (HH:MM): "
-                    ).strip()
-                    charge_time_to = input("Enter the charge time to (HH:MM): ").strip()
-
-                    charge_power = int(input("Enter the charge power to set (0-100): "))
-
-                    if charge_power < 0 or charge_power > 100:
-                        print("Error. Invalid charge power!")
-                        return None
-
-                    max_soc = int(input("Enter the max SOC to set (0-100): "))
-                    if max_soc < 0 or max_soc > 100:
-                        print("Error. Invalid SOC!")  # noqa: T201
-                        return None
-
-                    discharge_time_from = input(
-                        "Enter the discharge time from (HH:MM): "
-                    ).strip()
-                    discharge_time_to = input(
-                        "Enter the discharge time to (HH:MM): "
-                    ).strip()
-
-                    discharge_power = int(
-                        input("Enter the discharge power to set (0-100): ")
-                    )
-
-                    if discharge_power < 0 or discharge_power > 100:
-                        print("Error. Invalid discharge power!")  # noqa: T201
-                        return None
-
-                    min_soc = int(input("Enter the min SOC to set (0-100): "))
-                    if min_soc < 0 or min_soc > 100:
-                        print("Error. Invalid SOC!")  # noqa: T201
-                        return None
-
-                    time_period = TimePeriodBean()
-                    time_period.charge_time_from = charge_time_from
-                    time_period.charge_time_to = charge_time_to
-                    time_period.discharge_time_from = discharge_time_from
-                    time_period.discharge_time_to = discharge_time_to
-                    time_period.charge_power = charge_power
-                    time_period.discharge_power = discharge_power
-                    time_period.max_soc = max_soc
-                    time_period.min_soc = min_soc
-
-                    time_periods.append(time_period)
-
-                    cont = input("Do you want to add another time period? (y/n): ")
-                    if cont != "y":
-                        break
-                    else:
-                        continue
-
-                print(f"Your time periods: {time_periods}")  # noqa: T201
-
-                cont = input("Do you want to continue with these settings? (y/n): ")
-                if cont != "y":
-                    return None
 
         return await dtu.async_set_energy_storage_working_mode(
             dtu_serial_number=gateway_info.serial_number,
-            inverter_serial_number=inverter.serial_number,
+            inverter_serial_number=inverter_serial_number,
             bms_working_mode=bms_working_mode,
             rev_soc=rev_soc,
             time_settings=time_settings,
@@ -586,6 +458,190 @@ async def async_set_energy_storage_working_mode(
             peak_meter_power=peak_meter_power,
             time_periods=time_periods,
         )
+
+
+async def async_set_energy_storage_working_mode_interactive(
+    dtu: DTU,
+    dtu_serial_number: int,
+    registry: ESRegPB_pb2.ESRegReqDTO,
+    bms_working_mode: BMSWorkingMode = None,
+) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
+    """Set the working mode of the energy storage."""
+
+    time_settings = None
+    time_periods = None
+
+    print(  # noqa: T201
+        RED
+        + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+        + "!!! Danger zone! This will change the working mode of the energy storage. !!!\n"
+        + "!!!      Please be careful and make sure you know what you are doing.     !!!\n"
+        + "!!!              Only proceed if you know what you are doing.             !!!\n"
+        + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+        + END,
+    )
+
+    print("Available inverters:")  # noqa: T201
+    for idx, inverter in enumerate(registry.inverters, start=1):
+        print(f"{idx}: {inverter.serial_number}")  # noqa: T201
+
+    while True:
+        try:
+            selection = int(
+                input(f"Select inverter number (1-{len(registry.inverters)}): ")
+            )
+            if 1 <= selection <= len(registry.inverters):
+                selected_inverter = registry.inverters[selection - 1]
+                break
+            else:
+                print("Invalid selection. Please choose a valid number.")  # noqa: T201
+        except ValueError:
+            print("Please enter a number.")  # noqa: T201
+    inverter_serial_number = selected_inverter.serial_number
+
+    print(f"Inverter serial number: {inverter_serial_number}")  # noqa: T201
+
+    cont = input("Do you want to continue? (y/n): ")
+    if cont != "y":
+        return None
+
+    bms_working_mode = prompt_user_for_bms_working_mode()
+
+    if bms_working_mode is None:
+        print("Error. Invalid working mode!")  # noqa: T201
+        return None
+
+    rev_soc = int(input("Enter the SOC to reserve: (0-100): "))
+    if rev_soc < 0 or rev_soc > 100:
+        print("Error. Invalid SOC!")  # noqa: T201
+        return None
+
+    if bms_working_mode == BMSWorkingMode.ECONOMIC:
+        time_settings: list[DateBean] = []
+        while True:
+            print("Configuring time settings...")  # noqa: T201
+
+            start_date = input("Please enter the start date (DD.MM): ").strip()
+            end_date = input("Please enter the end date (DD.MM): ").strip()
+
+            print("Configuring  time range 1...")  # noqa: T201
+            time_range_1 = promt_user_for_rate_time_range()
+
+            print("Configuring  time range 2...")  # noqa: T201
+            time_range_2 = promt_user_for_rate_time_range()
+
+            time_setting = DateBean()
+            time_setting.start_date = start_date
+            time_setting.end_date = end_date
+            time_setting.time = [time_range_1, time_range_2]
+
+            time_settings.append(time_setting)
+
+            cont = input("Do you want to add another time setting? (y/n): ")
+            if cont != "y":
+                break
+            else:
+                continue
+
+        print()  # noqa: T201
+        print("Your time settings:")  # noqa: T201
+        for time_setting in time_settings:
+            pprint(asdict(time_setting))  # noqa: T203
+        print()  # noqa: T201
+
+        cont = input("Do you want to continue with these settings? (y/n): ")
+        if cont != "y":
+            return None
+
+    elif bms_working_mode == BMSWorkingMode.FORCED_CHARGING:
+        max_power = int(input("Enter the max charging power to set (0-100): "))
+        if max_power < 0 or max_power > 100:
+            print("Error. Invalid charging power!")
+            return None
+
+    elif bms_working_mode == BMSWorkingMode.FORCED_DISCHARGE:
+        max_power = int(input("Enter the min discharge power to set (0-100): "))
+        if max_power < 0 or max_power > 100:
+            print("Error. Invalid discharge power!")
+            return None
+
+    elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
+        peak_soc = int(input("Enter baseline SOC to reserve: (0-100): "))
+        if peak_soc < 0 or peak_soc > 100:
+            print("Error. Invalid SOC!")  # noqa: T201
+            return None
+
+        peak_meter_power = int(input("Enter the peak meter power meter: "))
+
+    elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
+        time_periods: list[TimePeriodBean] = []
+
+        while True:
+            charge_time_from = input("Enter the charge time from (HH:MM): ").strip()
+            charge_time_to = input("Enter the charge time to (HH:MM): ").strip()
+
+            charge_power = int(input("Enter the charge power to set (0-100): "))
+
+            if charge_power < 0 or charge_power > 100:
+                print("Error. Invalid charge power!")
+                return None
+
+            max_soc = int(input("Enter the max SOC to set (0-100): "))
+            if max_soc < 0 or max_soc > 100:
+                print("Error. Invalid SOC!")  # noqa: T201
+                return None
+
+            discharge_time_from = input(
+                "Enter the discharge time from (HH:MM): "
+            ).strip()
+            discharge_time_to = input("Enter the discharge time to (HH:MM): ").strip()
+
+            discharge_power = int(input("Enter the discharge power to set (0-100): "))
+
+            if discharge_power < 0 or discharge_power > 100:
+                print("Error. Invalid discharge power!")  # noqa: T201
+                return None
+
+            min_soc = int(input("Enter the min SOC to set (0-100): "))
+            if min_soc < 0 or min_soc > 100:
+                print("Error. Invalid SOC!")  # noqa: T201
+                return None
+
+            time_period = TimePeriodBean()
+            time_period.charge_time_from = charge_time_from
+            time_period.charge_time_to = charge_time_to
+            time_period.discharge_time_from = discharge_time_from
+            time_period.discharge_time_to = discharge_time_to
+            time_period.charge_power = charge_power
+            time_period.discharge_power = discharge_power
+            time_period.max_soc = max_soc
+            time_period.min_soc = min_soc
+
+            time_periods.append(time_period)
+
+            cont = input("Do you want to add another time period? (y/n): ")
+            if cont != "y":
+                break
+            else:
+                continue
+
+        print(f"Your time periods: {time_periods}")  # noqa: T201
+
+        cont = input("Do you want to continue with these settings? (y/n): ")
+        if cont != "y":
+            return None
+
+    return await dtu.async_set_energy_storage_working_mode(
+        dtu_serial_number=dtu_serial_number,
+        inverter_serial_number=inverter_serial_number,
+        bms_working_mode=bms_working_mode,
+        rev_soc=rev_soc,
+        time_settings=time_settings,
+        max_power=max_power,
+        peak_soc=peak_soc,
+        peak_meter_power=peak_meter_power,
+        time_periods=time_periods,
+    )
 
 
 def print_invalid_command(command: str) -> None:
@@ -669,63 +725,17 @@ async def main() -> None:
     )
 
     parser.add_argument(
-        "--charge_time_from",
+        "--time-settings",
         type=str,
         required=False,
-        help="Charge time from (HH:MM)",
+        help="Time settings for the economic working mode (START_DATE|END_DATE|WEEKDAYS:DURATION,DURATION;WEEKDAYS:DURATION,DURATION||START_DATE|END_DATE|...)",
     )
 
     parser.add_argument(
-        "--charge_time_to",
+        "--time-periods",
         type=str,
         required=False,
-        help="Charge time to (HH:MM)",
-    )
-
-    parser.add_argument(
-        "--discharge_time_from",
-        type=str,
-        required=False,
-        help="Discharge time from (HH:MM)",
-    )
-
-    parser.add_argument(
-        "--discharge_time_to",
-        type=str,
-        required=False,
-        help="Discharge time to (HH:MM)",
-    )
-
-    parser.add_argument(
-        "--charge-power",
-        type=int,
-        default=None,
-        choices=range(0, 101),
-        help="Charge power to set (0...100).",
-    )
-
-    parser.add_argument(
-        "--discharge-power",
-        type=int,
-        default=None,
-        choices=range(0, 101),
-        help="Charge power to set (0...100).",
-    )
-
-    parser.add_argument(
-        "--max-soc",
-        type=int,
-        default=None,
-        choices=range(0, 101),
-        help="Max SOC to set (0...100).",
-    )
-
-    parser.add_argument(
-        "--min-soc",
-        type=int,
-        default=None,
-        choices=range(0, 101),
-        help="Min SOC to set (0...100).",
+        help="Time periods for the time of use working mode (CHARGE_FROM-CHARGE_TO-CHARGE_POWER-MAX_SOC|DISCHARGE_FROM-DISCHARGE_TO-DISCHARGE_POWER-MIN_SOC||...)",
     )
 
     parser.add_argument(

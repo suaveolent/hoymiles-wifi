@@ -1,6 +1,13 @@
 """Utils for interacting with Hoymiles WiFi API."""
 
-from hoymiles_wifi.hoymiles import BMSWorkingMode, DurationBean, TariffType, TimeBean
+from hoymiles_wifi.hoymiles import (
+    BMSWorkingMode,
+    DateBean,
+    DurationBean,
+    TariffType,
+    TimeBean,
+    TimePeriodBean,
+)
 from hoymiles_wifi.protobuf import (
     GetConfig_pb2,
     SetConfig_pb2,
@@ -125,3 +132,122 @@ def prompt_user_for_tariff_details(tariff: TariffType) -> DurationBean:
     duration_bean.type = tariff
 
     return duration_bean
+
+
+def parse_time_settings(time_settings_str: str) -> list[DateBean]:
+    """Parse the --time-settings CLI input into DateBean objects."""
+
+    time_settings = []
+
+    if not time_settings_str.strip():
+        return time_settings
+
+    entries = time_settings_str.strip().split("||")
+
+    try:
+        for entry in entries:
+            date_part, rest = entry.split(":")
+            start_date, end_date = date_part.strip().split("-")
+
+            time_ranges = rest.split(";")
+            if len(time_ranges) != 2:
+                raise ValueError(
+                    "Each date block must contain exactly two time ranges separated by ';'."
+                )
+
+            parsed_time_ranges = []
+
+            for time_range in time_ranges:
+                week_part, durations_part = time_range.split("=")
+                week = [
+                    int(day.strip())
+                    for day in week_part.split(",")
+                    if day.strip().isdigit()
+                ]
+
+                duration_strs = durations_part.split(",")
+                if len(duration_strs) != 3:
+                    raise ValueError(
+                        "Each time range must include exactly 3 tariff durations."
+                    )
+
+                durations = []
+                for idx, duration_str in enumerate(duration_strs):
+                    start, end, in_price, out_price = duration_str.strip().split("-")
+                    durations.append(
+                        DurationBean(
+                            start_time=start.strip(),
+                            end_time=end.strip(),
+                            in_price=float(in_price),
+                            out_price=float(out_price),
+                            type=[
+                                TariffType.PEAK,
+                                TariffType.OFF_PEAK,
+                                TariffType.PARTIAL_PEAK,
+                            ][idx],
+                        )
+                    )
+
+                parsed_time_ranges.append(TimeBean(duration=durations, week=week))
+
+            time_settings.append(
+                DateBean(
+                    start_date=start_date.strip(),
+                    end_date=end_date.strip(),
+                    time=parsed_time_ranges,
+                )
+            )
+
+    except Exception as e:
+        raise ValueError(f"Invalid time-setting format in block '{entry}': {e}") from e
+
+    return time_settings
+
+
+def parse_time_periods_input(time_periods_str: str) -> list[TimePeriodBean]:
+    """Parse --time-periods input into a list of TimePeriodBean objects."""
+
+    time_periods = []
+
+    if not time_periods_str.strip():
+        return time_periods
+
+    period_blocks = time_periods_str.strip().split("||")
+
+    try:
+        for block in period_blocks:
+            charge_part, discharge_part = block.split("|")
+
+            charge_time_from, charge_time_to, charge_power, max_soc = charge_part.split(
+                "-"
+            )
+            discharge_time_from, discharge_time_to, discharge_power, min_soc = (
+                discharge_part.split("-")
+            )
+
+            time_period = TimePeriodBean(
+                charge_time_from=charge_time_from,
+                charge_time_to=charge_time_to,
+                charge_power=int(charge_power),
+                max_soc=int(max_soc),
+                discharge_time_from=discharge_time_from,
+                discharge_time_to=discharge_time_to,
+                discharge_power=int(discharge_power),
+                min_soc=int(min_soc),
+            )
+
+            for value_name, value in {
+                "charge_power": time_period.charge_power,
+                "max_soc": time_period.max_soc,
+                "discharge_power": time_period.discharge_power,
+                "min_soc": time_period.min_soc,
+            }.items():
+                if not 0 <= value <= 100:
+                    raise ValueError(f"{value_name} out of range: {value}")
+
+            time_periods.append(time_period)
+
+    except Exception as e:
+        raise ValueError(f"Invalid time period format: '{block}' -> {e}") from e
+
+    return time_periods

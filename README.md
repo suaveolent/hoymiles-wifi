@@ -1,6 +1,6 @@
 # hoymiles-wifi
 
-This Python library facilitates communication with Hoymiles DTUs and the HMS-XXXXW-2T HMS microinverters, utilizing protobuf messages.
+This Python library facilitates communication with Hoymiles DTUs, the HMS-XXXXW microinverters, and hybrid inverters, utilizing protobuf messages.
 
 For the Home Assistant integration have a look here:
 https://github.com/suaveolent/ha-hoymiles-wifi
@@ -61,12 +61,97 @@ commands:
     get-gateway-info,
     get-gateway-network-info,
     get-energy-storage-registry,
-    get-energy-storage-data
-
-The `--as-json` option is optional and allows formatting the output as JSON.
-The `--disable-interactive` option is optional allows to disable interactive modes (e.g. for setting the power limit).
-For the `set-power-limit` command, you can also use the `--power-limit` parameter to specify the desired power limit. This requires the `--disable-interactive` option to be enabled.
+    get-energy-storage-data,
+    set-energy-storage-working-mode
 ```
+
+## Additional CLI Parameters
+
+The following arguments are available when using the CLI:
+
+### CLI Arguments
+
+### CLI Arguments
+
+| Argument                | Type | Description                                                                                                                             |
+| ----------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------- | --------- | ---- | ----------- |
+| `--host`                | str  | IP address or hostname of the DTU (required)                                                                                            |
+| `--local_addr`          | str  | IP address of the interface to bind to (optional)                                                                                       |
+| `--as-json`             | flag | Format output as JSON                                                                                                                   |
+| `--disable-interactive` | flag | Disables interactive prompts                                                                                                            |
+| `--power-limit`         | int  | Power limit to set (0–100)                                                                                                              |
+| `--bms_working_mode`    | int  | BMS mode: 1=SELF_USE, 2=ECONOMIC, 3=BACKUP_POWER, 4=PURE_OFF_GRID, 5=FORCED_CHARGING, 6=FORCED_DISCHARGE, 7=PEAK_SHAVING, 8=TIME_OF_USE |
+| `--rev-soc`             | int  | Reserved SOC to set (0–100)                                                                                                             |
+| `--max-power`           | int  | Max (dis)charging power to set (0–100)                                                                                                  |
+| `--peak-soc`            | int  | Peak SOC to set (0–100)                                                                                                                 |
+| `--peak-meter-power`    | int  | Peak meter power to set (0–100)                                                                                                         |
+| `--time-settings`       | str  | Economic mode config: `START-END:WEEKDAYS=DURATION,DURATION,DURATION                                                                    |           | ...` |
+| `--time-periods`        | str  | Time of use config: `CHARGE                                                                                                             | DISCHARGE |      | ...` format |
+
+You can combine these flags to predefine configuration actions such as setting working mode, power limits, and schedules without requiring interactive prompts.
+
+For `set-energy-storage-working-mode` there are multiple options depending on the bms_working_mode:
+
+#### ⏱️ `--time-settings` (Economic working mode)
+
+```
+START-END:WEEKDAYS=PEAK_START-PEAK_END-PEAK_IN-PEAK_OUT,OFF_START-OFF_END-OFF_IN-OFF_OUT,PARTIAL_START-PARTIAL_END-PARTIAL_IN-PARTIAL_OUT;WEEKDAYS=...||START-END:...||...
+```
+
+- `START`, `END`: Date in `DD.MM`
+- For each date range, **exactly two time ranges** must be configured
+- Each time range includes:
+  - `WEEKDAYS`: Comma-separated days (`1=Mon`, ..., `7=Sun`)
+  - 3 tariff blocks: `PEAK`, `OFF_PEAK`, `PARTIAL_PEAK`
+- Each block format: `START-END-IN_PRICE-OUT_PRICE`
+- Use `;` to separate **Time Range 1** and **Time Range 2**
+- Use `||` to separate multiple date ranges
+
+#### Example
+
+```
+01.01-31.03:1,2,3=06:00-10:00-0.20-0.10,00:00-06:00-0.10-0.05,10:00-18:00-0.15-0.08;4,5=07:00-11:00-0.22-0.11,00:00-07:00-0.08-0.04,11:00-17:00-0.14-0.07
+```
+
+| Field            | Value         | Description                |
+| ---------------- | ------------- | -------------------------- |
+| Start Date       | `01.01`       | Start of date range        |
+| End Date         | `31.03`       | End of date range          |
+| **Time Range 1** |               |                            |
+| Weekdays         | `1,2,3`       | Monday, Tuesday, Wednesday |
+| PEAK             | `06:00-10:00` | Buy: `0.20`, Sell: `0.10`  |
+| OFF_PEAK         | `00:00-06:00` | Buy: `0.10`, Sell: `0.05`  |
+| PARTIAL_PEAK     | `10:00-18:00` | Buy: `0.15`, Sell: `0.08`  |
+| **Time Range 2** |               |                            |
+| Weekdays         | `4,5`         | Thursday, Friday           |
+| PEAK             | `07:00-11:00` | Buy: `0.22`, Sell: `0.11`  |
+| OFF_PEAK         | `00:00-07:00` | Buy: `0.08`, Sell: `0.04`  |
+| PARTIAL_PEAK     | `11:00-17:00` | Buy: `0.14`, Sell: `0.07`  |
+
+##### `--time-periods` (Time of use mode)
+
+```
+CHARGE_FROM-CHARGE_TO-CHARGE_PWR-MAX_SOC|DISCHARGE_FROM-DISCHARGE_TO-DISCHARGE_PWR-MIN_SOC||...
+```
+
+- All values are required
+- Use `||` to separate multiple time periods
+- Power and SOC values must be `0–100`
+
+###### Example
+
+```
+06:00-08:00-50-90|18:00-20:00-40-20
+```
+
+| Field             | Value         | Description               |
+| ----------------- | ------------- | ------------------------- |
+| Charge From–To    | `06:00-08:00` | Charging window           |
+| Charge Power      | `50`          | % power used to charge    |
+| Max SOC           | `90`          | Max state of charge (%)   |
+| Discharge From–To | `18:00-20:00` | Discharging window        |
+| Discharge Power   | `40`          | % power used to discharge |
+| Min SOC           | `20`          | Min state of charge (%)   |
 
 ### Python code
 
@@ -104,6 +189,7 @@ else:
 - `async_get_gateway_network_info()` : Get network information for hybrid-inverters
 - `async_get_energy_storage_registry()`: Get information about the hybrid-inverter
 - `async_get_energy_storage_data()`: Get live data of the hybrid-inverter
+- `async_set_energy_storage_working_mode()`: Set the working mode of the hybrid-inverter
 
 ## Note
 
