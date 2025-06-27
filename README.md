@@ -35,46 +35,43 @@ You can integrate the library into your own project, or simply use it in the com
 ### Command line:
 
 ```
-hoymiles-wifi [-h] --host HOST [--local_addr IP_OF_INTERFACE_TO_USE] [--as-json] <command> [--disable-interactive]
-
-commands:
-    get-real-data-new,
-    get-real-data,
-    get-config,
-    network-info,
-    app-information-data,
-    app-get-hist-power,
-    set-power-limit,
-    set-wifi,
-    firmware-update,
-    restart-dtu,
-    turn-on-inverter,
-    turn-off-inverter,
-    get-information-data,
-    get-version-info,
-    heartbeat,
-    identify-dtu,
-    identify-inverters,
-    identify-meters,
-    get-alarm-list,
-    enable-performance-data-mode,
-    get-gateway-info,
-    get-gateway-network-info,
-    get-energy-storage-registry,
-    get-energy-storage-data,
-    set-energy-storage-working-mode
+hoymiles-wifi --host HOST <command> [additional-arguments]
 ```
 
-## Additional CLI Parameters
+| Command                         | Device Class                           | Description                                                      |
+| ------------------------------- | -------------------------------------- | ---------------------------------------------------------------- |
+| get-real-data-new               | DTU and W-series                       | Retrieve real-time data                                          |
+| get-real-data                   | DTU and W-series                       | Retrieve real-time data                                          |
+| get-config                      | DTU and W-series                       | Retrieve configuration information                               |
+| network-info                    | DTU and W-series                       | Retrieve network information                                     |
+| app-information-data            | DTU and W-series                       | Retrieve application information data                            |
+| app-get-hist-power              | DTU and W-series                       | Retrieve historical power data                                   |
+| set-power-limit                 | DTU and W-series                       | Set the power limit of the inverter (0-100%)                     |
+| set-wifi                        | DTU and W-series                       | Configure the WiFi network                                       |
+| firmware-update                 | DTU and W-series                       | Update to latest firmware                                        |
+| restart-dtu                     | DTU and W-series                       | Restart the DTU                                                  |
+| turn-on-inverter                | DTU and W-series                       | Turn the inverter on                                             |
+| turn-off-inverter               | DTU and W-series                       | Turn the inverter off                                            |
+| get-information-data            | DTU and W-series                       | Retrieve information data                                        |
+| get-version-info                | DTU and W-series                       | Retrieve version information                                     |
+| heartbeat                       | DTU and W-series                       | Request a heartbeat message from the DTU                         |
+| identify-dtu                    | DTU and W-series                       | Identify the DTU                                                 |
+| identify-inverters              | DTU and W-series                       | Identify connected inverters                                     |
+| identify-meters                 | DTU and W-series                       | Identify connected meters                                        |
+| get-alarm-list                  | DTU and W-series                       | Get alarm list from the DTU                                      |
+| enable-performance-data-mode    | DTU and W-series                       | _Experimental_: Enable higher update interval mode (30s or less) |
+| get-gateway-info                | HAT / HYT / HAS / HYS battery inverter | Get gateway information for hybrid-inverters                     |
+| get-gateway-network-info        | HAT / HYT / HAS / HYS battery inverter | Get network information for hybrid-inverters                     |
+| get-energy-storage-registry     | HAT / HYT / HAS / HYS battery inverter | Get information about the hybrid-inverter                        |
+| get-energy-storage-data         | HAT / HYT / HAS / HYS battery inverter | Get live data of the hybrid-inverter                             |
+| set-energy-storage-working-mode | HAT / HYT / HAS / HYS battery inverter | Set the working mode of the hybrid-inverter                      |
+
+### CLI Arguments
 
 The following arguments are available when using the CLI:
 
-### CLI Arguments
-
-### CLI Arguments
-
 | Argument                | Type | Description                                                                                                                             |
-| ----------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------- | --------- | ---- | ----------- |
+| ----------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------- | --------- | ----------- |
 | `--host`                | str  | IP address or hostname of the DTU (required)                                                                                            |
 | `--local_addr`          | str  | IP address of the interface to bind to (optional)                                                                                       |
 | `--as-json`             | flag | Format output as JSON                                                                                                                   |
@@ -85,10 +82,8 @@ The following arguments are available when using the CLI:
 | `--max-power`           | int  | Max (dis)charging power to set (0–100)                                                                                                  |
 | `--peak-soc`            | int  | Peak SOC to set (0–100)                                                                                                                 |
 | `--peak-meter-power`    | int  | Peak meter power to set (0–100)                                                                                                         |
-| `--time-settings`       | str  | Economic mode config: `START-END:WEEKDAYS=DURATION,DURATION,DURATION                                                                    |           | ...` |
-| `--time-periods`        | str  | Time of use config: `CHARGE                                                                                                             | DISCHARGE |      | ...` format |
-
-You can combine these flags to predefine configuration actions such as setting working mode, power limits, and schedules without requiring interactive prompts.
+| `--time-settings`       | str  | Economic mode config: `START-END:WEEKDAYS=DURATION,DURATION,DURATION, ...`                                                              |
+| `--time-periods`        | str  | Time of use config: `CHARGE                                                                                                             | DISCHARGE | ...` format |
 
 ## 🔧 BMS Working Modes & Required Parameters
 
