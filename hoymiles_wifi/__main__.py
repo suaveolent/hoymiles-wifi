@@ -405,18 +405,28 @@ async def async_set_energy_storage_working_mode(
 ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
     """Set the working mode of the energy storage."""
 
-    # Put into release
-    gateway_info = await dtu.async_get_gateway_info()
+    ## DEBUG ONLY
+    registry = ESRegPB_pb2.ESRegReqDTO()
 
-    if gateway_info is None:
-        return None
+    inverter = ESRegPB_pb2.RegInvMO()
+    inverter.serial_number = 1
+    registry.inverters.append(inverter)
 
-    registry = await dtu.async_get_energy_storage_registry(
-        dtu_serial_number=gateway_info.serial_number
-    )
+    gateway_info = GWInfo_pb2.GWInfoReqDTO()
+    gateway_info.serial_number = 1234567890
+    ## Remove in release
 
-    if registry is None or not registry.inverters:
-        return None
+    # gateway_info = await dtu.async_get_gateway_info()
+
+    # if gateway_info is None:
+    #     return None
+
+    # registry = await dtu.async_get_energy_storage_registry(
+    #     dtu_serial_number=gateway_info.serial_number
+    # )
+
+    # if registry is None or not registry.inverters:
+    #     return None
 
     if interactive_mode:
         return await async_set_energy_storage_working_mode_interactive(
@@ -430,13 +440,39 @@ async def async_set_energy_storage_working_mode(
         time_settings = None
         time_periods = None
 
+        if inverter_serial_number is None:
+            print("Error. No inverter serial number provided!")  # noqa: T201
+            return None
+
+        if rev_soc is None:
+            print("Error. No reserve SOC provided!")  # noqa: T201
+            return None
+
         if bms_working_mode == BMSWorkingMode.ECONOMIC:
             time_settings: list[DateBean] = parse_time_settings_input(time_settings_str)
             if not time_settings:
                 print("Error. Invalid time settings!")  # noqa: T201
+                return None
 
             for time_setting in time_settings:
                 pprint(asdict(time_setting))  # noqa: T203
+
+        elif bms_working_mode in (
+            BMSWorkingMode.FORCED_CHARGING,
+            BMSWorkingMode.FORCED_DISCHARGE,
+        ):
+            if max_power is None:
+                print("Error. No max power provided!")  # noqa: T201
+                return None
+
+        elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
+            if peak_soc is None:
+                print("Error. No peak SOC provided!")
+                return None
+
+            if peak_meter_power is None:
+                print("Error. No peak meter power provided!")
+                return None
 
         elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
             time_periods: list[TimePeriodBean] = parse_time_periods_input(
@@ -468,8 +504,11 @@ async def async_set_energy_storage_working_mode_interactive(
 ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
     """Set the working mode of the energy storage."""
 
-    time_settings = None
-    time_periods = None
+    time_settings: list[DateBean] = None
+    time_periods: list[TimePeriodBean] = None
+    max_power: int = None
+    peak_soc: int = None
+    peak_meter_power: int = None
 
     print(  # noqa: T201
         RED
@@ -517,7 +556,7 @@ async def async_set_energy_storage_working_mode_interactive(
         return None
 
     if bms_working_mode == BMSWorkingMode.ECONOMIC:
-        time_settings: list[DateBean] = []
+        time_settings = []
         while True:
             print("Configuring time settings...")  # noqa: T201
 
@@ -574,7 +613,7 @@ async def async_set_energy_storage_working_mode_interactive(
         peak_meter_power = int(input("Enter the peak meter power meter: "))
 
     elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
-        time_periods: list[TimePeriodBean] = []
+        time_periods = []
 
         while True:
             charge_time_from = input("Enter the charge time from (HH:MM): ").strip()
@@ -679,7 +718,7 @@ async def main() -> None:
     parser.add_argument(
         "--power-limit",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Power limit to set (0...100).",
     )
@@ -693,9 +732,16 @@ async def main() -> None:
     )
 
     parser.add_argument(
+        "--inverter-serial-number",
+        type=int,
+        default=None,
+        help="Inverter serial number to set.",
+    )
+
+    parser.add_argument(
         "--rev-soc",
         type=int,
-        default=-1,
+        default=None,
         choices=range(0, 101),
         help="Reserved SOC to set (0...100).",
     )
@@ -811,20 +857,16 @@ async def main() -> None:
         response = await command_func(dtu, **kwargs)
     if args.command == "set-energy-storage-working-mode":
         kwargs = {}
+        kwargs["interactive_mode"] = not args.disable_interactive
         kwargs["bms_working_mode"] = BMSWorkingMode(args.bms_working_mode)
+        kwargs["inverter_serial_number"] = args.inverter_serial_number
         kwargs["rev_soc"] = args.rev_soc
+        kwargs["time_settings_str"] = args.time_settings
         kwargs["max_power"] = args.max_power
         kwargs["peak_soc"] = args.peak_soc
         kwargs["peak_meter_power"] = args.peak_meter_power
-        kwargs["charge_time_from"] = args.charge_time_from
-        kwargs["charge_time_to"] = args.charge_time_to
-        kwargs["discharge_time_from"] = args.discharge_time_from
-        kwargs["discharge_time_to"] = args.discharge_time_to
-        kwargs["charge_power"] = args.charge_power
-        kwargs["discharge_power"] = args.discharge_power
-        kwargs["max_soc"] = args.max_soc
-        kwargs["min_soc"] = args.min_soc
-        kwargs["interactive_mode"] = not args.disable_interactive
+        kwargs["time_periods_str"] = args.time_periods
+
         response = await command_func(dtu, **kwargs)
     else:
         response = await command_func(dtu)

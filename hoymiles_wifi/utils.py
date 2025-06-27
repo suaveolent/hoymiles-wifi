@@ -134,7 +134,7 @@ def prompt_user_for_tariff_details(tariff: TariffType) -> DurationBean:
     return duration_bean
 
 
-def parse_time_settings(time_settings_str: str) -> list[DateBean]:
+def parse_time_settings_input(time_settings_str: str) -> list[DateBean]:
     """Parse the --time-settings CLI input into DateBean objects."""
 
     time_settings = []
@@ -146,7 +146,7 @@ def parse_time_settings(time_settings_str: str) -> list[DateBean]:
 
     try:
         for entry in entries:
-            date_part, rest = entry.split(":")
+            date_part, rest = entry.split(":", 1)
             start_date, end_date = date_part.strip().split("-")
 
             time_ranges = rest.split(";")

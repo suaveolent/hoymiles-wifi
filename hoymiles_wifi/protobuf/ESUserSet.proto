@@ -30,8 +30,8 @@ message EconomicsSetDateMO {
 }
 
 message EconomicsSetWeekMO {
-  int32 in = 8;
-  int32 out = 9;
+  int32 in_price = 8;
+  int32 out_price = 9;
   int32 peak_in = 3;
   int32 peak_out = 4;
   int32 peak_time = 2;

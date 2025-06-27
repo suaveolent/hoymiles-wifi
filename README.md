@@ -76,33 +76,39 @@ The following arguments are available when using the CLI:
 | `--local_addr`          | str  | IP address of the interface to bind to (optional) |
 | `--as-json`             | flag | Format output as JSON                             |
 | `--disable-interactive` | flag | Disables interactive prompts                      |
-| `--power-limit`         | int  | Power limit to set (0–100)                        |
-| `--bms_working_mode`    | int  | BMS mode (1-8)                                    |
-| `--rev-soc`             | int  | Reserved SOC to set (0–100)                       |
-| `--max-power`           | int  | Max (dis)charging power to set (0–100)            |
-| `--peak-soc`            | int  | Peak SOC to set (0–100)                           |
-| `--peak-meter-power`    | int  | Peak meter power to set (0–100)                   |
-| `--time-settings`       | str  | See Economic working mode                         |
-| `--time-periods`        | str  | See Time of Use working mode                      |
 
-## 🔧 BMS Working Modes & Required Parameters
+The following arguments are only available when using the `--disable-interactive` flag:
+
+| Argument                   | Type | Description                            |
+| -------------------------- | ---- | -------------------------------------- |
+| `--power-limit`            | int  | Power limit to set (0–100)             |
+| `--inverter-serial-number` | int  | Inverter serial number                 |
+| `--bms_working_mode`       | int  | BMS mode (1-8)                         |
+| `--rev-soc`                | int  | Reserved SOC to set (0–100)            |
+| `--max-power`              | int  | Max (dis)charging power to set (0–100) |
+| `--peak-soc`               | int  | Peak SOC to set (0–100)                |
+| `--peak-meter-power`       | int  | Peak meter power to set (0–100)        |
+| `--time-settings`          | str  | See Economic working mode              |
+| `--time-periods`           | str  | See Time of Use working mode           |
+
+### 🔧 BMS Working Modes & Required Parameters
 
 For `set-energy-storage-working-mode` different CLI parameters must be provided depending on the selected BMS working mode. Below is an overview:
 
-| Working Mode       | Required Parameters                             |
-| ------------------ | ----------------------------------------------- |
-| `SELF_USE`         | `--rev-soc`                                     |
-| `ECONOMIC`         | `--rev-soc`, `--time-settings`                  |
-| `BACKUP_POWER`     | `--rev-soc`                                     |
-| `PURE_OFF_GRID`    | `--rev-soc`                                     |
-| `FORCED_CHARGING`  | `--rev-soc`, `--max-power`                      |
-| `FORCED_DISCHARGE` | `--rev-soc`, `--max-power`                      |
-| `PEAK_SHAVING`     | `--rev-soc`, `--peak-soc`, `--peak-meter-power` |
-| `TIME_OF_USE`      | `--rev-soc`, `--time-periods`                   |
+| Working Mode              | Required Parameters                                                         |
+| ------------------------- | --------------------------------------------------------------------------- |
+| `Self Consumption Mode=1` | `--inverter-serial-number`, `--rev-soc`                                     |
+| `Economy Mode=2`          | `--inverter-serial-number`, `--rev-soc`, `--time-settings`                  |
+| `Backup Mode=3`           | `--inverter-serial-number`, `--rev-soc`                                     |
+| `Off-Grid Mode=4`         | `--inverter-serial-number`, `--rev-soc`                                     |
+| `Force Charge Mode =5`    | `--inverter-serial-number`, `--rev-soc`, `--max-power`                      |
+| `Force Dischage Mode=6`   | `--inverter-serial-number`, `--rev-soc`, `--max-power`                      |
+| `Peak Shaving Mode=7`     | `--inverter-serial-number`, `--rev-soc`, `--peak-soc`, `--peak-meter-power` |
+| `Time of Use Mode=8`      | `--inverter-serial-number`, `--rev-soc`, `--time-periods`                   |
 
 ---
 
-#### ⏱️ `--time-settings` (Economic working mode)
+#### `--time-settings` (Economic working mode)
 
 ```
 START-END:WEEKDAYS=PEAK_START-PEAK_END-PEAK_IN-PEAK_OUT,OFF_START-OFF_END-OFF_IN-OFF_OUT,PARTIAL_START-PARTIAL_END-PARTIAL_IN-PARTIAL_OUT;WEEKDAYS=...||START-END:...||...
@@ -117,7 +123,7 @@ START-END:WEEKDAYS=PEAK_START-PEAK_END-PEAK_IN-PEAK_OUT,OFF_START-OFF_END-OFF_IN
 - Use `;` to separate **Time Range 1** and **Time Range 2**
 - Use `||` to separate multiple date ranges
 
-#### Example
+##### Example
 
 ```
 01.01-31.03:1,2,3=06:00-10:00-0.20-0.10,00:00-06:00-0.10-0.05,10:00-18:00-0.15-0.08;4,5=07:00-11:00-0.22-0.11,00:00-07:00-0.08-0.04,11:00-17:00-0.14-0.07
@@ -138,7 +144,7 @@ START-END:WEEKDAYS=PEAK_START-PEAK_END-PEAK_IN-PEAK_OUT,OFF_START-OFF_END-OFF_IN
 | OFF_PEAK         | `00:00-07:00` | Buy: `0.08`, Sell: `0.04`  |
 | PARTIAL_PEAK     | `11:00-17:00` | Buy: `0.14`, Sell: `0.07`  |
 
-##### `--time-periods` (Time of use mode)
+#### `--time-periods` (Time of use mode)
 
 ```
 CHARGE_FROM-CHARGE_TO-CHARGE_PWR-MAX_SOC|DISCHARGE_FROM-DISCHARGE_TO-DISCHARGE_PWR-MIN_SOC||...
@@ -148,7 +154,7 @@ CHARGE_FROM-CHARGE_TO-CHARGE_PWR-MAX_SOC|DISCHARGE_FROM-DISCHARGE_TO-DISCHARGE_P
 - Use `||` to separate multiple time periods
 - Power and SOC values must be `0–100`
 
-###### Example
+##### Example
 
 ```
 06:00-08:00-50-90|18:00-20:00-40-20

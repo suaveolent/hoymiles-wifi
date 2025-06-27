@@ -47,7 +47,8 @@ from hoymiles_wifi.hoymiles import (
     DateBean,
     TimePeriodBean,
     convert_inverter_serial_number,
-    encode_time_range,
+    encode_date_time_range,
+    encode_week_range,
 )
 from hoymiles_wifi.protobuf import (
     AppGetHistPower_pb2,
@@ -531,7 +532,34 @@ class DTU:
                 return
             request.max_power = max_power * 10
 
-        if bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
+        if bms_working_mode == BMSWorkingMode.ECONOMIC:
+            for time_setting in time_settings:
+                set_date = ESUserSet_pb2.EconomicsSetDateMO()
+                set_date.dr = encode_date_time_range(
+                    time_setting.start_date, time_setting.end_date, "."
+                )
+
+                if time_setting.time is None or len(time_setting.time) > 3:
+                    logger.error(
+                        "Error. No time settings or too many time settings provided!"
+                    )
+                    return
+
+                for time_bean in time_setting.time:
+                    set_week = ESUserSet_pb2.EconomicsSetWeekMO()
+                    set_week.in_price = -1
+                    set_week.out_price = -1
+                    set_week.peak_in = -1
+                    set_week.peak_out = -1
+                    set_week.peak_time = -1
+                    set_week.valley_in = -1
+                    set_week.valley_out = -1
+                    set_week.valley_time = -1
+                    set_week.wr = encode_week_range(time_bean.week)
+
+                request.date.extend([set_date])
+
+        elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
             if peak_soc is None or peak_meter_power is None:
                 logger.error("Error. Peak SOC or peak meter power!")
                 return
@@ -566,10 +594,10 @@ class DTU:
                     return
 
                 time_of_use = ESUserSet_pb2.TimeOfUseSetMO()
-                time_of_use.chrg_tr = encode_time_range(
+                time_of_use.chrg_tr = encode_date_time_range(
                     time_period.charge_time_from, time_period.charge_time_to, ":"
                 )
-                time_of_use.dischrg_tr = encode_time_range(
+                time_of_use.dischrg_tr = encode_date_time_range(
                     time_period.discharge_time_from, time_period.discharge_time_to, ":"
                 )
                 time_of_use.chrg_pwr = time_period.charge_power
