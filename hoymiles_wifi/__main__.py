@@ -443,9 +443,6 @@ async def async_set_energy_storage_working_mode(
                 print("Error. Invalid time settings!")  # noqa: T201
                 return None
 
-            for time_setting in time_settings:
-                pprint(asdict(time_setting))  # noqa: T203
-
         elif bms_working_mode in (
             BMSWorkingMode.FORCED_CHARGING,
             BMSWorkingMode.FORCED_DISCHARGE,
