@@ -90,7 +90,22 @@ The following arguments are available when using the CLI:
 
 You can combine these flags to predefine configuration actions such as setting working mode, power limits, and schedules without requiring interactive prompts.
 
-For `set-energy-storage-working-mode` there are multiple options depending on the bms_working_mode:
+## 🔧 BMS Working Modes & Required Parameters
+
+For `set-energy-storage-working-mode` different CLI parameters must be provided depending on the selected BMS working mode. Below is an overview:
+
+| Working Mode       | Required Parameters                             |
+| ------------------ | ----------------------------------------------- |
+| `SELF_USE`         | `--rev-soc`                                     |
+| `ECONOMIC`         | `--rev-soc`, `--time-settings`                  |
+| `BACKUP_POWER`     | `--rev-soc`                                     |
+| `PURE_OFF_GRID`    | `--rev-soc`                                     |
+| `FORCED_CHARGING`  | `--rev-soc`, `--max-power`                      |
+| `FORCED_DISCHARGE` | `--rev-soc`, `--max-power`                      |
+| `PEAK_SHAVING`     | `--rev-soc`, `--peak-soc`, `--peak-meter-power` |
+| `TIME_OF_USE`      | `--rev-soc`, `--time-periods`                   |
+
+---
 
 #### ⏱️ `--time-settings` (Economic working mode)
 
