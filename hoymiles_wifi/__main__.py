@@ -364,7 +364,9 @@ async def async_get_energy_storage_registry(dtu: DTU) -> ESRegPB_pb2.ESRegReqDTO
     )
 
 
-async def async_get_energy_storage_data(dtu: DTU) -> ESData_pb2.ESDataReqDTO | None:
+async def async_get_energy_storage_data(
+    dtu: DTU,
+) -> list[ESData_pb2.ESDataReqDTO] | None:
     """Get energy storage registry from the dtu asynchronously."""
 
     gateway_info = await dtu.async_get_gateway_info()
@@ -863,6 +865,12 @@ async def main() -> None:
                 print(MessageToJson(response))  # noqa: T201
             elif isinstance(response, dict):
                 print(json.dumps(response, indent=4))  # noqa: T201
+            elif isinstance(response, list):  # Check if response is a list
+                json_list = [
+                    MessageToJson(item) if isinstance(item, Message) else item
+                    for item in response
+                ]
+                print(json.dumps(json_list, indent=4))  # noqa: T201
             elif is_dataclass(response):
                 print(json.dumps(asdict(response), indent=4))  # noqa: T201
             else:
