@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+message ESUserSetPutReqDTO {
+  int32 err_code = 4;
+  int64 serial_number = 3;
+  int64 tid = 2;
+  int32 time = 1;
+}
+
+message ESUserSetPutResDTO {
+  repeated EconomicsSetDateMO date = 7;
+  repeated HeatpumpSetMO hp = 13;
+  int32 max_power = 6;
+  repeated MidSetMO mid = 12;
+  int32 mode = 4;
+  int32 peak_meterpwr = 10;
+  int32 peak_soc = 9;
+  repeated RelaySetMO relay = 8;
+  int32 rev_soc = 5;
+  repeated int64 serial_number = 3;
+  int64 tid = 2;
+  int32 time = 1;
+  repeated TimeOfUseSetMO tou = 11;
+}
+
+message EconomicsSetDateMO {
+  int32 dr = 1;
+  EconomicsSetWeekMO w1 = 2;
+  EconomicsSetWeekMO w2 = 3;
+}
+
+message EconomicsSetWeekMO {
+  int32 partial_peak_in = 8;
+  int32 partial_peak_out = 9;
+  int32 peak_in = 3;
+  int32 peak_out = 4;
+  int32 peak_time = 2;
+  int32 valley_in = 6;
+  int32 valley_out = 7;
+  int32 valley_time = 5;
+  int32 wr = 1;
+}
+
+message GenExerciseSetMO {
+  int32 duration = 5;
+  int32 freq = 2;
+  int32 mode = 1;
+  int32 sta_time = 4;
+}
+
+message HeatpumpSetMO {
+  int32 consp_pwr = 6;
+  int32 day_runtime = 9;
+  repeated int32 dr = 1;
+  int32 feed_pwr = 5;
+  int32 maxtim_en = 12;
+  int32 min_runtime = 8;
+  int32 mode = 3;
+  int32 soc_en = 7;
+  int32 sta_pwr = 4;
+  int32 sta_soc = 10;
+  int32 stp_soc = 11;
+  repeated int32 wr = 2;
+}
+
+message MidSetMO {
+  repeated RelayCommSetMO commset = 2;
+  repeated RelayGenSetMO genset = 3;
+  int32 mode = 1;
+}
+
+message RelayCommSetMO {
+  RelaySetLoadIntelligentMO intelligent = 4;
+  int32 load_mode = 2;
+  int32 protect_soc = 5;
+  int32 sw = 1;
+  RelaySetLoadTimiMO timi = 3;
+}
+
+message RelayGenSetMO {
+  int32 chrg_time = 4;
+  GenExerciseSetMO exerc_set = 8;
+  int32 mode = 1;
+  int32 quiet_en = 5;
+  int32 quiet_tim1 = 6;
+  int32 quiet_tim2 = 7;
+  int32 sta_cap = 2;
+  int32 stp_cap = 3;
+}
+
+message RelaySetLoadIntelligentMO {
+  int32 min_runtime = 5;
+  int32 rated_pwr = 6;
+  int32 wr1 = 1;
+  int32 wr1_tr = 2;
+  int32 wr2 = 3;
+  int32 wr2_tr = 4;
+}
+
+message RelaySetLoadTimiMO {
+  int32 wr1 = 1;
+  int32 wr1_tr1 = 2;
+  int32 wr1_tr2 = 3;
+  int32 wr2 = 4;
+  int32 wr2_tr1 = 5;
+  int32 wr2_tr2 = 6;
+}
+
+message RelaySetMO {
+  int32 breaker_size = 7;
+  int32 ev_chrg_size = 8;
+  RelayGenSetMO genset = 9;
+  RelaySetLoadIntelligentMO intelligent = 5;
+  int32 load_mode = 3;
+  int32 mode = 1;
+  int32 protect_soc = 6;
+  int32 sw = 2;
+  RelaySetLoadTimiMO timi = 4;
+}
+
+message TimeOfUseSetMO {
+  int32 chrg_pwr = 2;
+  int32 chrg_tr = 1;
+  int32 dischrg_pwr = 4;
+  int32 dischrg_tr = 3;
+  int32 max_soc = 6;
+  int32 min_soc = 5;
+}

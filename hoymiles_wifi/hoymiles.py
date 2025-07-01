@@ -2,6 +2,8 @@
 
 import struct
 from enum import Enum
+from dataclasses import dataclass
+
 
 from hoymiles_wifi import logger
 
@@ -138,6 +140,60 @@ meter_mapping = {
     0x10C0: MeterType.DDSU666,
     0x37FF: MeterType.DTSU666,
 }
+
+
+class BMSWorkingMode(Enum):
+    """BMS working mode."""
+
+    SELF_USE = 1
+    ECONOMIC = 2
+    BACKUP_POWER = 3
+    PURE_OFF_GRID = 4
+    FORCED_CHARGING = 5
+    FORCED_DISCHARGE = 6
+    PEAK_SHAVING = 7
+    TIME_OF_USE = 8
+    UNKNOWN = -1
+
+
+class TariffType(Enum):
+    OFF_PEAK = 1
+    PARTIAL_PEAK = 2
+    PEAK = 3
+
+
+@dataclass
+class DurationBean:
+    start_time: str = None
+    end_time: str = None
+    in_price: float = None
+    out_price: float = None
+    type: TariffType = None
+
+
+@dataclass
+class TimeBean:
+    durations: list[DurationBean] = None
+    week: list[int] = None
+
+
+@dataclass
+class DateBean:
+    end_date: str = None
+    start_date: str = None
+    time: list[TimeBean] = None
+
+
+@dataclass
+class TimePeriodBean:
+    charge_time_from: str = None
+    charge_time_to: str = None
+    discharge_time_from: str = None
+    discharge_time_to: str = None
+    charge_power: int = None
+    discharge_power: int = None
+    max_soc: int = None
+    min_soc: int = None
 
 
 def format_number(number: int) -> str:
@@ -366,3 +422,51 @@ def get_meter_model_name(serial_number: str) -> str:
         return "Unknown"
     else:
         return meter_type.value
+
+
+def encode_date_time_range(
+    from_date_time: str, to_date_time: str, delimiter: str = ":"
+) -> int:
+    def parse_date_time(date_time_str):
+        """Splits the time string and ensures it has two numeric parts."""
+        parts = (date_time_str or "00" + delimiter + "00").split(delimiter)
+        if len(parts) != 2:
+            raise ValueError(f"Invalid date/time format: {date_time_str}")
+        return [int(p) for p in parts]
+
+    # Extract hours/days and minutes/month for both datetimes
+    from_first, from_second = parse_date_time(from_date_time)
+    to_first, to_second = parse_date_time(to_date_time)
+
+    # Encode into a 32-bit integer
+    encoded = (from_first << 24) | (from_second << 16) | (to_first << 8) | to_second
+    return encoded
+
+
+def encode_week_range(week: list[int]):
+    # Use an empty list if the input is None
+    week = week if week is not None else []
+
+    i3 = 0
+    for value in week:
+        if value == 1:
+            i3 |= 1
+        elif value == 2:
+            i3 |= 2
+        elif value == 3:
+            i3 |= 4
+        elif value == 4:
+            i3 |= 8
+        elif value == 5:
+            i3 |= 16
+        elif value == 6:
+            i3 |= 32
+        elif value == 7:
+            i3 |= 64
+
+    return i3
+
+
+def float_to_scaled_int(float_value: float) -> int:
+    """Convert a float value to an integer scaled by 100."""
+    return int((float_value if float_value is not None else 0.0) * 100)

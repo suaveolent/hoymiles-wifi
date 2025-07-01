@@ -27,6 +27,7 @@ from hoymiles_wifi.const import (
     CMD_COMMAND_RES_DTO,
     CMD_ES_DATA_DTO,
     CMD_ES_REG_RES_DTO,
+    CMD_ES_USER_SET_RES_DTO,
     CMD_GET_CONFIG,
     CMD_GW_INFO_RES_DTO,
     CMD_GW_NET_INFO_RES,
@@ -41,7 +42,16 @@ from hoymiles_wifi.const import (
     DTU_PORT,
     OFFSET,
 )
-from hoymiles_wifi.hoymiles import convert_inverter_serial_number
+from hoymiles_wifi.hoymiles import (
+    BMSWorkingMode,
+    DateBean,
+    TariffType,
+    TimePeriodBean,
+    convert_inverter_serial_number,
+    encode_date_time_range,
+    encode_week_range,
+    float_to_scaled_int,
+)
 from hoymiles_wifi.protobuf import (
     AppGetHistPower_pb2,
     APPHeartbeatPB_pb2,
@@ -49,6 +59,7 @@ from hoymiles_wifi.protobuf import (
     CommandPB_pb2,
     ESData_pb2,
     ESRegPB_pb2,
+    ESUserSet_pb2,
     GetConfig_pb2,
     GWInfo_pb2,
     GWNetInfo_pb2,
@@ -474,7 +485,6 @@ class DTU:
     ) -> ESData_pb2.ESDataReqDTO | None:
         """Get energy storage registry."""
 
-        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8"))
         request = ESData_pb2.ESDataResDTO()
         request.time = int(time.time())
         request.time_ymd_hms = (
@@ -490,6 +500,143 @@ class DTU:
             command,
             request,
             ESData_pb2.ESDataReqDTO,
+            is_extended_format=True,
+            dtu_serial_number=dtu_serial_number,
+            number=1,
+        )
+
+    async def async_set_energy_storage_working_mode(
+        self,
+        dtu_serial_number: int,
+        inverter_serial_number: int,
+        bms_working_mode: BMSWorkingMode,
+        rev_soc: int = None,
+        time_settings: list[DateBean] = None,
+        max_power: int = None,
+        peak_soc: int = None,
+        peak_meter_power: int = None,
+        time_periods: list[TimePeriodBean] = None,
+    ) -> ESUserSet_pb2.ESUserSetPutReqDTO | None:
+        """Set energy storage working mode."""
+
+        request = ESUserSet_pb2.ESUserSetPutResDTO()
+        request.time = int(time.time())
+        request.tid = int(time.time())
+        request.serial_number.extend([inverter_serial_number])
+        request.mode = bms_working_mode.value
+
+        if rev_soc is not None:
+            request.rev_soc = rev_soc
+
+        if max_power is not None:
+            if max_power < 0 or max_power > 100:
+                logger.error("Error. Max power! (" + str(max_power) + ")")
+                return
+            request.max_power = max_power * 10
+
+        if bms_working_mode == BMSWorkingMode.ECONOMIC:
+            for time_setting in time_settings:
+                set_date = ESUserSet_pb2.EconomicsSetDateMO()
+                set_date.dr = encode_date_time_range(
+                    time_setting.start_date, time_setting.end_date, "."
+                )
+
+                if time_setting.time is None or len(time_setting.time) != 2:
+                    logger.error(
+                        "Error. No time settings or too many time settings provided!"
+                    )
+                    return
+
+                for idx, time_range in enumerate(time_setting.time):
+                    set_week = ESUserSet_pb2.EconomicsSetWeekMO()
+                    set_week.wr = encode_week_range(time_range.week)
+
+                    for duration in time_range.durations:
+                        if duration.type == TariffType.PEAK:
+                            set_week.peak_in = float_to_scaled_int(duration.in_price)
+                            set_week.peak_out = float_to_scaled_int(duration.out_price)
+                            set_week.peak_time = encode_date_time_range(
+                                duration.start_time, duration.end_time, ":"
+                            )
+                        elif duration.type == TariffType.OFF_PEAK:
+                            set_week.valley_in = float_to_scaled_int(duration.in_price)
+                            set_week.valley_out = float_to_scaled_int(
+                                duration.out_price
+                            )
+                            set_week.valley_time = encode_date_time_range(
+                                duration.start_time, duration.end_time, ":"
+                            )
+                        elif duration.type == TariffType.PARTIAL_PEAK:
+                            set_week.partial_peak_in = float_to_scaled_int(
+                                duration.in_price
+                            )
+                            set_week.partial_peak_out = float_to_scaled_int(
+                                duration.out_price
+                            )
+
+                        if idx == 0:
+                            set_date.w1.CopyFrom(set_week)
+                        elif idx == 1:
+                            set_date.w2.CopyFrom(set_week)
+
+                request.date.extend([set_date])
+
+        elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
+            if peak_soc is None or peak_meter_power is None:
+                logger.error("Error. Peak SOC or peak meter power!")
+                return
+            request.peak_soc = peak_soc
+            request.peak_meterpwr = peak_meter_power
+        elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
+            for time_period in time_periods:
+                if (
+                    time_period.charge_time_from is None
+                    or time_period.charge_time_to is None
+                    or time_period.discharge_time_from is None
+                    or time_period.discharge_time_to is None
+                    or time_period.charge_power is None
+                    or time_period.discharge_power is None
+                    or time_period.max_soc is None
+                    or time_period.min_soc is None
+                ):
+                    logger.error("Error. Check parameters for Time of Use!")
+                    return
+
+                if (
+                    time_period.charge_power < 0
+                    or time_period.charge_power > 100
+                    or time_period.discharge_power < 0
+                    or time_period.discharge_power > 100
+                    or time_period.max_soc < 0
+                    or time_period.max_soc > 100
+                    or time_period.min_soc < 0
+                    or time_period.min_soc > 100
+                ):
+                    logger.error("Error. Check power values for Time of Use!")
+                    return
+
+                time_of_use = ESUserSet_pb2.TimeOfUseSetMO()
+                time_of_use.chrg_tr = encode_date_time_range(
+                    time_period.charge_time_from, time_period.charge_time_to, ":"
+                )
+                time_of_use.dischrg_tr = encode_date_time_range(
+                    time_period.discharge_time_from, time_period.discharge_time_to, ":"
+                )
+                time_of_use.chrg_pwr = time_period.charge_power
+                time_of_use.dischrg_pwr = time_period.discharge_power
+                time_of_use.max_soc = time_period.max_soc
+                time_of_use.min_soc = time_period.min_soc
+
+                request.tou.extend([time_of_use])
+
+        command = CMD_ES_USER_SET_RES_DTO
+
+        logger.debug("Set energy storage working mode: " + str(request))
+
+        return await self.async_send_request(
+            command,
+            request,
+            ESUserSet_pb2.ESUserSetPutReqDTO,
             is_extended_format=True,
             dtu_serial_number=dtu_serial_number,
             number=1,

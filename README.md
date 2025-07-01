@@ -1,6 +1,6 @@
 # hoymiles-wifi
 
-This Python library facilitates communication with Hoymiles DTUs and the HMS-XXXXW-2T HMS microinverters, utilizing protobuf messages.
+This Python library facilitates communication with Hoymiles DTUs, the HMS-XXXXW microinverters, and hybrid inverters, utilizing protobuf messages.
 
 For the Home Assistant integration have a look here:
 https://github.com/suaveolent/ha-hoymiles-wifi
@@ -35,38 +35,139 @@ You can integrate the library into your own project, or simply use it in the com
 ### Command line:
 
 ```
-hoymiles-wifi [-h] --host HOST [--local_addr IP_OF_INTERFACE_TO_USE] [--as-json] <command> [--disable-interactive]
-
-commands:
-    get-real-data-new,
-    get-real-data,
-    get-config,
-    network-info,
-    app-information-data,
-    app-get-hist-power,
-    set-power-limit,
-    set-wifi,
-    firmware-update,
-    restart-dtu,
-    turn-on-inverter,
-    turn-off-inverter,
-    get-information-data,
-    get-version-info,
-    heartbeat,
-    identify-dtu,
-    identify-inverters,
-    identify-meters,
-    get-alarm-list,
-    enable-performance-data-mode,
-    get-gateway-info,
-    get-gateway-network-info,
-    get-energy-storage-registry,
-    get-energy-storage-data
-
-The `--as-json` option is optional and allows formatting the output as JSON.
-The `--disable-interactive` option is optional allows to disable interactive modes (e.g. for setting the power limit).
-For the `set-power-limit` command, you can also use the `--power-limit` parameter to specify the desired power limit. This requires the `--disable-interactive` option to be enabled.
+hoymiles-wifi --host HOST <command> [additional-arguments]
 ```
+
+| Command                         | Device Class                           | Description                                                      |
+| ------------------------------- | -------------------------------------- | ---------------------------------------------------------------- |
+| get-real-data-new               | DTU and W-series                       | Retrieve real-time data                                          |
+| get-real-data                   | DTU and W-series                       | Retrieve real-time data                                          |
+| get-config                      | DTU and W-series                       | Retrieve configuration information                               |
+| network-info                    | DTU and W-series                       | Retrieve network information                                     |
+| app-information-data            | DTU and W-series                       | Retrieve application information data                            |
+| app-get-hist-power              | DTU and W-series                       | Retrieve historical power data                                   |
+| set-power-limit                 | DTU and W-series                       | Set the power limit of the inverter (0-100%)                     |
+| set-wifi                        | DTU and W-series                       | Configure the WiFi network                                       |
+| firmware-update                 | DTU and W-series                       | Update to latest firmware                                        |
+| restart-dtu                     | DTU and W-series                       | Restart the DTU                                                  |
+| turn-on-inverter                | DTU and W-series                       | Turn the inverter on                                             |
+| turn-off-inverter               | DTU and W-series                       | Turn the inverter off                                            |
+| get-information-data            | DTU and W-series                       | Retrieve information data                                        |
+| get-version-info                | DTU and W-series                       | Retrieve version information                                     |
+| heartbeat                       | DTU and W-series                       | Request a heartbeat message from the DTU                         |
+| identify-dtu                    | DTU and W-series                       | Identify the DTU                                                 |
+| identify-inverters              | DTU and W-series                       | Identify connected inverters                                     |
+| identify-meters                 | DTU and W-series                       | Identify connected meters                                        |
+| get-alarm-list                  | DTU and W-series                       | Get alarm list from the DTU                                      |
+| enable-performance-data-mode    | DTU and W-series                       | _Experimental_: Enable higher update interval mode (30s or less) |
+| get-gateway-info                | HAT / HYT / HAS / HYS battery inverter | Get gateway information for hybrid-inverters                     |
+| get-gateway-network-info        | HAT / HYT / HAS / HYS battery inverter | Get network information for hybrid-inverters                     |
+| get-energy-storage-registry     | HAT / HYT / HAS / HYS battery inverter | Get information about the hybrid-inverter                        |
+| get-energy-storage-data         | HAT / HYT / HAS / HYS battery inverter | Get live data of the hybrid-inverter                             |
+| set-energy-storage-working-mode | HAT / HYT / HAS / HYS battery inverter | Set the working mode of the hybrid-inverter                      |
+
+### CLI Arguments
+
+The following arguments are available when using the CLI:
+
+| Argument                | Type | Description                                       |
+| ----------------------- | ---- | ------------------------------------------------- |
+| `--host`                | str  | IP address or hostname of the DTU (required)      |
+| `--local_addr`          | str  | IP address of the interface to bind to (optional) |
+| `--as-json`             | flag | Format output as JSON                             |
+| `--disable-interactive` | flag | Disables interactive prompts                      |
+
+The following arguments are only available when using the `--disable-interactive` flag:
+
+| Argument                   | Type | Description                            |
+| -------------------------- | ---- | -------------------------------------- |
+| `--power-limit`            | int  | Power limit to set (0–100)             |
+| `--inverter-serial-number` | int  | Inverter serial number                 |
+| `--bms_working_mode`       | int  | BMS mode (1-8)                         |
+| `--rev-soc`                | int  | Reserved SOC to set (0–100)            |
+| `--max-power`              | int  | Max (dis)charging power to set (0–100) |
+| `--peak-soc`               | int  | Peak SOC to set (0–100)                |
+| `--peak-meter-power`       | int  | Peak meter power to set (0–100)        |
+| `--time-settings`          | str  | See Economic working mode              |
+| `--time-periods`           | str  | See Time of Use working mode           |
+
+### 🔧 BMS Working Modes & Required Parameters
+
+For `set-energy-storage-working-mode` different CLI parameters must be provided depending on the selected BMS working mode. Below is an overview:
+
+| Working Mode              | Required Parameters                                                         |
+| ------------------------- | --------------------------------------------------------------------------- |
+| `Self Consumption Mode=1` | `--inverter-serial-number`, `--rev-soc`                                     |
+| `Economy Mode=2`          | `--inverter-serial-number`, `--rev-soc`, `--time-settings`                  |
+| `Backup Mode=3`           | `--inverter-serial-number`, `--rev-soc`                                     |
+| `Off-Grid Mode=4`         | `--inverter-serial-number`, `--rev-soc`                                     |
+| `Force Charge Mode =5`    | `--inverter-serial-number`, `--rev-soc`, `--max-power`                      |
+| `Force Dischage Mode=6`   | `--inverter-serial-number`, `--rev-soc`, `--max-power`                      |
+| `Peak Shaving Mode=7`     | `--inverter-serial-number`, `--rev-soc`, `--peak-soc`, `--peak-meter-power` |
+| `Time of Use Mode=8`      | `--inverter-serial-number`, `--rev-soc`, `--time-periods`                   |
+
+---
+
+#### `--time-settings` (Economic working mode)
+
+```
+START-END:WEEKDAYS=PEAK_START-PEAK_END-PEAK_IN-PEAK_OUT,OFF_START-OFF_END-OFF_IN-OFF_OUT,PARTIAL_START-PARTIAL_END-PARTIAL_IN-PARTIAL_OUT;WEEKDAYS=...||START-END:...||...
+```
+
+- `START`, `END`: Date in `DD.MM`
+- For each date range, **exactly two time ranges** must be configured
+- Each time range includes:
+  - `WEEKDAYS`: Comma-separated days (`1=Mon`, ..., `7=Sun`)
+  - 3 tariff blocks: `PEAK`, `OFF_PEAK`, `PARTIAL_PEAK`
+- Each block format: `START-END-IN_PRICE-OUT_PRICE`
+- Use `;` to separate **Time Range 1** and **Time Range 2**
+- Use `||` to separate multiple date ranges
+
+##### Example
+
+```
+01.01-31.03:1,2,3=06:00-10:00-0.20-0.10,00:00-06:00-0.10-0.05,10:00-18:00-0.15-0.08;4,5=07:00-11:00-0.22-0.11,00:00-07:00-0.08-0.04,11:00-17:00-0.14-0.07
+```
+
+| Field            | Value         | Description                |
+| ---------------- | ------------- | -------------------------- |
+| Start Date       | `01.01`       | Start of date range        |
+| End Date         | `31.03`       | End of date range          |
+| **Time Range 1** |               |                            |
+| Weekdays         | `1,2,3`       | Monday, Tuesday, Wednesday |
+| PEAK             | `06:00-10:00` | Buy: `0.20`, Sell: `0.10`  |
+| OFF_PEAK         | `00:00-06:00` | Buy: `0.10`, Sell: `0.05`  |
+| PARTIAL_PEAK     | `10:00-18:00` | Buy: `0.15`, Sell: `0.08`  |
+| **Time Range 2** |               |                            |
+| Weekdays         | `4,5`         | Thursday, Friday           |
+| PEAK             | `07:00-11:00` | Buy: `0.22`, Sell: `0.11`  |
+| OFF_PEAK         | `00:00-07:00` | Buy: `0.08`, Sell: `0.04`  |
+| PARTIAL_PEAK     | `11:00-17:00` | Buy: `0.14`, Sell: `0.07`  |
+
+#### `--time-periods` (Time of use mode)
+
+```
+CHARGE_FROM-CHARGE_TO-CHARGE_PWR-MAX_SOC|DISCHARGE_FROM-DISCHARGE_TO-DISCHARGE_PWR-MIN_SOC||...
+```
+
+- All values are required
+- Use `||` to separate multiple time periods
+- Power and SOC values must be `0–100`
+
+##### Example
+
+```
+06:00-08:00-50-90|18:00-20:00-40-20
+```
+
+| Field             | Value         | Description               |
+| ----------------- | ------------- | ------------------------- |
+| Charge From–To    | `06:00-08:00` | Charging window           |
+| Charge Power      | `50`          | % power used to charge    |
+| Max SOC           | `90`          | Max state of charge (%)   |
+| Discharge From–To | `18:00-20:00` | Discharging window        |
+| Discharge Power   | `40`          | % power used to discharge |
+| Min SOC           | `20`          | Min state of charge (%)   |
 
 ### Python code
 
@@ -104,6 +205,7 @@ else:
 - `async_get_gateway_network_info()` : Get network information for hybrid-inverters
 - `async_get_energy_storage_registry()`: Get information about the hybrid-inverter
 - `async_get_energy_storage_data()`: Get live data of the hybrid-inverter
+- `async_set_energy_storage_working_mode()`: Set the working mode of the hybrid-inverter
 
 ## Note
 
