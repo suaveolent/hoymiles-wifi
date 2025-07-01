@@ -208,17 +208,37 @@ class DTU:
     ) -> AppGetHistPower_pb2.AppGetHistPowerReqDTO | None:
         """Get historical power."""
 
+        combined_response = AppGetHistPower_pb2.AppGetHistPowerReqDTO()
+
         request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
-        request.control_point = 0
+        request.cp = 0
         request.offset = OFFSET
         request.requested_time = int(time.time())
         request.requested_day = 0
         command = CMD_APP_GET_HIST_POWER_RES
-        return await self.async_send_request(
+
+        response = await self.async_send_request(
             command,
             request,
             AppGetHistPower_pb2.AppGetHistPowerReqDTO,
         )
+
+        if response is not None:
+            combined_response.MergeFrom(response)
+
+            # Fetch additional data based on the value of response.ap
+            for cp in range(1, response.ap):
+                request.cp = cp
+
+                additional_response = await self.async_send_request(
+                    command,
+                    request,
+                    AppGetHistPower_pb2.AppGetHistPowerReqDTO,
+                )
+                if additional_response is not None:
+                    combined_response.MergeFrom(additional_response)
+
+        return combined_response if combined_response.ByteSize() > 0 else None
 
     async def async_set_power_limit(
         self,
