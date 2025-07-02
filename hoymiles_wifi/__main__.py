@@ -9,7 +9,7 @@ import sys
 from dataclasses import asdict, dataclass, is_dataclass
 from pprint import pprint
 
-from google.protobuf.json_format import MessageToJson
+from google.protobuf.json_format import MessageToDict, MessageToJson
 from google.protobuf.message import Message
 
 from hoymiles_wifi.const import DTU_FIRMWARE_URL_00_01_11, MAX_POWER_LIMIT
