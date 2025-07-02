@@ -865,9 +865,9 @@ async def main() -> None:
                 print(MessageToJson(response))  # noqa: T201
             elif isinstance(response, dict):
                 print(json.dumps(response, indent=4))  # noqa: T201
-            elif isinstance(response, list):  # Check if response is a list
+            elif isinstance(response, list):
                 json_list = [
-                    MessageToJson(item) if isinstance(item, Message) else item
+                    MessageToDict(item) if isinstance(item, Message) else item
                     for item in response
                 ]
                 print(json.dumps(json_list, indent=4))  # noqa: T201
