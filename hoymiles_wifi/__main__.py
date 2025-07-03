@@ -393,6 +393,35 @@ async def async_get_energy_storage_data(
     return responses
 
 
+async def async_get_energy_storage_working_mode(
+    dtu: DTU,
+) -> list[ESUserSet_pb2.ESUserSetPutResDTO] | None:
+    """Get energy storage working mode from the dtu asynchronously."""
+
+    gateway_info = await dtu.async_get_gateway_info()
+
+    if gateway_info is None:
+        return None
+
+    registry = await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
+
+    if registry is None:
+        return None
+
+    responses = []
+    for inverter in registry.inverters:
+        working_mode = await dtu.async_get_energy_storage_working_mode(
+            dtu_serial_number=gateway_info.serial_number,
+            inverter_serial_number=inverter.serial_number,
+        )
+        if working_mode is not None:
+            responses.append(working_mode)
+
+    return responses
+
+
 async def async_set_energy_storage_working_mode(
     dtu: DTU,
     bms_working_mode: BMSWorkingMode = None,
@@ -800,6 +829,7 @@ async def main() -> None:
             "get-energy-storage-data",
             "get-gateway-info",
             "get-gateway-network-info",
+            "get-energy-storage-working-mode",
             "set-energy-storage-working-mode",
         ],
         help="Command to execute",
@@ -834,6 +864,7 @@ async def main() -> None:
         "get-gateway-network-info": async_get_gateway_network_info,
         "get-energy-storage-registry": async_get_energy_storage_registry,
         "get-energy-storage-data": async_get_energy_storage_data,
+        "get-energy-storage-working-mode": async_get_energy_storage_working_mode,
         "set-energy-storage-working-mode": async_set_energy_storage_working_mode,
     }
 

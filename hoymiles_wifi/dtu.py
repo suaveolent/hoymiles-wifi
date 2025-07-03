@@ -27,7 +27,8 @@ from hoymiles_wifi.const import (
     CMD_COMMAND_RES_DTO,
     CMD_ES_DATA_DTO,
     CMD_ES_REG_RES_DTO,
-    CMD_ES_USER_SET_RES_DTO,
+    CMD_ES_USER_SET_PUT_REQ_DTO,
+    CMD_ES_USER_SET_PUT_RES_DTO,
     CMD_GET_CONFIG,
     CMD_GW_INFO_RES_DTO,
     CMD_GW_NET_INFO_RES,
@@ -525,6 +526,27 @@ class DTU:
             number=1,
         )
 
+    async def async_get_energy_storage_working_mode(
+        self, dtu_serial_number: int, inverter_serial_number: int
+    ) -> ESUserSet_pb2.ESUserSetPutResDTO | None:
+        """Get energy storage working mode."""
+
+        request = ESUserSet_pb2.ESUserSetPutReqDTO()
+        request.time = int(time.time())
+        request.tid = int(time.time())
+        request.serial_number = inverter_serial_number
+
+        command = CMD_ES_USER_SET_PUT_REQ_DTO
+
+        return await self.async_send_request(
+            command,
+            request,
+            ESUserSet_pb2.ESUserSetPutResDTO,
+            is_extended_format=True,
+            dtu_serial_number=dtu_serial_number,
+            number=1,
+        )
+
     async def async_set_energy_storage_working_mode(
         self,
         dtu_serial_number: int,
@@ -649,7 +671,7 @@ class DTU:
 
                 request.tou.extend([time_of_use])
 
-        command = CMD_ES_USER_SET_RES_DTO
+        command = CMD_ES_USER_SET_PUT_RES_DTO
 
         logger.debug("Set energy storage working mode: " + str(request))
 
