@@ -80,6 +80,7 @@ class DTUType(Enum):
     DTU_W100_LITE_S = "DTU-W100/DTU-Lite-S"
     DTU_W_LITE = "DTU-WLite"
     DTU_SLS = "DTU-SLS"
+    DTS_WIFI_G1 = "DTS-WIFI-G1"
 
 
 type_mapping = {
@@ -126,6 +127,7 @@ type_mapping = {
     0x4143: DTUType.DTUBI,
     0x4144: DTUType.DTUBI,
     0xD030: DTUType.DTU_SLS,
+    0x4301: DTUType.DTS_WIFI_G1,
 }
 
 
