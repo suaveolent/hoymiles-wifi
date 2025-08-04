@@ -1,9 +1,8 @@
 """Hoymiles quirks for inverters and DTU."""
 
 import struct
-from enum import Enum
 from dataclasses import dataclass
-
+from enum import Enum
 
 from hoymiles_wifi import logger
 
@@ -159,6 +158,8 @@ class BMSWorkingMode(Enum):
 
 
 class TariffType(Enum):
+    """Tariff type for BMS working mode."""
+
     OFF_PEAK = 1
     PARTIAL_PEAK = 2
     PEAK = 3
@@ -166,6 +167,8 @@ class TariffType(Enum):
 
 @dataclass
 class DurationBean:
+    """Duration bean for BMS working mode."""
+
     start_time: str = None
     end_time: str = None
     in_price: float = None
@@ -175,12 +178,16 @@ class DurationBean:
 
 @dataclass
 class TimeBean:
+    """Time bean for BMS working mode."""
+
     durations: list[DurationBean] = None
     week: list[int] = None
 
 
 @dataclass
 class DateBean:
+    """Date bean for BMS working mode."""
+
     end_date: str = None
     start_date: str = None
     time: list[TimeBean] = None
@@ -188,6 +195,8 @@ class DateBean:
 
 @dataclass
 class TimePeriodBean:
+    """Time period bean for BMS working mode."""
+
     charge_time_from: str = None
     charge_time_to: str = None
     discharge_time_from: str = None
@@ -429,8 +438,10 @@ def get_meter_model_name(serial_number: str) -> str:
 def encode_date_time_range(
     from_date_time: str, to_date_time: str, delimiter: str = ":"
 ) -> int:
+    """Encode date/time range into a 32-bit integer."""
+
     def parse_date_time(date_time_str):
-        """Splits the time string and ensures it has two numeric parts."""
+        """Split the time string and ensures it has two numeric parts."""
         parts = (date_time_str or "00" + delimiter + "00").split(delimiter)
         if len(parts) != 2:
             raise ValueError(f"Invalid date/time format: {date_time_str}")
@@ -445,8 +456,8 @@ def encode_date_time_range(
     return encoded
 
 
-def encode_week_range(week: list[int]):
-    # Use an empty list if the input is None
+def encode_week_range(week: list[int]) -> int:
+    """Encode week range into an integer."""
     week = week if week is not None else []
 
     i3 = 0

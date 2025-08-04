@@ -40,8 +40,10 @@ from hoymiles_wifi.const import (
     DEV_DTU,
     DTU_FIRMWARE_URL_00_01_11,
     DTU_PORT,
+    NOT_ENCRYPTED_COMMANDS,
     OFFSET,
 )
+from hoymiles_wifi.crypt_util import crypt_data
 from hoymiles_wifi.hoymiles import (
     BMSWorkingMode,
     DateBean,
@@ -91,15 +93,23 @@ class NetworkState(Enum):
 class DTU:
     """DTU class."""
 
-    def __init__(self, host: str, local_addr: str = None):
+    def __init__(
+        self,
+        host: str,
+        local_addr: str = None,
+        is_encrypted: bool = False,
+        enc_rand: bytes = b"",
+    ):
         """Initialize DTU class."""
 
-        self.host = host
-        self.local_addr = local_addr
-        self.state = NetworkState.Unknown
-        self.sequence = 0
-        self.mutex = asyncio.Lock()
-        self.last_request_time = 0
+        self.host: str = host
+        self.local_addr: str = local_addr
+        self.state: NetworkState = NetworkState.Unknown
+        self.sequence: int = 0
+        self.mutex: asyncio.Lock = asyncio.Lock()
+        self.last_request_time: int = 0
+        self.is_encrypted: bool = is_encrypted
+        self.enc_rand: bytes = enc_rand
 
     def get_state(self) -> NetworkState:
         """Get DTU state."""
@@ -732,10 +742,29 @@ class DTU:
 
         self.sequence = (self.sequence + 1) & 0xFFFF
 
-        request_as_bytes = request.SerializeToString()
-        crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
-            request_as_bytes
-        )
+        u16_tag = struct.unpack(">H", command)[0]
+
+        if (
+            self.is_encrypted
+            and not is_extended_format
+            and command not in NOT_ENCRYPTED_COMMANDS
+        ):
+            request_as_bytes = crypt_data(
+                encrypt=True,
+                enc_rand=self.enc_rand,
+                u16_tag=u16_tag,
+                u16_seq=self.sequence,
+                input_data=request.SerializeToString(),
+            )
+            crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
+                request_as_bytes[:-16]
+            )
+
+        else:
+            request_as_bytes = request.SerializeToString()
+            crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
+                request_as_bytes
+            )
 
         header = CMD_HEADER + command
         metadata = struct.pack(">HH", self.sequence, crc16)
@@ -744,15 +773,17 @@ class DTU:
             metadata += struct.pack(
                 ">HHQHH", 24 + len(request_as_bytes), 14, serial_number, 0, number
             )
+        elif self.is_encrypted and command not in NOT_ENCRYPTED_COMMANDS:
+            metadata += struct.pack(">H", len(request_as_bytes) - 16 + 10)
         else:
             metadata += struct.pack(">H", len(request_as_bytes) + 10)
 
         message = header + metadata + request_as_bytes
 
-        logger.debug(f"Request header: {header.hex()}")
-        logger.debug(f"Request metadata: {metadata.hex()}")
-        logger.debug(f"Request: {request_as_bytes.hex()}")
-        logger.debug(f"Request message: {message.hex()}")
+        logger.debug(f"[*] Request header: {header.hex()}")
+        logger.debug(f"[*] Request metadata: {metadata.hex()}")
+        logger.debug(f"[*] Request: {request_as_bytes.hex()}")
+        logger.debug(f"[*] Request message: {message.hex()}")
 
         return message
 
@@ -763,27 +794,51 @@ class DTU:
             if len(buffer) < 10:
                 raise ValueError("Buffer is too short for unpacking")
 
+            tag_num = buffer[2:4]
+            u16_tag, u16_seq = struct.unpack(">HH", buffer[2:6])
+
             crc16_target, read_length = struct.unpack(">HH", buffer[6:10])
 
             logger.debug(f"Read length: {read_length}")
 
-            if len(buffer) != read_length:
-                raise ValueError("Buffer is incomplete")
-
-            if is_extended_format:
-                response_as_bytes = buffer[24:read_length]
-            else:
-                response_as_bytes = buffer[10:read_length]
-
-            crc16_response = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
-                response_as_bytes
+            expected_length = (
+                read_length + 16
+                if self.is_encrypted and not is_extended_format
+                else read_length
             )
 
+            if len(buffer) != expected_length and tag_num not in NOT_ENCRYPTED_COMMANDS:
+                raise ValueError(
+                    f"Buffer is incomplete (expected {expected_length}, got {len(buffer)})"
+                )
+
+            if is_extended_format:
+                crc16_response = mkCrcFun(
+                    0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000
+                )(buffer[24:read_length])
+            else:
+                crc16_response = mkCrcFun(
+                    0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000
+                )(buffer[10:read_length])
+
             if crc16_response != crc16_target:
-                logger.debug(
+                logger.error(
                     f"CRC16 mismatch: {hex(crc16_response)} != {hex(crc16_target)}"
                 )
                 raise ValueError("CRC16 mismatch")
+
+            if is_extended_format:
+                logger.debug("Detected extended format!")
+                response_as_bytes = buffer[24:read_length]
+            elif self.is_encrypted and tag_num in NOT_ENCRYPTED_COMMANDS:
+                logger.debug("Detected encrypted format!")
+                ciphertext = buffer[10:expected_length]
+                response_as_bytes = crypt_data(
+                    False, self.enc_rand, u16_tag, u16_seq, ciphertext
+                )
+            else:
+                logger.debug("Detected unencrypted format!")
+                response_as_bytes = buffer[10:read_length]
 
             logger.debug(f"Response: {response_as_bytes.hex()}")
 
