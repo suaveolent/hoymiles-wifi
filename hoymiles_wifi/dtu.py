@@ -803,11 +803,13 @@ class DTU:
 
             expected_length = (
                 read_length + 16
-                if self.is_encrypted and not is_extended_format
+                if self.is_encrypted
+                and tag_num not in NOT_ENCRYPTED_COMMANDS
+                and not is_extended_format
                 else read_length
             )
 
-            if len(buffer) != expected_length and tag_num not in NOT_ENCRYPTED_COMMANDS:
+            if len(buffer) != expected_length:
                 raise ValueError(
                     f"Buffer is incomplete (expected {expected_length}, got {len(buffer)})"
                 )
@@ -830,7 +832,7 @@ class DTU:
             if is_extended_format:
                 logger.debug("Detected extended format!")
                 response_as_bytes = buffer[24:read_length]
-            elif self.is_encrypted and tag_num in NOT_ENCRYPTED_COMMANDS:
+            elif self.is_encrypted and tag_num not in NOT_ENCRYPTED_COMMANDS:
                 logger.debug("Detected encrypted format!")
                 ciphertext = buffer[10:expected_length]
                 response_as_bytes = crypt_data(
