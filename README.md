@@ -60,6 +60,7 @@ hoymiles-wifi --host HOST <command> [additional-arguments]
 | identify-meters                 | DTU and W-series                       | Identify connected meters                                        |
 | get-alarm-list                  | DTU and W-series                       | Get alarm list from the DTU                                      |
 | enable-performance-data-mode    | DTU and W-series                       | _Experimental_: Enable higher update interval mode (30s or less) |
+| is-encrypted                    | DTU and W-series                       | Check if DTU uses encryption and retrieve encryption data        |
 | get-gateway-info                | HAT / HYT / HAS / HYS battery inverter | Get gateway information for hybrid-inverters                     |
 | get-gateway-network-info        | HAT / HYT / HAS / HYS battery inverter | Get network information for hybrid-inverters                     |
 | get-energy-storage-registry     | HAT / HYT / HAS / HYS battery inverter | Get information about the hybrid-inverter                        |
@@ -76,6 +77,7 @@ The following arguments are available when using the CLI:
 | `--local_addr`          | str  | IP address of the interface to bind to (optional) |
 | `--as-json`             | flag | Format output as JSON                             |
 | `--disable-interactive` | flag | Disables interactive prompts                      |
+| `--enc-rand`            | str  | Set inverter specific encryption data             |
 
 The following arguments are only available when using the `--disable-interactive` flag:
 
