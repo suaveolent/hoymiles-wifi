@@ -23,6 +23,11 @@ message APPDtuInfoMO {
   int32 sub1g_rp = 20;                   // Sub1G RP
   int32 sub1g_channel_total = 21;        // Sub1G channel total
   string gprs_imei = 22;                 // GPRS IMEI
+  int32 dtu_swb_time = 23;
+  int64 dfs = 24;
+  repeated int64 shls = 25;
+  int32 type = 26;
+  bytes enc_rand = 27;
 }
 
 message APPMeterInfoMO {

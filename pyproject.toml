@@ -4,17 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hoymiles-wifi"
-version = "0.4.1"
+version = "0.5.0"
 description = "Library to communicate with Hoymiles DTUs and HMS WiFi enabled microinverters via protobuf."
 requires-python = ">=3.7"
 authors = [{ name = "suaveolent" }]
+license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["protobuf>=5.29.3", "crcmod"]
+dependencies = ["protobuf>=5.29.3", "crcmod>=1.7", "cryptography>=39.0.1"]
 
 [project.scripts]
 hoymiles-wifi = "hoymiles_wifi.__main__:run_main"

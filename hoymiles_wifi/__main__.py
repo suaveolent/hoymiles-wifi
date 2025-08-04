@@ -12,7 +12,11 @@ from pprint import pprint
 from google.protobuf.json_format import MessageToDict, MessageToJson
 from google.protobuf.message import Message
 
-from hoymiles_wifi.const import DTU_FIRMWARE_URL_00_01_11, MAX_POWER_LIMIT
+from hoymiles_wifi.const import (
+    DTU_FIRMWARE_URL_00_01_11,
+    IS_ENCRYPTED_BIT_INDEX,
+    MAX_POWER_LIMIT,
+)
 from hoymiles_wifi.dtu import DTU
 from hoymiles_wifi.hoymiles import (
     BMSWorkingMode,
@@ -455,11 +459,11 @@ async def async_set_energy_storage_working_mode(
 
         elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
             if peak_soc is None:
-                print("Error. No peak SOC provided!")
+                print("Error. No peak SOC provided!")  # noqa: T201
                 return None
 
             if peak_meter_power is None:
-                print("Error. No peak meter power provided!")
+                print("Error. No peak meter power provided!")  # noqa: T201
                 return None
 
         elif bms_working_mode == BMSWorkingMode.TIME_OF_USE:
@@ -583,13 +587,13 @@ async def async_set_energy_storage_working_mode_interactive(
     elif bms_working_mode == BMSWorkingMode.FORCED_CHARGING:
         max_power = int(input("Enter the max charging power to set (0-100): "))
         if max_power < 0 or max_power > 100:
-            print("Error. Invalid charging power!")
+            print("Error. Invalid charging power!")  # noqa: T201
             return None
 
     elif bms_working_mode == BMSWorkingMode.FORCED_DISCHARGE:
         max_power = int(input("Enter the min discharge power to set (0-100): "))
         if max_power < 0 or max_power > 100:
-            print("Error. Invalid discharge power!")
+            print("Error. Invalid discharge power!")  # noqa: T201
             return None
 
     elif bms_working_mode == BMSWorkingMode.PEAK_SHAVING:
@@ -610,7 +614,7 @@ async def async_set_energy_storage_working_mode_interactive(
             charge_power = int(input("Enter the charge power to set (0-100): "))
 
             if charge_power < 0 or charge_power > 100:
-                print("Error. Invalid charge power!")
+                print("Error. Invalid charge power!")  # noqa: T201
                 return None
 
             max_soc = int(input("Enter the max SOC to set (0-100): "))
@@ -669,6 +673,24 @@ async def async_set_energy_storage_working_mode_interactive(
         peak_meter_power=peak_meter_power,
         time_periods=time_periods,
     )
+
+
+async def async_is_encrypted(dtu: DTU):
+    """Check if the DTU is using encrypted communication."""
+
+    app_information_data = await dtu.async_app_information_data()
+
+    is_encrypted_info = {}
+
+    if app_information_data and app_information_data.dtu_info.dfs:
+        if (app_information_data.dtu_info.dfs >> IS_ENCRYPTED_BIT_INDEX) & 1:
+            is_encrypted_info["is_encrypted"] = True
+            is_encrypted_info["enc_rand"] = app_information_data.dtu_info.enc_rand.hex()
+
+    else:
+        is_encrypted_info["is_encrypted"] = False
+
+    return is_encrypted_info
 
 
 def print_invalid_command(command: str) -> None:
@@ -773,6 +795,13 @@ async def main() -> None:
     )
 
     parser.add_argument(
+        "--enc-rand",
+        type=str,
+        required=False,
+        help="The inverter specific random string used for encryption, see command: is-encrypted",
+    )
+
+    parser.add_argument(
         "command",
         type=str,
         choices=[
@@ -801,12 +830,22 @@ async def main() -> None:
             "get-gateway-info",
             "get-gateway-network-info",
             "set-energy-storage-working-mode",
+            "is-encrypted",
         ],
         help="Command to execute",
     )
+
     args = parser.parse_args()
 
-    dtu = DTU(args.host, args.local_addr)
+    if args.enc_rand:
+        dtu = DTU(
+            args.host,
+            args.local_addr,
+            is_encrypted=True,
+            enc_rand=bytes.fromhex(args.enc_rand),
+        )
+    else:
+        dtu = DTU(args.host, args.local_addr)
 
     # Execute the specified command using a switch case
     switch = {
@@ -835,6 +874,7 @@ async def main() -> None:
         "get-energy-storage-registry": async_get_energy_storage_registry,
         "get-energy-storage-data": async_get_energy_storage_data,
         "set-energy-storage-working-mode": async_set_energy_storage_working_mode,
+        "is-encrypted": async_is_encrypted,
     }
 
     command_func = switch.get(args.command, print_invalid_command)
