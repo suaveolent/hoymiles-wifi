@@ -1,6 +1,6 @@
 # hoymiles-wifi
 
-This Python library facilitates communication with Hoymiles DTUs, the HMS-XXXXW microinverters, and hybrid inverters, utilizing protobuf messages.
+This Python library enables local communication with Hoymiles DTUs, HMS-XXXXW microinverters, and hybrid inverters using protobuf messages.
 
 For the Home Assistant integration have a look here:
 https://github.com/suaveolent/ha-hoymiles-wifi
