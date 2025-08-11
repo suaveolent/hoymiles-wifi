@@ -33,6 +33,11 @@ $ pip install hoymiles-wifi
 
 You can integrate the library into your own project, or simply use it in the command line.
 
+## Warning
+
+> [!CAUTION]
+> Please refrain from using the power limitation feature for zero feed-in, as it may lead to damaging the inverter due to excessive writes to the EEPROM.
+
 ### Command line:
 
 ```
