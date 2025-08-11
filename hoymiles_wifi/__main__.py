@@ -883,7 +883,7 @@ async def main() -> None:
         kwargs["power_limit"] = args.power_limit
         kwargs["interactive_mode"] = not args.disable_interactive
         response = await command_func(dtu, **kwargs)
-    if args.command == "set-energy-storage-working-mode":
+    elif args.command == "set-energy-storage-working-mode":
         kwargs = {}
         kwargs["interactive_mode"] = not args.disable_interactive
         kwargs["bms_working_mode"] = BMSWorkingMode(args.bms_working_mode)
