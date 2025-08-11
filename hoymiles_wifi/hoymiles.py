@@ -5,6 +5,9 @@ from dataclasses import dataclass
 from enum import Enum
 
 from hoymiles_wifi import logger
+from hoymiles_wifi.const import (
+    IS_ENCRYPTED_BIT_INDEX,
+)
 
 
 class InverterType(Enum):
@@ -483,3 +486,8 @@ def encode_week_range(week: list[int]) -> int:
 def float_to_scaled_int(float_value: float) -> int:
     """Convert a float value to an integer scaled by 100."""
     return int((float_value if float_value is not None else 0.0) * 100)
+
+
+def is_encrypted_dtu(dfs: int) -> bool:
+    """Check if the DTU is encrypted."""
+    return (dfs >> IS_ENCRYPTED_BIT_INDEX) & 1
