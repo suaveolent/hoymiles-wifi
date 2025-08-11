@@ -14,7 +14,6 @@ from google.protobuf.message import Message
 
 from hoymiles_wifi.const import (
     DTU_FIRMWARE_URL_00_01_11,
-    IS_ENCRYPTED_BIT_INDEX,
     MAX_POWER_LIMIT,
 )
 from hoymiles_wifi.dtu import DTU
@@ -29,6 +28,7 @@ from hoymiles_wifi.hoymiles import (
     get_dtu_model_name,
     get_inverter_model_name,
     get_meter_model_name,
+    is_encrypted_dtu,
 )
 from hoymiles_wifi.protobuf import (
     AppGetHistPower_pb2,
@@ -683,7 +683,7 @@ async def async_is_encrypted(dtu: DTU):
     is_encrypted_info = {}
 
     if app_information_data and app_information_data.dtu_info.dfs:
-        if (app_information_data.dtu_info.dfs >> IS_ENCRYPTED_BIT_INDEX) & 1:
+        if is_encrypted_dtu(app_information_data.dtu_info.dfs):
             is_encrypted_info["is_encrypted"] = True
             is_encrypted_info["enc_rand"] = app_information_data.dtu_info.enc_rand.hex()
 
