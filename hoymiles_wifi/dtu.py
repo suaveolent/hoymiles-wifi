@@ -234,6 +234,9 @@ class DTU:
         )
 
         if response is not None:
+            # Save initial absolute_start and other relevant props
+            initial_absolute_start = response.absolute_start
+
             combined_response.MergeFrom(response)
 
             # Fetch additional data based on the value of response.ap
@@ -247,6 +250,9 @@ class DTU:
                 )
                 if additional_response is not None:
                     combined_response.MergeFrom(additional_response)
+
+            # Restore the initial values after merging
+            combined_response.absolute_start = initial_absolute_start
 
         return combined_response if combined_response.ByteSize() > 0 else None
 
