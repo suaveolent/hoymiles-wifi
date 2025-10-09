@@ -96,7 +96,7 @@ The following arguments are only available when using the `--disable-interactive
 | `--rev-soc`                | int  | Reserved SOC to set (0–100)            |
 | `--max-power`              | int  | Max (dis)charging power to set (0–100) |
 | `--peak-soc`               | int  | Peak SOC to set (0–100)                |
-| `--peak-meter-power`       | int  | Peak meter power to set (0–100)        |
+| `--peak-meter-power`       | int  | Peak meter power (in W) to set         |
 | `--time-settings`          | str  | See Economic working mode              |
 | `--time-periods`           | str  | See Time of Use working mode           |
 

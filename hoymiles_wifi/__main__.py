@@ -776,8 +776,7 @@ async def main() -> None:
         "--peak-meter-power",
         type=int,
         default=None,
-        choices=range(0, 101),
-        help="Peak meter power to set (0...100).",
+        help="Peak meter power (in W) to set.",
     )
 
     parser.add_argument(
