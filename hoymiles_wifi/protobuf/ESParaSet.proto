@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+// Top-level message
+message ESParaSetBO {
+  ParaEmsMO emspara = 1;
+  ParaRelaySetMO relay = 2;
+  ParaMidSetMO midrelay = 3;
+  ParaGenSetMO genset = 4;
+  ParaHpSetMO hp = 5;
+}
+
+/* ---------------------- EMS / ECO related ---------------------- */
+
+message EmsParRevSocMO {
+  int32 rev_soc = 1;
+}
+
+message EmsParChgDchgMO {
+  int32 rev_soc = 1;
+  int32 max_p = 2;
+}
+
+message EcoSetWeekMO {
+  int32 wr = 1;
+  int32 peak_time = 2;
+  int32 vale_time = 3;
+  int32 peak_in = 4;
+  int32 peak_out = 5;
+  int32 vale_in = 6;
+  int32 vale_out = 7;
+  int32 in = 8;
+  int32 out = 9;
+}
+
+message EcoSetTimMO {
+  int32 dr = 1;
+  EcoSetWeekMO w1 = 2;
+  EcoSetWeekMO w2 = 3;
+}
+
+message EmsParEcoSetMO {
+  int32 rev_soc = 1;
+  repeated EcoSetTimMO ts = 2;
+}
+
+message EmsParPeakCutMO {
+  int32 peakrev_soc = 1;
+  int32 peak_meterp = 2;
+}
+
+message TimeOfSetMO {
+  int32 chg_tr = 1;
+  int32 chg_p = 2;
+  int32 dchg_tr = 3;
+  int32 dchg_p = 4;
+  int32 min_soc = 5;
+  int32 max_soc = 6;
+}
+
+message EmsParUseTiSetMO {
+  int32 rev_soc = 1;
+  repeated TimeOfSetMO trs = 2;
+}
+
+message EmsParRevSocMO_Simple {
+  // duplicate of EmsParRevSocMO kept for clarity if needed
+  int32 rev_soc = 1;
+}
+
+message ParaEmsMO {
+  int32 mode = 1;
+  EmsParRevSocMO selfu = 2;
+  EmsParEcoSetMO date = 3;
+  EmsParRevSocMO back = 4;
+  EmsParChgDchgMO chrg_m = 5;
+  EmsParChgDchgMO dchg_m = 6;
+  EmsParPeakCutMO peakcut = 7;
+  EmsParUseTiSetMO tou = 8;
+}
+
+/* ---------------------- Generator related ---------------------- */
+
+message GenExeSetMO {
+  int32 freq = 1;
+  int32 w = 2;
+  int32 sta_ti = 3;
+  int32 durti = 4;
+}
+
+message GenRunSetMO {
+  int32 sta_cap = 1;
+  int32 stp_cap = 2;
+  int32 quiet_en = 3;
+  int32 quiet_ti1 = 4;
+  int32 quiet_ti2 = 5;
+}
+
+message ParaGenSetMO {
+  int32 rmode = 1;
+  GenRunSetMO run_set = 2;
+  int32 exemode = 3;
+  GenExeSetMO exe_set = 4;
+  int32 chg_ti = 5;
+}
+
+/* ---------------------- HP (heat pump?) related ---------------------- */
+
+message HpTiSetMO {
+  int32 dr = 1;
+  int32 wr = 2;
+}
+
+message ParaHpSetMO {
+  int32 mode = 1;
+  int32 sta_p = 2;
+  int32 feed_p = 3;
+  int32 consp_p = 4;
+  int32 soc_en = 5;
+  int32 min_rti = 6;
+  int32 day_rti = 7;
+  int32 sta_soc = 8;
+  int32 stp_soc = 9;
+  int32 maxti_en = 10;
+  repeated HpTiSetMO hp_tim = 11;
+}
+
+/* ---------------------- Local control / relay / mid-level ---------------------- */
+
+message LCtrlAcChgMO {
+  int32 air_i = 1;
+  int32 evchrg_i = 2;
+}
+
+message LCtrlAiMO {
+  int32 wr1 = 1;
+  int32 wr1_tr = 2;
+  int32 wr2 = 3;
+  int32 wr2_tr = 4;
+  int32 min_rti = 5;
+  int32 rated_p = 6;
+}
+
+message LCtrlManualMO {
+  int32 sw = 1;
+}
+
+message LCtrlOffNetMO {
+  int32 ptect_soc = 1;
+}
+
+message LCtrlTiMO {
+  int32 wr1 = 1;
+  int32 wr1_tr1 = 2;
+  int32 wr1_tr2 = 3;
+  int32 wr2 = 4;
+  int32 wr2_tr1 = 5;
+  int32 wr2_tr2 = 6;
+}
+
+message MidLSetMO {
+  int32 l_mode = 1;
+  LCtrlManualMO sw = 2;
+  LCtrlTiMO ti = 3;
+  LCtrlAiMO ai = 4;
+  LCtrlOffNetMO offnet = 5;
+}
+
+message ParaMidSetMO {
+  int32 mode = 1;
+  repeated MidLSetMO comset = 2;
+}
+
+/* ---------------------- Relay / LCtrl aggregate ---------------------- */
+
+message RelayParLCtrlMO {
+  int32 load_mode = 1;
+  LCtrlManualMO sw = 2;
+  LCtrlTiMO timi = 3;
+  LCtrlAiMO ai = 4;
+  LCtrlOffNetMO offnet = 5;
+  LCtrlAcChgMO acch = 6;
+  ParaHpSetMO hp = 7;
+}
+
+message ParaRelaySetMO {
+  int32 mode = 1;
+  RelayParLCtrlMO lctrl = 2;
+  ParaGenSetMO genset = 3;
+}

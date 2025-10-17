@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+message CommDevCfgFetchReqDTO {
+  // Field numbers and inferred types
+  int32 time = 1;
+  int64 tid = 2;
+  int32 rid = 3;
+  bytes data = 4;
+  int32 crc = 5;
+  int64 sn = 6;
+  int32 ap = 7;
+  int32 cp = 8;
+  int32 type = 9;
+  int32 s_addr = 10;
+  int32 data_type = 11;
+}
+
+message CommDevCfgFetchResDTO {
+  int32 time = 1;
+  int64 tid = 2;
+  int64 sn = 3;
+  int32 cp = 4;
+  int32 type = 5;
+  int32 data_type = 6;
+}
+
+message CommDevCfgPutReqDTO {
+  int32 time = 1;
+  int64 tid = 2;
+  int64 sn = 3;
+  int32 status = 4;
+  int32 cp = 5;
+}
+
+message CommDevCfgPutResDTO {
+  int32 time = 1;
+  int64 tid = 2;
+  int32 rid = 3;
+  bytes data = 4;
+  int32 crc = 5;
+  int64 sn = 6;
+  int32 ap = 7;
+  int32 cp = 8;
+  int32 type = 9;
+  int32 s_addr = 10;
+  int32 data_type = 11;
+}
+
+message CommDevCfgReportReqDTO {
+  int32 time = 1;
+  int64 tid = 2;
+  int32 rid = 3;
+  bytes data = 4;
+  int32 crc = 5;
+  int64 sn = 6;
+  int32 ap = 7;
+  int32 cp = 8;
+  int32 type = 9;
+  int32 s_addr = 10;
+  int32 data_type = 11;
+}
+
+message CommDevCfgReportResDTO {
+  int64 sn = 1;
+  int64 tid = 2;
+  int32 cp = 3;
+  int32 time = 4;
+}
