@@ -96,6 +96,7 @@ class DTU:
     def __init__(
         self,
         host: str,
+        timeout : int,
         local_addr: str = None,
         is_encrypted: bool = False,
         enc_rand: bytes = b"",
@@ -110,6 +111,7 @@ class DTU:
         self.last_request_time: int = 0
         self.is_encrypted: bool = is_encrypted
         self.enc_rand: bytes = enc_rand
+        self.timeout : int = 5
 
     def get_state(self) -> NetworkState:
         """Get DTU state."""
@@ -713,13 +715,13 @@ class DTU:
                         port=dtu_port,
                         local_addr=ip_to_bind,
                     ),
-                    timeout=5,
+                    timeout=self.timeout,
                 )
 
                 writer.write(message)
                 await writer.drain()
 
-                buffer = await asyncio.wait_for(reader.read(1024), timeout=5)
+                buffer = await asyncio.wait_for(reader.read(1024), timeout=self.timeout)
             except (OSError, asyncio.TimeoutError) as e:
                 logger.debug(f"{e}")
                 self.set_state(NetworkState.Offline)
