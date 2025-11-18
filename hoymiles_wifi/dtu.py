@@ -96,10 +96,10 @@ class DTU:
     def __init__(
         self,
         host: str,
-        timeout : int,
         local_addr: str = None,
         is_encrypted: bool = False,
         enc_rand: bytes = b"",
+        timeout : int = 5,
     ):
         """Initialize DTU class."""
 
@@ -111,7 +111,7 @@ class DTU:
         self.last_request_time: int = 0
         self.is_encrypted: bool = is_encrypted
         self.enc_rand: bytes = enc_rand
-        self.timeout : int = 5
+        self.timeout : int = timeout
 
     def get_state(self) -> NetworkState:
         """Get DTU state."""
