@@ -35,6 +35,7 @@ class InverterPower(Enum):
     P_250 = "250"
     P_300_350_400 = "300/350/400"
     P_400 = "400"
+    P_450 = "450"
     P_400W_500W = "400W/500W"
     P_500 = "500"
     P_600_700_800 = "600/700/800"
@@ -63,6 +64,7 @@ power_mapping = {
     0x1061: InverterPower.P_1200_1500,
     0x1161: InverterPower.P_1000_1200_1500,
     0x1164: InverterPower.P_1600_1800_2000,
+    0x1400: InverterPower.P_450,
     0x1412: InverterPower.P_800W_1000W,
     0x1382: InverterPower.P_2250,
     0x2821: InverterPower.P_1000,
@@ -298,7 +300,7 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
     elif serial_bytes[0] == 0x13:
         inverter_type = InverterType.SIX
     elif serial_bytes[0] == 0x14:
-        if serial_bytes[1] in [0x03]:
+        if serial_bytes[1] in [0x00, 0x03]:
             inverter_type = InverterType.ONE
         if serial_bytes[1] in [0x10, 0x12]:
             inverter_type = InverterType.TWO
