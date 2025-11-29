@@ -801,6 +801,13 @@ async def main() -> None:
     )
 
     parser.add_argument(
+        "--timeout",
+        type=int,
+        default=None,
+        help="Custom timeout"
+    )
+
+    parser.add_argument(
         "command",
         type=str,
         choices=[
@@ -845,6 +852,9 @@ async def main() -> None:
         )
     else:
         dtu = DTU(args.host, args.local_addr)
+
+    if args.timeout:
+        dtu.timeout = args.timeout
 
     # Execute the specified command using a switch case
     switch = {

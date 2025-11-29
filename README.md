@@ -85,6 +85,8 @@ The following arguments are available when using the CLI:
 | `--as-json`             | flag | Format output as JSON                             |
 | `--disable-interactive` | flag | Disables interactive prompts                      |
 | `--enc-rand`            | str  | Set inverter specific encryption data             |
+| `--timeout`             | int  | Set custom timeout in seconds                     |
+
 
 The following arguments are only available when using the `--disable-interactive` flag:
 
