@@ -37,6 +37,7 @@ from hoymiles_wifi.const import (
     CMD_REAL_DATA_RES_DTO,
     CMD_REAL_RES_DTO,
     CMD_SET_CONFIG,
+    DEFAULT_TIMEOUT,
     DEV_DTU,
     DTU_FIRMWARE_URL_00_01_11,
     DTU_PORT,
@@ -99,7 +100,7 @@ class DTU:
         local_addr: str = None,
         is_encrypted: bool = False,
         enc_rand: bytes = b"",
-        timeout : int = 5,
+        timeout: int = DEFAULT_TIMEOUT,
     ):
         """Initialize DTU class."""
 
@@ -111,7 +112,7 @@ class DTU:
         self.last_request_time: int = 0
         self.is_encrypted: bool = is_encrypted
         self.enc_rand: bytes = enc_rand
-        self.timeout : int = timeout
+        self.timeout: int = timeout
 
     def get_state(self) -> NetworkState:
         """Get DTU state."""

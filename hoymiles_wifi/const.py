@@ -2,6 +2,9 @@
 
 DTU_PORT = 10081
 
+DEFAULT_TIMEOUT = 10
+
+
 # App -> DTU start with 0xa3, responses start 0xa2
 CMD_HEADER = b"HM"
 CMD_APP_INFO_DATA_REQ_DTO = b"\xa2\x01"
