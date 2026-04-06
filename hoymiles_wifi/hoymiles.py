@@ -65,6 +65,7 @@ power_mapping = {
     0x1161: InverterPower.P_1000_1200_1500,
     0x1164: InverterPower.P_1600_1800_2000,
     0x1400: InverterPower.P_450,
+    0x1410: InverterPower.P_1000,
     0x1412: InverterPower.P_800W_1000W,
     0x1382: InverterPower.P_2250,
     0x2821: InverterPower.P_1000,
