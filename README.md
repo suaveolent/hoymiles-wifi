@@ -103,6 +103,37 @@ The following arguments are only available when using the `--disable-interactive
 | `--time-settings`          | str  | See Economic working mode              |
 | `--time-periods`           | str  | See Time of Use working mode           |
 
+### Encryption (enc_rand)
+
+Some DTUs enforce encrypted communication. This is notably the case for devices running firmware v01.x, where encryption is mandatory. On older firmware (v00.x), data could be retrieved without encryption; firmware v01.x enables encryption, so `enc_rand` must be supplied.
+
+> [!NOTE]
+> Whether a DTU uses encryption is determined by a flag in the DTU's application information data. The `--enc-rand` argument is only required when the DTU reports as encrypted.
+
+To obtain the `enc_rand` value, use the `is-encrypted` command:
+
+```bash
+hoymiles-wifi --host HOST is-encrypted
+```
+
+Example output (with `--as-json`):
+
+```json
+{
+  "is_encrypted": true,
+  "enc_rand": "00112233445566778899aabbccddeeff"
+}
+```
+
+Then pass the retrieved value via `--enc-rand` when running any command:
+
+```bash
+hoymiles-wifi --host HOST --enc-rand 00112233445566778899aabbccddeeff get-real-data-new
+```
+
+> [!NOTE]
+> The `enc_rand` value is device-specific. If the DTU is re-paired or reset, re-run `is-encrypted` to fetch the new value.
+
 ### 🔧 BMS Working Modes & Required Parameters
 
 For `set-energy-storage-working-mode` different CLI parameters must be provided depending on the selected BMS working mode. Below is an overview:
