@@ -27,8 +27,53 @@ The library was successfully tested with:
 
 ## Installation
 
+### Quick install (system-wide or existing environment)
+
+```bash
+pip install hoymiles-wifi
 ```
-$ pip install hoymiles-wifi
+
+### Isolated install with a virtual environment (recommended)
+
+A virtual environment keeps the library and its dependencies isolated from your
+system Python and other projects. Works on Linux, macOS, and Windows.
+
+**Linux / macOS**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install hoymiles-wifi
+```
+
+**Windows (PowerShell)**
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install hoymiles-wifi
+```
+
+**Windows (Command Prompt)**
+
+```cmd
+python -m venv .venv
+.\.venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+pip install hoymiles-wifi
+```
+
+After activation, the `hoymiles-wifi` command is available inside the venv.
+To leave the environment, run `deactivate`.
+
+**Editable install from a cloned source tree** (for development):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .\.venv\Scripts\Activate.ps1
+pip install -e .
 ```
 
 ## Usage
