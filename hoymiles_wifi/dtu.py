@@ -101,6 +101,7 @@ class DTU:
         is_encrypted: bool = False,
         enc_rand: bytes = b"",
         timeout: int = DEFAULT_TIMEOUT,
+        dtu_time_offset: int = 0,
     ):
         """Initialize DTU class."""
 
@@ -113,6 +114,7 @@ class DTU:
         self.is_encrypted: bool = is_encrypted
         self.enc_rand: bytes = enc_rand
         self.timeout: int = timeout
+        self.dtu_time_offset: int = dtu_time_offset
 
     def get_state(self) -> NetworkState:
         """Get DTU state."""
@@ -126,6 +128,10 @@ class DTU:
             self.state = new_state
             logger.debug(f"DTU is {new_state}")
 
+    def _request_time(self) -> int:
+        """Return the host time adjusted to the DTU clock."""
+        return int(time.time()) + self.dtu_time_offset
+
     async def async_get_real_data(self) -> RealData_pb2.RealDataReqDTO | None:
         """Get real data."""
 
@@ -133,7 +139,7 @@ class DTU:
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.offset = OFFSET
         request.error_code = 0
 
@@ -152,7 +158,7 @@ class DTU:
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
         request.offset = OFFSET
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.cp = 0
         command = CMD_REAL_RES_DTO
 
@@ -168,6 +174,7 @@ class DTU:
             # Fetch additional data based on the value of response.ap
             for cp in range(1, response.ap):
                 request.cp = cp
+                request.time = self._request_time()
 
                 additional_response = await self.async_send_request(
                     command, request, RealDataNew_pb2.RealDataNewReqDTO
@@ -182,7 +189,7 @@ class DTU:
 
         request = GetConfig_pb2.GetConfigResDTO()
         request.offset = OFFSET
-        request.time = int(time.time()) - 60
+        request.time = self._request_time()
         command = CMD_GET_CONFIG
         return await self.async_send_request(
             command,
@@ -195,7 +202,7 @@ class DTU:
 
         request = NetworkInfo_pb2.NetworkInfoResDTO()
         request.offset = OFFSET
-        request.time = int(time.time())
+        request.time = self._request_time()
         command = CMD_NETWORK_INFO_RES
         return await self.async_send_request(
             command, request, NetworkInfo_pb2.NetworkInfoReqDTO
@@ -449,7 +456,7 @@ class DTU:
         """Enable performance data mode."""
 
         request = CommandPB_pb2.CommandResDTO()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.action = CMD_ACTION_PERFORMANCE_DATA_MODE
         request.package_nub = 1
 
