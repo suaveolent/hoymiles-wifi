@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import sys
+import time
 from dataclasses import asdict, dataclass, is_dataclass
 from pprint import pprint
 
@@ -678,21 +679,19 @@ async def async_set_energy_storage_working_mode_interactive(
 
 
 async def async_is_encrypted(dtu: DTU):
-    """Check if the DTU is using encrypted communication."""
+    """Check encryption and report the DTU clock offset."""
+    app_info = await dtu.async_app_information_data()
+    if app_info is None:
+        return None
 
-    app_information_data = await dtu.async_app_information_data()
-
-    is_encrypted_info = {}
-
-    if app_information_data and app_information_data.dtu_info.dfs:
-        if is_encrypted_dtu(app_information_data.dtu_info.dfs):
-            is_encrypted_info["is_encrypted"] = True
-            is_encrypted_info["enc_rand"] = app_information_data.dtu_info.enc_rand.hex()
-
-    else:
-        is_encrypted_info["is_encrypted"] = False
-
-    return is_encrypted_info
+    is_encrypted = bool(is_encrypted_dtu(app_info.dtu_info.dfs))
+    result = {
+        "is_encrypted": is_encrypted,
+        "dtu_time_offset": app_info.timestamp - round(time.time()),
+    }
+    if is_encrypted:
+        result["enc_rand"] = app_info.dtu_info.enc_rand.hex()
+    return result
 
 
 def print_invalid_command(command: str) -> None:
@@ -802,6 +801,13 @@ async def main() -> None:
         help="The inverter specific random string used for encryption, see command: is-encrypted",
     )
 
+    parser.add_argument(
+        "--dtu-time-offset",
+        type=int,
+        default=0,
+        help="Signed seconds to add to request timestamps, see command: is-encrypted",
+    )
+
     parser.add_argument("--timeout", type=int, default=None, help="Custom timeout")
 
     parser.add_argument(
@@ -846,9 +852,12 @@ async def main() -> None:
             args.local_addr,
             is_encrypted=True,
             enc_rand=bytes.fromhex(args.enc_rand),
+            dtu_time_offset=args.dtu_time_offset,
         )
     else:
-        dtu = DTU(args.host, args.local_addr)
+        dtu = DTU(
+            args.host, args.local_addr, dtu_time_offset=args.dtu_time_offset
+        )
 
     if args.timeout:
         dtu.timeout = args.timeout

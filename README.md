@@ -131,6 +131,7 @@ The following arguments are available when using the CLI:
 | `--as-json`             | flag | Format output as JSON                             |
 | `--disable-interactive` | flag | Disables interactive prompts                      |
 | `--enc-rand`            | str  | Set inverter specific encryption data             |
+| `--dtu-time-offset`     | int  | Clock offset in seconds (default: 0)              |
 | `--timeout`             | int  | Set custom timeout in seconds                     |
 
 
@@ -152,6 +153,8 @@ The following arguments are only available when using the `--disable-interactive
 
 Some DTUs enforce encrypted communication. This is notably the case for devices running firmware v01.x, where encryption is mandatory. On older firmware (v00.x), data could be retrieved without encryption; firmware v01.x enables encryption, so `enc_rand` must be supplied.
 
+If the DTU has been disconnected from the internet for some time, its clock may be out of sync. Encrypted requests containing the current time may then be rejected. Supply the clock difference as `dtu_time_offset` when needed.
+
 > [!NOTE]
 > Whether a DTU uses encryption is determined by a flag in the DTU's application information data. The `--enc-rand` argument is only required when the DTU reports as encrypted.
 
@@ -166,18 +169,48 @@ Example output (with `--as-json`):
 ```json
 {
   "is_encrypted": true,
+  "dtu_time_offset": -120,
   "enc_rand": "00112233445566778899aabbccddeeff"
 }
 ```
 
-Then pass the retrieved value via `--enc-rand` when running any command:
+Pass `enc_rand` via `--enc-rand` for encrypted commands. If the DTU clock is out of sync (time offset larger than +/- 60), also pass the measured offset via `--dtu-time-offset`. The offset is the DTU clock minus the host clock in seconds, so a negative value means the DTU is behind the host:
 
 ```bash
-hoymiles-wifi --host HOST --enc-rand 00112233445566778899aabbccddeeff get-real-data-new
+hoymiles-wifi --host HOST --enc-rand 00112233445566778899aabbccddeeff --dtu-time-offset -120 get-real-data-new
 ```
 
 > [!NOTE]
 > The `enc_rand` value is device-specific. If the DTU is re-paired or reset, re-run `is-encrypted` to fetch the new value.
+
+In Python, `DTU.async_app_information_data()` returns the raw DTU timestamp,
+encryption flag, and `enc_rand`. Calculate the offset from that response and
+set it on the `DTU` instance:
+
+```python
+import asyncio
+import time
+
+from hoymiles_wifi.dtu import DTU
+from hoymiles_wifi.hoymiles import is_encrypted_dtu
+
+async def main():
+    dtu = DTU("10.10.100.254")
+    info = await dtu.async_app_information_data()
+    if info is None:
+        raise RuntimeError("Could not read DTU information")
+    dtu.dtu_time_offset = info.timestamp - round(time.time())
+    dtu.is_encrypted = bool(is_encrypted_dtu(info.dtu_info.dfs))
+    dtu.enc_rand = info.dtu_info.enc_rand
+
+    return await dtu.async_get_real_data_new()
+
+response = asyncio.run(main())
+print(response)
+```
+
+Calculate the offset immediately after receiving the response so it reflects
+the current difference between the two clocks.
 
 ### 🔧 BMS Working Modes & Required Parameters
 
