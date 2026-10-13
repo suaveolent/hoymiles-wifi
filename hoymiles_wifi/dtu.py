@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import math
 import struct
 import time
 from datetime import datetime
@@ -18,6 +19,7 @@ from hoymiles_wifi.const import (
     CMD_ACTION_DTU_UPGRADE,
     CMD_ACTION_INV_REBOOT,
     CMD_ACTION_LIMIT_POWER,
+    CMD_ACTION_LIMIT_POWER_TEMPORARY,
     CMD_ACTION_MI_SHUTDOWN,
     CMD_ACTION_MI_START,
     CMD_ACTION_PERFORMANCE_DATA_MODE,
@@ -41,6 +43,8 @@ from hoymiles_wifi.const import (
     DEV_DTU,
     DTU_FIRMWARE_URL_00_01_11,
     DTU_PORT,
+    MAX_TEMPORARY_POWER_LIMIT_WATTS,
+    MIN_TEMPORARY_POWER_LIMIT_WATTS,
     NOT_ENCRYPTED_COMMANDS,
     OFFSET,
 )
@@ -263,7 +267,7 @@ class DTU:
         self,
         power_limit: int,
     ) -> CommandPB_pb2.CommandReqDTO | None:
-        """Set power limit."""
+        """Set the persistent power limit in percent (action 8)."""
         if power_limit < 0 or power_limit > 100:
             logger.error("Error. Invalid power limit!")
             return
@@ -281,6 +285,33 @@ class DTU:
 
         return await self.async_send_request(
             command, request, CommandPB_pb2.CommandReqDTO
+        )
+
+    async def async_set_power_limit_temporary(
+        self,
+        power_watts: float,
+    ) -> CommandPB_pb2.CommandReqDTO | None:
+        """Set a runtime watt limit on supported HMS-W devices (requires firmare V01.01.01 or above)."""
+        if (
+            isinstance(power_watts, bool)
+            or not isinstance(power_watts, (int, float))
+            or not math.isfinite(power_watts)
+            or not MIN_TEMPORARY_POWER_LIMIT_WATTS
+            <= power_watts
+            <= MAX_TEMPORARY_POWER_LIMIT_WATTS
+        ):
+            logger.error("Invalid temporary power limit; expected 0.1–3276.7 W")
+            return None
+
+        scaled_watts = math.floor(power_watts * 10 + 0.5)
+        request = CommandPB_pb2.CommandResDTO()
+        request.time = int(time.time())
+        request.action = CMD_ACTION_LIMIT_POWER_TEMPORARY
+        request.package_nub = 1
+        request.tid = request.time
+        request.data = f"S:1,P:{scaled_watts}\r"
+        return await self.async_send_request(
+            CMD_COMMAND_RES_DTO, request, CommandPB_pb2.CommandReqDTO
         )
 
     async def async_set_wifi(
