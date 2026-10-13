@@ -167,6 +167,20 @@ async def async_set_power_limit(
     return await dtu.async_set_power_limit(power_limit)
 
 
+async def async_set_power_limit_temporary(
+    dtu: DTU,
+    power_watts: float | None = None,
+    interactive_mode: bool = True,
+) -> CommandPB_pb2.CommandReqDTO | None:
+    """Set a temporary watt limit on supported HMS-W-2T inverters."""
+    if interactive_mode:
+        power_watts = float(input("Enter the temporary power limit (0.1–3276.7 W): "))
+    if power_watts is None:
+        print("Error. Supply --power-limit-watts.")  # noqa: T201
+        return None
+    return await dtu.async_set_power_limit_temporary(power_watts)
+
+
 async def async_set_wifi(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
     """Set the wifi SSID and password of the inverter asynchronously."""
 
@@ -736,6 +750,13 @@ async def main() -> None:
     )
 
     parser.add_argument(
+        "--power-limit-watts",
+        type=float,
+        default=None,
+        help="Temporary power limit in watts (0.1–3276.7, supported HMS-W-2T only).",
+    )
+
+    parser.add_argument(
         "--bms_working_mode",
         type=int,
         choices=range(1, 9),  # Restrict input to 1 through 8
@@ -815,6 +836,7 @@ async def main() -> None:
             "app-information-data",
             "app-get-hist-power",
             "set-power-limit",
+            "set-power-limit-temporary",
             "set-wifi",
             "firmware-update",
             "restart-dtu",
@@ -862,6 +884,7 @@ async def main() -> None:
         "app-information-data": async_app_information_data,
         "app-get-hist-power": async_app_get_hist_power,
         "set-power-limit": async_set_power_limit,
+        "set-power-limit-temporary": async_set_power_limit_temporary,
         "set-wifi": async_set_wifi,
         "firmware-update": async_firmware_update,
         "restart-dtu": async_restart_dtu,
@@ -889,6 +912,12 @@ async def main() -> None:
         kwargs["power_limit"] = args.power_limit
         kwargs["interactive_mode"] = not args.disable_interactive
         response = await command_func(dtu, **kwargs)
+    elif args.command == "set-power-limit-temporary":
+        response = await command_func(
+            dtu,
+            power_watts=args.power_limit_watts,
+            interactive_mode=not args.disable_interactive,
+        )
     elif args.command == "set-energy-storage-working-mode":
         kwargs = {}
         kwargs["interactive_mode"] = not args.disable_interactive

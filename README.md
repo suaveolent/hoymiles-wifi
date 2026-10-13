@@ -83,7 +83,7 @@ You can integrate the library into your own project, or simply use it in the com
 ## Warning
 
 > [!CAUTION]
-> Please refrain from using the power limitation feature for zero feed-in, as it may lead to damaging the inverter due to excessive writes to the EEPROM.
+> Please refrain from using the persistent percentage power limit (`set-power-limit`) for zero feed-in, as frequent writes may damage the EEPROM. Use `set-power-limit-temporary` instead.
 
 ### Command line:
 
@@ -100,6 +100,7 @@ hoymiles-wifi --host HOST <command> [additional-arguments]
 | app-information-data            | DTU and W-series                       | Retrieve application information data                            |
 | app-get-hist-power              | DTU and W-series                       | Retrieve historical power data                                   |
 | set-power-limit                 | DTU and W-series                       | Set the power limit of the inverter (0-100%)                     |
+| set-power-limit-temporary       | Supported HMS-W-2T only                 | Set a temporary limit in watts                       |
 | set-wifi                        | DTU and W-series                       | Configure the WiFi network                                       |
 | firmware-update                 | DTU and W-series                       | Update to latest firmware                                        |
 | restart-dtu                     | DTU and W-series                       | Restart the DTU                                                  |
@@ -279,7 +280,8 @@ else:
 - `async_network_info()`: Retrieve network information
 - `async_app_information_data()`: Retrieve application information data
 - `async_app_get_hist_power()`: Retrieve historical power data
-- `async_set_power_limit(power_limit)`: Set the power limit of the inverter (0-100%)
+- `async_set_power_limit(power_limit)`: Set the persistent power limit of the inverter (0-100%)
+- `async_set_power_limit_temporary(power_watts)`: Set a temporary watt limit on supported HMS-W-2T devices.
 - `async_set_wifi(wifi_ssid, wifi_password)`: Configure the wifi network
 - `async_firmware_update()`: Update to latest firmware
 - `async_restart_dtu()`: Restart the DTU
