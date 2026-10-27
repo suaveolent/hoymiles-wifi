@@ -413,6 +413,29 @@ async def async_get_energy_storage_data(
     return responses
 
 
+async def async_get_energy_storage_working_mode(dtu: DTU) -> dict | None:
+    """Read working-mode settings for each registered hybrid inverter."""
+    gateway_info = await dtu.async_get_gateway_info()
+    if gateway_info is None:
+        return None
+    registry = await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
+    if registry is None:
+        return None
+    responses = {}
+    for inverter in registry.inverters:
+        configuration = await dtu.async_get_energy_storage_working_mode(
+            dtu_serial_number=gateway_info.serial_number,
+            inverter_serial_number=inverter.serial_number,
+        )
+        if configuration is not None:
+            responses[str(inverter.serial_number)] = MessageToDict(
+                configuration, preserving_proto_field_name=True
+            )
+    return responses
+
+
 async def async_set_energy_storage_working_mode(
     dtu: DTU,
     bms_working_mode: BMSWorkingMode = None,
@@ -854,6 +877,7 @@ async def main() -> None:
             "get-energy-storage-data",
             "get-gateway-info",
             "get-gateway-network-info",
+            "get-energy-storage-working-mode",
             "set-energy-storage-working-mode",
             "is-encrypted",
         ],
@@ -902,6 +926,7 @@ async def main() -> None:
         "get-gateway-network-info": async_get_gateway_network_info,
         "get-energy-storage-registry": async_get_energy_storage_registry,
         "get-energy-storage-data": async_get_energy_storage_data,
+        "get-energy-storage-working-mode": async_get_energy_storage_working_mode,
         "set-energy-storage-working-mode": async_set_energy_storage_working_mode,
         "is-encrypted": async_is_encrypted,
     }

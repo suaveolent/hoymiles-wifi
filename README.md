@@ -119,7 +119,9 @@ hoymiles-wifi --host HOST <command> [additional-arguments]
 | get-gateway-network-info        | HAT / HYT / HAS / HYS battery inverter | Get network information for hybrid-inverters                     |
 | get-energy-storage-registry     | HAT / HYT / HAS / HYS battery inverter | Get information about the hybrid-inverter                        |
 | get-energy-storage-data         | HAT / HYT / HAS / HYS battery inverter | Get live data of the hybrid-inverter                             |
+| get-energy-storage-working-mode | HAT / HYT / HAS / HYS battery inverter | Read current working mode and mode-specific settings |
 | set-energy-storage-working-mode | HAT / HYT / HAS / HYS battery inverter | Set the working mode of the hybrid-inverter                      |
+
 
 ### CLI Arguments
 
