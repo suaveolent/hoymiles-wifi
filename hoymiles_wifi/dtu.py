@@ -18,6 +18,7 @@ from hoymiles_wifi.const import (
     CMD_ACTION_ALARM_LIST,
     CMD_ACTION_DTU_REBOOT,
     CMD_ACTION_DTU_UPGRADE,
+    CMD_ACTION_GRID_FILE_READ,
     CMD_ACTION_INV_REBOOT,
     CMD_ACTION_LIMIT_POWER,
     CMD_ACTION_LIMIT_POWER_TEMPORARY,
@@ -28,6 +29,7 @@ from hoymiles_wifi.const import (
     CMD_APP_INFO_DATA_RES_DTO,
     CMD_CLOUD_COMMAND_RES_DTO,
     CMD_COMMAND_RES_DTO,
+    CMD_DEV_CONFIG_FETCH_RES_DTO,
     CMD_ES_CONFIG_FETCH_RES_DTO,
     CMD_ES_CONFIG_TYPE,
     CMD_ES_DATA_DTO,
@@ -48,16 +50,26 @@ from hoymiles_wifi.const import (
     DTU_FIRMWARE_URL_00_01_11,
     DTU_PORT,
     ES_CONFIG_PAGE_PREFIX_SIZE,
+    GRID_PROFILE_READ_ATTEMPTS,
+    GRID_PROFILE_RETRY_INTERVAL_SECONDS,
+    GRID_PROFILE_RULE_TYPE,
     MAX_ES_CONFIG_PAGES,
+    MAX_GRID_PROFILE_PAGES,
     MAX_TEMPORARY_POWER_LIMIT_WATTS,
     MIN_TEMPORARY_POWER_LIMIT_WATTS,
     NOT_ENCRYPTED_COMMANDS,
     OFFSET,
 )
 from hoymiles_wifi.crypt_util import crypt_data
+from hoymiles_wifi.grid_profile import (
+    decode_grid_profile,
+    get_grid_profile_name,
+    get_grid_profile_version,
+)
 from hoymiles_wifi.hoymiles import (
     BMSWorkingMode,
     DateBean,
+    DecodedGridProfileConfiguration,
     TariffType,
     TimePeriodBean,
     convert_inverter_serial_number,
@@ -71,6 +83,7 @@ from hoymiles_wifi.protobuf import (
     APPInfomationData_pb2,
     CommandPB_pb2,
     CommDevCfg_pb2,
+    DevConfig_pb2,
     ESData_pb2,
     ESParaSet_pb2,
     ESRegPB_pb2,
@@ -278,6 +291,152 @@ class DTU:
             combined_response.absolute_start = initial_absolute_start
 
         return combined_response if combined_response.ByteSize() > 0 else None
+
+    async def async_get_grid_profile(
+        self, inverter_serial: str
+    ) -> DevConfig_pb2.DevConfigFetchReqDTO | None:
+        """Read a microinverter's grid profile without changing its settings.
+
+        Return the validated configuration protobuf with its binary data intact.
+        """
+        inverter_number = convert_inverter_serial_number(inverter_serial)
+        app_info = await self.async_app_information_data()
+        if app_info is None or not app_info.dtu_serial_number:
+            return None
+        inverter_info = next(
+            (
+                info
+                for info in app_info.pv_info
+                if info.pv_serial_number == inverter_number
+            ),
+            None,
+        )
+        if inverter_info is None:
+            logger.debug("Inverter %s not found in app information", inverter_serial)
+            return None
+        inverter_serial = inverter_serial.upper()
+        transaction_id = int(time.time())
+        request = CommandPB_pb2.CommandResDTO(
+            time=self._request_time(),
+            action=CMD_ACTION_GRID_FILE_READ,
+            dev_kind=DEV_DTU,
+            package_nub=1,
+            tid=transaction_id,
+            data="0",
+            mi_to_sn=[inverter_number],
+        )
+        acknowledgement = await self.async_send_request(
+            CMD_COMMAND_RES_DTO, request, CommandPB_pb2.CommandReqDTO
+        )
+        if (
+            acknowledgement is None
+            or acknowledgement.err_code != 0
+            or acknowledgement.action != CMD_ACTION_GRID_FILE_READ
+            or acknowledgement.tid != transaction_id
+            or acknowledgement.dtu_sn.upper() != app_info.dtu_serial_number.upper()
+        ):
+            logger.debug(
+                "DTU did not acknowledge grid profile read for %s", inverter_serial
+            )
+            return None
+        return await self._async_fetch_grid_profile(
+            app_info.dtu_serial_number, inverter_serial, transaction_id
+        )
+
+    async def async_get_grid_profile_decoded(
+        self, inverter_serial: str
+    ) -> DecodedGridProfileConfiguration | None:
+        """Read and decode the big-endian grid-profile payload returned locally."""
+        response = await self.async_get_grid_profile(inverter_serial)
+        if response is None:
+            return None
+        profile_code = None
+        profile_version = None
+        decoded = None
+        if len(response.data) >= 4:
+            profile_code = int.from_bytes(response.data[:2], "big")
+            profile_version = int.from_bytes(response.data[2:4], "big")
+            decoded = decode_grid_profile(response.data, profile_code, profile_version)
+        return DecodedGridProfileConfiguration(
+            dtu_serial_number=response.dtu_sn,
+            inverter_serial_number=response.dev_sn,
+            grid_profile_code=profile_code,
+            grid_profile=profile_version,
+            rule_id=response.rule_id,
+            data_hex=response.data.hex(),
+            configuration_hex=response.cfg_data.hex(),
+            grid_profile_name=get_grid_profile_name(profile_code),
+            grid_profile_version=(
+                get_grid_profile_version(profile_version)
+                if profile_version is not None
+                else None
+            ),
+            decoded=decoded,
+        )
+
+    async def _async_fetch_grid_profile(
+        self, dtu_serial: str, inverter_serial: str, transaction_id: int
+    ) -> DevConfig_pb2.DevConfigFetchReqDTO | None:
+        """Collect and validate the complete binary grid-configuration response."""
+        combined = None
+        total_pages = None
+        for page in range(MAX_GRID_PROFILE_PAGES):
+            request = DevConfig_pb2.DevConfigFetchResDTO(
+                response_time=self._request_time(),
+                transaction_id=transaction_id,
+                dtu_sn=dtu_serial,
+                dev_sn=inverter_serial,
+                current_package=page,
+                rule_type=GRID_PROFILE_RULE_TYPE,
+            )
+            for attempt in range(GRID_PROFILE_READ_ATTEMPTS):
+                response = await self.async_send_request(
+                    CMD_DEV_CONFIG_FETCH_RES_DTO,
+                    request,
+                    DevConfig_pb2.DevConfigFetchReqDTO,
+                )
+                if response is not None:
+                    break
+                if page != 0 or attempt + 1 == GRID_PROFILE_READ_ATTEMPTS:
+                    return None
+                await asyncio.sleep(GRID_PROFILE_RETRY_INTERVAL_SECONDS)
+                request.response_time = self._request_time()
+            if (
+                response.transaction_id != transaction_id
+                or response.dtu_sn.upper() != dtu_serial.upper()
+                or response.dev_sn.upper() != inverter_serial.upper()
+                or response.rule_type != GRID_PROFILE_RULE_TYPE
+                or response.current_package != page
+                or not 1 <= response.total_packages <= MAX_GRID_PROFILE_PAGES
+                or (total_pages is not None and response.total_packages != total_pages)
+                or not response.data
+                or (
+                    combined is not None
+                    and (
+                        response.rule_id != combined.rule_id
+                        or response.crc != combined.crc
+                        or response.cfg_crc != combined.cfg_crc
+                    )
+                )
+            ):
+                logger.debug("Invalid grid profile response on page %s", page)
+                return None
+            total_pages = response.total_packages
+            if combined is None:
+                combined = DevConfig_pb2.DevConfigFetchReqDTO()
+                combined.CopyFrom(response)
+            else:
+                combined.data += response.data
+                combined.cfg_data += response.cfg_data
+            if page + 1 == total_pages:
+                break
+        crc16 = mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)
+        if crc16(combined.data) != combined.crc or (
+            combined.cfg_data and crc16(combined.cfg_data) != combined.cfg_crc
+        ):
+            logger.debug("Grid profile configuration checksum mismatch")
+            return None
+        return combined
 
     async def async_set_power_limit(
         self,

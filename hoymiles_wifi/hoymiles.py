@@ -8,6 +8,23 @@ from hoymiles_wifi import logger
 from hoymiles_wifi.const import (
     IS_ENCRYPTED_BIT_INDEX,
 )
+from hoymiles_wifi.grid_profile import DecodedGridProfile
+
+
+@dataclass(frozen=True)
+class DecodedGridProfileConfiguration:
+    """Grid configuration with interpreted profile identifiers and settings."""
+
+    dtu_serial_number: str
+    inverter_serial_number: str
+    grid_profile_code: int | None
+    grid_profile: int | None
+    rule_id: int
+    data_hex: str
+    configuration_hex: str
+    grid_profile_name: str | None
+    grid_profile_version: str | None
+    decoded: DecodedGridProfile | None
 
 
 class InverterType(Enum):

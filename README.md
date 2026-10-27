@@ -96,6 +96,8 @@ hoymiles-wifi --host HOST <command> [additional-arguments]
 | get-real-data-new               | DTU and W-series                       | Retrieve real-time data                                          |
 | get-real-data                   | DTU and W-series                       | Retrieve real-time data                                          |
 | get-config                      | DTU and W-series                       | Retrieve configuration information                               |
+| get-grid-profile                | DTU and W-series                       | Read the raw grid-configuration protobuf (`--inverter-serial` required) |
+| get-grid-profile-decoded        | DTU and W-series                       | Read and decode microinverter grid-profile settings (`--inverter-serial` required) |
 | network-info                    | DTU and W-series                       | Retrieve network information                                     |
 | app-information-data            | DTU and W-series                       | Retrieve application information data                            |
 | app-get-hist-power              | DTU and W-series                       | Retrieve historical power data                                   |
