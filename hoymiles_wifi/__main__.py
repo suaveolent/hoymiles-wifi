@@ -24,6 +24,7 @@ from hoymiles_wifi.dtu import DTU
 from hoymiles_wifi.hoymiles import (
     BMSWorkingMode,
     DateBean,
+    DecodedGridProfileConfiguration,
     TimePeriodBean,
     generate_dtu_version_string,
     generate_inverter_serial_number,
@@ -39,6 +40,7 @@ from hoymiles_wifi.protobuf import (
     APPHeartbeatPB_pb2,
     APPInfomationData_pb2,
     CommandPB_pb2,
+    DevConfig_pb2,
     ESData_pb2,
     ESRegPB_pb2,
     ESUserSet_pb2,
@@ -128,6 +130,20 @@ async def async_app_get_hist_power(
     """Get historical power data from the inverter asynchronously."""
 
     return await dtu.async_app_get_hist_power()
+
+
+async def async_get_grid_profile(
+    dtu: DTU, inverter_serial: str
+) -> DevConfig_pb2.DevConfigFetchReqDTO | None:
+    """Return the selected microinverter's raw grid-configuration protobuf."""
+    return await dtu.async_get_grid_profile(inverter_serial)
+
+
+async def async_get_grid_profile_decoded(
+    dtu: DTU, inverter_serial: str
+) -> DecodedGridProfileConfiguration | None:
+    """Read and decode the selected microinverter's grid profile."""
+    return await dtu.async_get_grid_profile_decoded(inverter_serial)
 
 
 async def async_set_power_limit(
@@ -751,6 +767,40 @@ def print_invalid_command(command: str) -> None:
     sys.exit(1)
 
 
+async def _async_execute_command(dtu: DTU, args: argparse.Namespace, command_func):
+    """Execute a CLI command with its supported arguments."""
+    if args.command in {"get-grid-profile", "get-grid-profile-decoded"}:
+        response = await command_func(dtu, args.inverter_serial)
+    elif args.command == "set-power-limit":
+        kwargs = {}
+        kwargs["power_limit"] = args.power_limit
+        kwargs["interactive_mode"] = not args.disable_interactive
+        response = await command_func(dtu, **kwargs)
+    elif args.command == "set-power-limit-temporary":
+        response = await command_func(
+            dtu,
+            power_watts=args.power_limit_watts,
+            interactive_mode=not args.disable_interactive,
+        )
+    elif args.command == "set-energy-storage-working-mode":
+        kwargs = {}
+        kwargs["interactive_mode"] = not args.disable_interactive
+        kwargs["bms_working_mode"] = BMSWorkingMode(args.bms_working_mode)
+        kwargs["inverter_serial_number"] = args.inverter_serial_number
+        kwargs["rev_soc"] = args.rev_soc
+        kwargs["time_settings_str"] = args.time_settings
+        kwargs["max_power"] = args.max_power
+        kwargs["peak_soc"] = args.peak_soc
+        kwargs["peak_meter_power"] = args.peak_meter_power
+        kwargs["time_periods_str"] = args.time_periods
+
+        response = await command_func(dtu, **kwargs)
+    else:
+        response = await command_func(dtu)
+
+    return response
+
+
 async def main() -> None:
     """Execute the main function for the hoymiles_wifi package."""
 
@@ -874,6 +924,8 @@ async def main() -> None:
             "get-real-data-new",
             "get-real-data",
             "get-config",
+            "get-grid-profile",
+            "get-grid-profile-decoded",
             "network-info",
             "app-information-data",
             "app-get-hist-power",
@@ -903,18 +955,25 @@ async def main() -> None:
         help="Command to execute",
     )
 
-    args = parser.parse_args()
+    parser.add_argument(
+        "--inverter-serial",
+        help="Hexadecimal microinverter serial number for grid-profile commands",
+    )
 
-    if args.enc_rand:
-        dtu = DTU(
-            args.host,
-            args.local_addr,
-            is_encrypted=True,
-            enc_rand=bytes.fromhex(args.enc_rand),
-            dtu_time_offset=args.dtu_time_offset,
-        )
-    else:
-        dtu = DTU(args.host, args.local_addr, dtu_time_offset=args.dtu_time_offset)
+    args = parser.parse_args()
+    if (
+        args.command in {"get-grid-profile", "get-grid-profile-decoded"}
+        and not args.inverter_serial
+    ):
+        parser.error(f"--inverter-serial is required for {args.command}")
+
+    dtu = DTU(
+        args.host,
+        args.local_addr,
+        is_encrypted=bool(args.enc_rand),
+        enc_rand=bytes.fromhex(args.enc_rand) if args.enc_rand else b"",
+        dtu_time_offset=args.dtu_time_offset,
+    )
 
     if args.timeout:
         dtu.timeout = args.timeout
@@ -924,6 +983,8 @@ async def main() -> None:
         "get-real-data-new": async_get_real_data_new,
         "get-real-data": async_get_real_data,
         "get-config": async_get_config,
+        "get-grid-profile": async_get_grid_profile,
+        "get-grid-profile-decoded": async_get_grid_profile_decoded,
         "network-info": async_network_info,
         "app-information-data": async_app_information_data,
         "app-get-hist-power": async_app_get_hist_power,
@@ -952,32 +1013,7 @@ async def main() -> None:
     }
 
     command_func = switch.get(args.command, print_invalid_command)
-    if args.command == "set-power-limit":
-        kwargs = {}
-        kwargs["power_limit"] = args.power_limit
-        kwargs["interactive_mode"] = not args.disable_interactive
-        response = await command_func(dtu, **kwargs)
-    elif args.command == "set-power-limit-temporary":
-        response = await command_func(
-            dtu,
-            power_watts=args.power_limit_watts,
-            interactive_mode=not args.disable_interactive,
-        )
-    elif args.command == "set-energy-storage-working-mode":
-        kwargs = {}
-        kwargs["interactive_mode"] = not args.disable_interactive
-        kwargs["bms_working_mode"] = BMSWorkingMode(args.bms_working_mode)
-        kwargs["inverter_serial_number"] = args.inverter_serial_number
-        kwargs["rev_soc"] = args.rev_soc
-        kwargs["time_settings_str"] = args.time_settings
-        kwargs["max_power"] = args.max_power
-        kwargs["peak_soc"] = args.peak_soc
-        kwargs["peak_meter_power"] = args.peak_meter_power
-        kwargs["time_periods_str"] = args.time_periods
-
-        response = await command_func(dtu, **kwargs)
-    else:
-        response = await command_func(dtu)
+    response = await _async_execute_command(dtu, args, command_func)
 
     if response:
         if args.as_json:

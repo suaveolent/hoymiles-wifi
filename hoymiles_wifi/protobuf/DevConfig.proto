@@ -13,11 +13,11 @@ message DevConfigFetchReqDTO {
   int32 request_time = 1;     // Timestamp of the request
   int64 transaction_id = 2;   // Transaction ID
   int32 rule_id = 3;          // Rule ID
-  string data = 4;            // Data
+  bytes data = 4;            // Data
   int32 crc = 5;              // CRC value
   string dtu_sn = 6;          // DTU serial number
   string dev_sn = 7;          // Device serial number
-  string cfg_data = 8;        // Configuration data
+  bytes cfg_data = 8;        // Configuration data
   int32 cfg_crc = 9;          // Configuration CRC value
   int32 total_packages = 10;  // Total number of packages
   int32 current_package = 11; // Current package number
