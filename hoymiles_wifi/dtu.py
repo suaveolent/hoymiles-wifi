@@ -113,6 +113,7 @@ class DTU:
         is_encrypted: bool = False,
         enc_rand: bytes = b"",
         timeout: int = DEFAULT_TIMEOUT,
+        dtu_time_offset: int = 0,
     ):
         """Initialize DTU class."""
 
@@ -125,6 +126,7 @@ class DTU:
         self.is_encrypted: bool = is_encrypted
         self.enc_rand: bytes = enc_rand
         self.timeout: int = timeout
+        self.dtu_time_offset: int = dtu_time_offset
 
     def get_state(self) -> NetworkState:
         """Get DTU state."""
@@ -138,6 +140,10 @@ class DTU:
             self.state = new_state
             logger.debug(f"DTU is {new_state}")
 
+    def _request_time(self) -> int:
+        """Return the host time adjusted to the DTU clock."""
+        return int(time.time()) + self.dtu_time_offset
+
     async def async_get_real_data(self) -> RealData_pb2.RealDataReqDTO | None:
         """Get real data."""
 
@@ -145,7 +151,7 @@ class DTU:
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.offset = OFFSET
         request.error_code = 0
 
@@ -164,7 +170,7 @@ class DTU:
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
         request.offset = OFFSET
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.cp = 0
         command = CMD_REAL_RES_DTO
 
@@ -180,6 +186,7 @@ class DTU:
             # Fetch additional data based on the value of response.ap
             for cp in range(1, response.ap):
                 request.cp = cp
+                request.time = self._request_time()
 
                 additional_response = await self.async_send_request(
                     command, request, RealDataNew_pb2.RealDataNewReqDTO
@@ -194,7 +201,7 @@ class DTU:
 
         request = GetConfig_pb2.GetConfigResDTO()
         request.offset = OFFSET
-        request.time = int(time.time()) - 60
+        request.time = self._request_time()
         command = CMD_GET_CONFIG
         return await self.async_send_request(
             command,
@@ -207,7 +214,7 @@ class DTU:
 
         request = NetworkInfo_pb2.NetworkInfoResDTO()
         request.offset = OFFSET
-        request.time = int(time.time())
+        request.time = self._request_time()
         command = CMD_NETWORK_INFO_RES
         return await self.async_send_request(
             command, request, NetworkInfo_pb2.NetworkInfoReqDTO
@@ -216,7 +223,7 @@ class DTU:
     async def async_app_information_data(
         self,
     ) -> APPInfomationData_pb2.APPInfoDataReqDTO:
-        """Get app information data."""
+        """Read unencrypted app information to discover encryption and clock settings."""
         request = APPInfomationData_pb2.APPInfoDataResDTO()
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
@@ -238,7 +245,7 @@ class DTU:
         request = AppGetHistPower_pb2.AppGetHistPowerResDTO()
         request.cp = 0
         request.offset = OFFSET
-        request.requested_time = int(time.time())
+        request.requested_time = self._request_time()
         request.requested_day = 0
         command = CMD_APP_GET_HIST_POWER_RES
 
@@ -257,6 +264,7 @@ class DTU:
             # Fetch additional data based on the value of response.ap
             for cp in range(1, response.ap):
                 request.cp = cp
+                request.requested_time = self._request_time()
 
                 additional_response = await self.async_send_request(
                     command,
@@ -283,7 +291,7 @@ class DTU:
         power_limit = power_limit * 10
 
         request = CommandPB_pb2.CommandResDTO()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.action = CMD_ACTION_LIMIT_POWER
         request.package_nub = 1
         request.tid = int(time.time())
@@ -313,10 +321,10 @@ class DTU:
 
         scaled_watts = math.floor(power_watts * 10 + 0.5)
         request = CommandPB_pb2.CommandResDTO()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.action = CMD_ACTION_LIMIT_POWER_TEMPORARY
         request.package_nub = 1
-        request.tid = request.time
+        request.tid = int(time.time())
         request.data = f"S:1,P:{scaled_watts}\r"
         return await self.async_send_request(
             CMD_COMMAND_RES_DTO, request, CommandPB_pb2.CommandReqDTO
@@ -335,7 +343,7 @@ class DTU:
 
         request = initialize_set_config(get_config_req)
 
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.offset = OFFSET
         request.app_page = 1
         request.netmode_select = NetmodeSelect.WIFI
@@ -447,7 +455,7 @@ class DTU:
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
         request.offset = OFFSET
-        request.time = int(time.time())
+        request.time = self._request_time()
         command = CMD_APP_INFO_DATA_RES_DTO
         return await self.async_send_request(
             command, request, InfomationData_pb2.InfoDataReqDTO
@@ -461,7 +469,7 @@ class DTU:
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
         request.offset = OFFSET
-        request.time = int(time.time())
+        request.time = self._request_time()
 
         command = CMD_HB_RES_DTO
         return await self.async_send_request(
@@ -488,7 +496,7 @@ class DTU:
         """Enable performance data mode."""
 
         request = CommandPB_pb2.CommandResDTO()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.action = CMD_ACTION_PERFORMANCE_DATA_MODE
         request.package_nub = 1
 
@@ -501,7 +509,7 @@ class DTU:
         """Get gateway info."""
 
         request = GWInfo_pb2.GWInfoResDTO()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.offset = OFFSET
 
         command = CMD_GW_INFO_RES_DTO
@@ -520,7 +528,7 @@ class DTU:
         """Get gateway network info."""
 
         request = GWNetInfo_pb2.GWNetInfoRes()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.offset = OFFSET
 
         command = CMD_GW_NET_INFO_RES
@@ -540,7 +548,7 @@ class DTU:
         """Get energy storage registry."""
 
         request = ESRegPB_pb2.ESRegResDTO()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
@@ -564,7 +572,7 @@ class DTU:
         """Get energy storage registry."""
 
         request = ESData_pb2.ESDataResDTO()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.time_ymd_hms = (
             datetime.now().strftime("%Y-%m-%d %H:%M:%S").encode("utf-8")
         )
@@ -596,7 +604,7 @@ class DTU:
         total_pages = None
         for page in range(MAX_ES_CONFIG_PAGES):
             request = CommDevCfg_pb2.CommDevCfgFetchResDTO(
-                time=int(time.time()),
+                time=self._request_time(),
                 tid=int(time.time()),
                 cp=page,
                 type=CMD_ES_CONFIG_TYPE,
@@ -659,7 +667,7 @@ class DTU:
         """Set energy storage working mode."""
 
         request = ESUserSet_pb2.ESUserSetPutResDTO()
-        request.time = int(time.time())
+        request.time = self._request_time()
         request.tid = int(time.time())
         request.serial_number.extend([inverter_serial_number])
         request.mode = bms_working_mode.value
