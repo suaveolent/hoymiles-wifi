@@ -10,6 +10,7 @@ import os
 import sys
 import time
 from dataclasses import asdict, dataclass, is_dataclass
+from getpass import getpass
 from pprint import pprint
 
 from google.protobuf.json_format import MessageToDict, MessageToJson
@@ -182,16 +183,28 @@ async def async_set_power_limit_temporary(
     return await dtu.async_set_power_limit_temporary(power_watts)
 
 
+def prompt_wifi_password() -> str:
+    """Prompt for a WiFi password and confirm it."""
+    while True:
+        password = getpass("Enter the new WiFi password: ")
+        confirmation = getpass("Confirm the new WiFi password: ")
+
+        if password == confirmation:
+            return password
+
+        print("Passwords do not match. Please try again.")  # noqa: T201
+
+
 async def async_set_wifi(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
     """Set the wifi SSID and password of the inverter asynchronously."""
-
     wifi_ssid = input("Enter the new wifi SSID: ").strip()
-    wifi_password = input("Enter the new wifi password: ").strip()
+    wifi_password = prompt_wifi_password()
+
     print(f'Setting wifi to "{wifi_ssid}"')  # noqa: T201
-    print(f'Setting wifi password to "{wifi_password}"')  # noqa: T201
-    cont = input("Are you sure? (y/n): ")
-    if cont != "y":
+
+    if input("Are you sure? (y/n): ").strip().lower() != "y":
         return None
+
     return await dtu.async_set_wifi(wifi_ssid, wifi_password)
 
 
@@ -901,9 +914,7 @@ async def main() -> None:
             dtu_time_offset=args.dtu_time_offset,
         )
     else:
-        dtu = DTU(
-            args.host, args.local_addr, dtu_time_offset=args.dtu_time_offset
-        )
+        dtu = DTU(args.host, args.local_addr, dtu_time_offset=args.dtu_time_offset)
 
     if args.timeout:
         dtu.timeout = args.timeout
