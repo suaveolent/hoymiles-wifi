@@ -168,6 +168,20 @@ async def async_set_power_limit(
     return await dtu.async_set_power_limit(power_limit)
 
 
+async def async_set_power_limit_temporary(
+    dtu: DTU,
+    power_watts: float | None = None,
+    interactive_mode: bool = True,
+) -> CommandPB_pb2.CommandReqDTO | None:
+    """Set a temporary watt limit on supported HMS-W-2T inverters."""
+    if interactive_mode:
+        power_watts = float(input("Enter the temporary power limit (0.1–3276.7 W): "))
+    if power_watts is None:
+        print("Error. Supply --power-limit-watts.")  # noqa: T201
+        return None
+    return await dtu.async_set_power_limit_temporary(power_watts)
+
+
 async def async_set_wifi(dtu: DTU) -> CommandPB_pb2.CommandResDTO | None:
     """Set the wifi SSID and password of the inverter asynchronously."""
 
@@ -397,6 +411,29 @@ async def async_get_energy_storage_data(
         if storage_data is not None:
             responses.append(storage_data)
 
+    return responses
+
+
+async def async_get_energy_storage_working_mode(dtu: DTU) -> dict | None:
+    """Read working-mode settings for each registered hybrid inverter."""
+    gateway_info = await dtu.async_get_gateway_info()
+    if gateway_info is None:
+        return None
+    registry = await dtu.async_get_energy_storage_registry(
+        dtu_serial_number=gateway_info.serial_number
+    )
+    if registry is None:
+        return None
+    responses = {}
+    for inverter in registry.inverters:
+        configuration = await dtu.async_get_energy_storage_working_mode(
+            dtu_serial_number=gateway_info.serial_number,
+            inverter_serial_number=inverter.serial_number,
+        )
+        if configuration is not None:
+            responses[str(inverter.serial_number)] = MessageToDict(
+                configuration, preserving_proto_field_name=True
+            )
     return responses
 
 
@@ -735,6 +772,13 @@ async def main() -> None:
     )
 
     parser.add_argument(
+        "--power-limit-watts",
+        type=float,
+        default=None,
+        help="Temporary power limit in watts (0.1–3276.7, supported HMS-W-2T only).",
+    )
+
+    parser.add_argument(
         "--bms_working_mode",
         type=int,
         choices=range(1, 9),  # Restrict input to 1 through 8
@@ -821,6 +865,7 @@ async def main() -> None:
             "app-information-data",
             "app-get-hist-power",
             "set-power-limit",
+            "set-power-limit-temporary",
             "set-wifi",
             "firmware-update",
             "restart-dtu",
@@ -838,6 +883,7 @@ async def main() -> None:
             "get-energy-storage-data",
             "get-gateway-info",
             "get-gateway-network-info",
+            "get-energy-storage-working-mode",
             "set-energy-storage-working-mode",
             "is-encrypted",
         ],
@@ -871,6 +917,7 @@ async def main() -> None:
         "app-information-data": async_app_information_data,
         "app-get-hist-power": async_app_get_hist_power,
         "set-power-limit": async_set_power_limit,
+        "set-power-limit-temporary": async_set_power_limit_temporary,
         "set-wifi": async_set_wifi,
         "firmware-update": async_firmware_update,
         "restart-dtu": async_restart_dtu,
@@ -888,6 +935,7 @@ async def main() -> None:
         "get-gateway-network-info": async_get_gateway_network_info,
         "get-energy-storage-registry": async_get_energy_storage_registry,
         "get-energy-storage-data": async_get_energy_storage_data,
+        "get-energy-storage-working-mode": async_get_energy_storage_working_mode,
         "set-energy-storage-working-mode": async_set_energy_storage_working_mode,
         "is-encrypted": async_is_encrypted,
     }
@@ -898,6 +946,12 @@ async def main() -> None:
         kwargs["power_limit"] = args.power_limit
         kwargs["interactive_mode"] = not args.disable_interactive
         response = await command_func(dtu, **kwargs)
+    elif args.command == "set-power-limit-temporary":
+        response = await command_func(
+            dtu,
+            power_watts=args.power_limit_watts,
+            interactive_mode=not args.disable_interactive,
+        )
     elif args.command == "set-energy-storage-working-mode":
         kwargs = {}
         kwargs["interactive_mode"] = not args.disable_interactive

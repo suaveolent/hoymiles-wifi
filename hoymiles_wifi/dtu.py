@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import math
 import struct
 import time
 from datetime import datetime
@@ -10,6 +11,7 @@ from enum import Enum, IntEnum
 from typing import Any
 
 from crcmod import mkCrcFun
+from google.protobuf.message import DecodeError
 
 from hoymiles_wifi import logger
 from hoymiles_wifi.const import (
@@ -18,6 +20,7 @@ from hoymiles_wifi.const import (
     CMD_ACTION_DTU_UPGRADE,
     CMD_ACTION_INV_REBOOT,
     CMD_ACTION_LIMIT_POWER,
+    CMD_ACTION_LIMIT_POWER_TEMPORARY,
     CMD_ACTION_MI_SHUTDOWN,
     CMD_ACTION_MI_START,
     CMD_ACTION_PERFORMANCE_DATA_MODE,
@@ -25,9 +28,12 @@ from hoymiles_wifi.const import (
     CMD_APP_INFO_DATA_RES_DTO,
     CMD_CLOUD_COMMAND_RES_DTO,
     CMD_COMMAND_RES_DTO,
+    CMD_ES_CONFIG_FETCH_RES_DTO,
+    CMD_ES_CONFIG_TYPE,
     CMD_ES_DATA_DTO,
     CMD_ES_REG_RES_DTO,
     CMD_ES_USER_SET_RES_DTO,
+    CMD_ES_WORKING_MODE_DATA_TYPE,
     CMD_GET_CONFIG,
     CMD_GW_INFO_RES_DTO,
     CMD_GW_NET_INFO_RES,
@@ -41,6 +47,10 @@ from hoymiles_wifi.const import (
     DEV_DTU,
     DTU_FIRMWARE_URL_00_01_11,
     DTU_PORT,
+    ES_CONFIG_PAGE_PREFIX_SIZE,
+    MAX_ES_CONFIG_PAGES,
+    MAX_TEMPORARY_POWER_LIMIT_WATTS,
+    MIN_TEMPORARY_POWER_LIMIT_WATTS,
     NOT_ENCRYPTED_COMMANDS,
     OFFSET,
 )
@@ -60,7 +70,9 @@ from hoymiles_wifi.protobuf import (
     APPHeartbeatPB_pb2,
     APPInfomationData_pb2,
     CommandPB_pb2,
+    CommDevCfg_pb2,
     ESData_pb2,
+    ESParaSet_pb2,
     ESRegPB_pb2,
     ESUserSet_pb2,
     GetConfig_pb2,
@@ -270,7 +282,7 @@ class DTU:
         self,
         power_limit: int,
     ) -> CommandPB_pb2.CommandReqDTO | None:
-        """Set power limit."""
+        """Set the persistent power limit in percent (action 8)."""
         if power_limit < 0 or power_limit > 100:
             logger.error("Error. Invalid power limit!")
             return
@@ -288,6 +300,33 @@ class DTU:
 
         return await self.async_send_request(
             command, request, CommandPB_pb2.CommandReqDTO
+        )
+
+    async def async_set_power_limit_temporary(
+        self,
+        power_watts: float,
+    ) -> CommandPB_pb2.CommandReqDTO | None:
+        """Set a runtime watt limit on supported HMS-W devices (requires firmare V01.01.01 or above)."""
+        if (
+            isinstance(power_watts, bool)
+            or not isinstance(power_watts, (int, float))
+            or not math.isfinite(power_watts)
+            or not MIN_TEMPORARY_POWER_LIMIT_WATTS
+            <= power_watts
+            <= MAX_TEMPORARY_POWER_LIMIT_WATTS
+        ):
+            logger.error("Invalid temporary power limit; expected 0.1–3276.7 W")
+            return None
+
+        scaled_watts = math.floor(power_watts * 10 + 0.5)
+        request = CommandPB_pb2.CommandResDTO()
+        request.time = int(time.time())
+        request.action = CMD_ACTION_LIMIT_POWER_TEMPORARY
+        request.package_nub = 1
+        request.tid = request.time
+        request.data = f"S:1,P:{scaled_watts}\r"
+        return await self.async_send_request(
+            CMD_COMMAND_RES_DTO, request, CommandPB_pb2.CommandReqDTO
         )
 
     async def async_set_wifi(
@@ -550,6 +589,67 @@ class DTU:
             dtu_serial_number=dtu_serial_number,
             number=1,
         )
+
+    async def async_get_energy_storage_working_mode(
+        self, dtu_serial_number: int, inverter_serial_number: int
+    ) -> ESParaSet_pb2.ESParaSetBO | None:
+        """Read hybrid working mode and settings through the configuration protocol.
+
+        Return the complete configuration; ``emspara.mode`` uses BMSWorkingMode
+        values. Mode-specific settings retain their raw protocol units. Return
+        None when any page is missing, inconsistent, or cannot be decoded.
+        """
+        payload = bytearray()
+        total_pages = None
+        for page in range(MAX_ES_CONFIG_PAGES):
+            request = CommDevCfg_pb2.CommDevCfgFetchResDTO(
+                time=int(time.time()),
+                tid=int(time.time()),
+                cp=page,
+                type=CMD_ES_CONFIG_TYPE,
+                data_type=CMD_ES_WORKING_MODE_DATA_TYPE,
+            )
+            response = await self.async_send_request(
+                CMD_ES_CONFIG_FETCH_RES_DTO,
+                request,
+                CommDevCfg_pb2.CommDevCfgFetchReqDTO,
+                is_extended_format=True,
+                dtu_serial_number=dtu_serial_number,
+                number=1,
+            )
+            if response is None:
+                return None
+            if (
+                response.cp != page
+                or not 1 <= response.ap <= MAX_ES_CONFIG_PAGES
+                or (total_pages is not None and response.ap != total_pages)
+                or response.sn != inverter_serial_number
+                or response.type != CMD_ES_CONFIG_TYPE
+                or response.data_type != CMD_ES_WORKING_MODE_DATA_TYPE
+                or len(response.data) <= ES_CONFIG_PAGE_PREFIX_SIZE
+                or int.from_bytes(response.data[:ES_CONFIG_PAGE_PREFIX_SIZE], "big")
+                != len(response.data) - ES_CONFIG_PAGE_PREFIX_SIZE
+                or mkCrcFun(0x18005, rev=True, initCrc=0xFFFF, xorOut=0x0000)(
+                    response.data
+                )
+                != response.crc
+            ):
+                logger.debug("Invalid energy storage configuration page %s", page)
+                return None
+            total_pages = response.ap
+            payload.extend(response.data[ES_CONFIG_PAGE_PREFIX_SIZE:])
+            if page + 1 == total_pages:
+                break
+
+        try:
+            configuration = ESParaSet_pb2.ESParaSetBO.FromString(bytes(payload))
+        except DecodeError:
+            logger.debug("Unable to decode energy storage working mode configuration")
+            return None
+        if not configuration.HasField("emspara") or configuration.emspara.mode == 0:
+            logger.debug("Energy storage configuration contains no working mode")
+            return None
+        return configuration
 
     async def async_set_energy_storage_working_mode(
         self,
