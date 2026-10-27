@@ -177,7 +177,7 @@ Example output (with `--as-json`):
 }
 ```
 
-Pass `enc_rand` via `--enc-rand` for encrypted commands. If the DTU clock is out of sync (time offset larger than +/- 60), also pass the measured offset via `--dtu-time-offset`. The offset is the DTU clock minus the host clock in seconds, so a negative value means the DTU is behind the host:
+Pass `enc_rand` via `--enc-rand` for encrypted commands. If the DTU clock is out of sync, also pass the measured offset via `--dtu-time-offset`. The offset is the DTU clock minus the host clock in seconds, so a negative value means the DTU is behind the host:
 
 ```bash
 hoymiles-wifi --host HOST --enc-rand 00112233445566778899aabbccddeeff --dtu-time-offset -120 get-real-data-new
@@ -213,7 +213,15 @@ print(response)
 ```
 
 Calculate the offset immediately after receiving the response so it reflects
-the current difference between the two clocks.
+the current difference between the two clocks. Refresh it after a DTU restart
+or clock synchronization. The offset stays in memory and is not automatically
+learned by the library.
+
+Negative integers are valid CLI arguments: `--dtu-time-offset -120` and
+`--dtu-time-offset=-120` are equivalent. Positive values mean the DTU is ahead
+of the host. The offset adjusts request timestamps, including power-limit and
+hybrid configuration requests; transaction IDs and request pacing are unchanged.
+Unencrypted app-info discovery continues to use host time.
 
 ### 🔧 BMS Working Modes & Required Parameters
 
