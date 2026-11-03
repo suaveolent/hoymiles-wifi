@@ -161,11 +161,13 @@ class MeterType(Enum):
 
     DDSU666 = "DDSU666"
     DTSU666 = "DTSU666"
+    THREE_PHASE = "Three-phase meter"
 
 
 meter_mapping = {
     0x10C0: MeterType.DDSU666,
     0x37FF: MeterType.DTSU666,
+    0x4F05: MeterType.THREE_PHASE,
 }
 
 
