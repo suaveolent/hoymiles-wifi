@@ -1,4 +1,4 @@
-"""Verify meter recognition and phase classification using synthetic serials."""
+"""Verify meter recognition using synthetic serials."""
 
 import unittest
 from unittest.mock import patch
@@ -11,7 +11,7 @@ from hoymiles_wifi.hoymiles import (
 
 
 class MeterModelTests(unittest.TestCase):
-    """Recognize three-phase meters without relying on live phase readings."""
+    """Recognize supported meter prefixes and preserve known model names."""
 
     def test_4f05_is_recognized_without_unknown_meter_errors(self):
         """Recognize the reported prefix even when the exact model is unknown."""
@@ -22,23 +22,21 @@ class MeterModelTests(unittest.TestCase):
             ):
                 model = get_meter_model_type(bytes.fromhex(serial))
                 self.assertIs(model, MeterType.THREE_PHASE)
-                self.assertTrue(model.is_three_phase)
                 self.assertEqual(get_meter_model_name(serial), "Three-phase meter")
                 error.assert_not_called()
 
-    def test_existing_meter_names_and_phase_counts(self):
-        """Preserve known model names and distinguish single-phase meters."""
-        for serial, model, three_phase in [
-            ("10C0B72C6D91", MeterType.DDSU666, False),
-            ("37FFB72C6D91", MeterType.DTSU666, True),
+    def test_existing_meter_names(self):
+        """Preserve known model names."""
+        for serial, model in [
+            ("10C0B72C6D91", MeterType.DDSU666),
+            ("37FFB72C6D91", MeterType.DTSU666),
         ]:
             with self.subTest(serial=serial):
                 detected = get_meter_model_type(bytes.fromhex(serial))
                 self.assertIs(detected, model)
                 self.assertEqual(get_meter_model_name(serial), model.value)
-                self.assertIs(detected.is_three_phase, three_phase)
 
-    def test_unknown_prefix_is_not_assumed_three_phase(self):
+    def test_unknown_prefix_is_rejected(self):
         """Keep unsupported meters distinguishable from known three-phase meters."""
         with self.assertRaisesRegex(ValueError, "Unknown Meter"):
             get_meter_model_type(bytes.fromhex("FFFFB72C6D91"))

@@ -146,11 +146,6 @@ class MeterType(Enum):
     DTSU666 = "DTSU666"
     THREE_PHASE = "Three-phase meter"
 
-    @property
-    def is_three_phase(self) -> bool:
-        """Return whether the identified meter has three phases."""
-        return self in (MeterType.DTSU666, MeterType.THREE_PHASE)
-
 
 meter_mapping = {
     0x10C0: MeterType.DDSU666,
