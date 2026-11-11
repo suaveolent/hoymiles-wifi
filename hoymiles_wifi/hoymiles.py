@@ -57,6 +57,7 @@ class InverterPower(Enum):
     P_500 = "500"
     P_600_700_800 = "600/700/800"
     P_1000 = "1000"
+    P_600_700_800_900_1000 = "600/700/800/900/1000"
     P_800W_1000W = "800W/1000W"
     P_1000_1200_1500 = "1000/1200/1500"
     P_1200_1500 = "1200/1500"
@@ -77,6 +78,7 @@ power_mapping = {
     0x1042: InverterPower.P_600_700_800,
     0x1141: InverterPower.P_600_700_800,
     0x1144: InverterPower.P_1000,
+    0x1146: InverterPower.P_600_700_800_900_1000,
     0x1060: InverterPower.P_1000,
     0x1061: InverterPower.P_1200_1500,
     0x1161: InverterPower.P_1000_1200_1500,
@@ -312,7 +314,7 @@ def get_inverter_type(serial_bytes: bytes) -> InverterType:
     elif serial_bytes[0] == 0x11:
         if serial_bytes[1] in [0x25, 0x24, 0x22, 0x21]:
             inverter_type = InverterType.ONE
-        elif serial_bytes[1] in [0x44, 0x42, 0x41]:
+        elif serial_bytes[1] in [0x46, 0x44, 0x42, 0x41]:
             inverter_type = InverterType.TWO
         elif serial_bytes[1] in [0x64, 0x62, 0x61]:
             inverter_type = InverterType.FOUR
@@ -350,7 +352,9 @@ def get_inverter_series(serial_bytes: bytes) -> InverterSeries:
         else:
             series = InverterSeries.HMS
     elif serial_bytes[0] == 0x11:
-        if serial_bytes[1] & 0x0F == 0x04:
+        # 0x46 is HMS despite failing the low-nibble heuristic
+        # (OpenDTU classes it as HMS_2CH, tbnobody/OpenDTU#3206).
+        if serial_bytes[1] & 0x0F == 0x04 or serial_bytes[1] == 0x46:
             series = InverterSeries.HMS
         else:
             series = InverterSeries.HM
