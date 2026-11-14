@@ -110,6 +110,7 @@ class DTUType(Enum):
     DTU_W100_LITE_S = "DTU-W100/DTU-Lite-S"
     DTU_W_LITE = "DTU-WLite"
     DTU_SLS = "DTU-SLS"
+    SOLENSO_SLT_V2 = "Solenso SLT-V2"
     DTS_WIFI_G1 = "DTS-WIFI-G1"
 
 
@@ -157,6 +158,7 @@ type_mapping = {
     0x4143: DTUType.DTUBI,
     0x4144: DTUType.DTUBI,
     0x4145: DTUType.DTUBI,
+    0xD010: DTUType.SOLENSO_SLT_V2,
     0xD030: DTUType.DTU_SLS,
     0x4301: DTUType.DTS_WIFI_G1,
 }

@@ -23,7 +23,7 @@ class DTUModelTests(unittest.TestCase):
 
     def test_unknown_and_invalid_serials(self):
         """Return Unknown for unrecognized prefixes and malformed serials."""
-        for serial in ("D010987ZX", "FFFFA6B7C8D9", "ZZZZ12345", "", "4", "41", "414"):
+        for serial in ("FFFFA6B7C8D9", "ZZZZ12345", "", "4", "41", "414"):
             with self.subTest(serial=serial):
                 self.assertEqual(get_dtu_model_name(serial), DTUType.UNKNOWN.value)
 
@@ -32,3 +32,12 @@ class DTUModelTests(unittest.TestCase):
         self.assertIs(get_dtu_model_type(bytes.fromhex("4143A6B7C8D9")), DTUType.DTUBI)
         with self.assertRaisesRegex(ValueError, "Unknown DTU"):
             get_dtu_model_type(bytes.fromhex("FFFFA6B7C8D9"))
+
+    def test_solenso_slt_v2(self):
+        """Recognize the Solenso prefix without decoding its alphanumeric suffix."""
+        for serial in ("D010987ZX", "d010987zx"):
+            with self.subTest(serial=serial):
+                self.assertEqual(
+                    get_dtu_model_name(serial), DTUType.SOLENSO_SLT_V2.value
+                )
+        self.assertIs(get_dtu_model_type(bytes.fromhex("D010")), DTUType.SOLENSO_SLT_V2)
