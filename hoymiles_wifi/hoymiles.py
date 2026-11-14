@@ -30,6 +30,8 @@ class DecodedGridProfileConfiguration:
 class InverterType(Enum):
     """Inverter type."""
 
+    UNKNOWN = "Unknown"
+
     ONE = "1T"
     TWO = "2T"
     FOUR = "4T"
@@ -96,6 +98,8 @@ power_mapping = {
 class DTUType(Enum):
     """DTU type."""
 
+    UNKNOWN = "Unknown"
+
     DTU_G100 = "DTU-G100"
     DTU_W100 = "DTU-W100"
     DTU_LITE_S = "DTU-Lite-S"
@@ -160,6 +164,8 @@ type_mapping = {
 
 class MeterType(Enum):
     """Meter type."""
+
+    UNKNOWN = "Unknown"
 
     DDSU666 = "DDSU666"
     DTSU666 = "DTSU666"
@@ -400,7 +406,7 @@ def get_inverter_model_name(serial_number: str) -> str:
         inverter_power = get_inverter_power(serial_bytes)
     except Exception as e:
         logger.error(e)
-        return "Unknown"
+        return InverterType.UNKNOWN.value
     else:
         inverter_model_name = (
             inverter_series.value
@@ -428,16 +434,14 @@ def get_dtu_model_type(serial_bytes: bytes) -> DTUType:
 def get_dtu_model_name(serial_number: str) -> str:
     """Get DTU model name."""
 
-    if serial_number[-1:] == "J":
-        serial_number = serial_number[:-1]
-
-    serial_bytes = bytes.fromhex(serial_number)
-
     try:
-        dtu_type = get_dtu_model_type(serial_bytes)
-    except Exception as e:
-        logger.error(e)
-        return "Unknown"
+        serial_prefix = bytes.fromhex(serial_number[:4])
+        dtu_type = get_dtu_model_type(serial_prefix)
+    except (ValueError, struct.error):
+        logger.debug(
+            "Unable to identify DTU model from serial prefix %r", serial_number[:4]
+        )
+        return DTUType.UNKNOWN.value
     else:
         return dtu_type.value
 
@@ -464,7 +468,7 @@ def get_meter_model_name(serial_number: str) -> str:
         meter_type = get_meter_model_type(serial_bytes)
     except Exception as e:
         logger.error(e)
-        return "Unknown"
+        return MeterType.UNKNOWN.value
     else:
         return meter_type.value
 

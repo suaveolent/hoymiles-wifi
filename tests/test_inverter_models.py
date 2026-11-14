@@ -2,7 +2,7 @@
 
 import unittest
 
-from hoymiles_wifi.hoymiles import get_inverter_model_name
+from hoymiles_wifi.hoymiles import InverterType, get_inverter_model_name
 
 
 class InverterModelTests(unittest.TestCase):
@@ -17,3 +17,9 @@ class InverterModelTests(unittest.TestCase):
         ]:
             with self.subTest(serial=serial):
                 self.assertEqual(get_inverter_model_name(serial), model)
+
+    def test_unknown_prefix(self):
+        """Use the inverter enum fallback for unsupported models."""
+        self.assertEqual(
+            get_inverter_model_name("FFFFA6B7C8D9"), InverterType.UNKNOWN.value
+        )

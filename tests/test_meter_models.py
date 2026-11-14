@@ -40,3 +40,7 @@ class MeterModelTests(unittest.TestCase):
         """Keep unsupported meters distinguishable from known three-phase meters."""
         with self.assertRaisesRegex(ValueError, "Unknown Meter"):
             get_meter_model_type(bytes.fromhex("FFFFB72C6D91"))
+
+    def test_unknown_model_name(self):
+        """Use the meter enum fallback while keeping type lookups strict."""
+        self.assertEqual(get_meter_model_name("FFFFA6B7C8D9"), MeterType.UNKNOWN.value)
