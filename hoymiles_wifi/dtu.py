@@ -976,6 +976,7 @@ class DTU:
                 )
                 await asyncio.sleep(2 - elapsed_time)
 
+            writer = None
             try:
                 reader, writer = await asyncio.wait_for(
                     asyncio.open_connection(
@@ -987,7 +988,7 @@ class DTU:
                 )
 
                 writer.write(message)
-                await writer.drain()
+                await asyncio.wait_for(writer.drain(), timeout=self.timeout)
 
                 buffer = await asyncio.wait_for(reader.read(1024), timeout=self.timeout)
             except (OSError, asyncio.TimeoutError) as e:
@@ -995,12 +996,15 @@ class DTU:
                 self.set_state(NetworkState.Offline)
                 return None
             finally:
-                try:
-                    if writer:
-                        writer.close()
-                        await writer.wait_closed()
-                except Exception as e:
-                    logger.debug(f"Error closing writer: {e}")
+                if writer is not None:
+                    writer.close()
+                    try:
+                        await asyncio.wait_for(
+                            writer.wait_closed(), timeout=self.timeout
+                        )
+                    except (OSError, asyncio.TimeoutError) as err:
+                        logger.debug("Error closing DTU connection: %s", err)
+                        writer.transport.abort()
 
         self.last_request_time = time.time()
 
